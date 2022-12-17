@@ -280,3 +280,9 @@ mmi_info.ko
 mmi_relay.ko
 sensors_class.ko
 touchscreen_mmi.ko
+spf_core_dlkm.ko
+gpr_dlkm.ko
+snd_event_dlkm.ko
+q6_notifier_dlkm.ko
+q6_pdr_dlkm.ko
+adsp_loader_dlkm.ko
