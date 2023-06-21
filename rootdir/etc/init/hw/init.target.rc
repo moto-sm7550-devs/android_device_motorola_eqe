@@ -90,8 +90,6 @@ on property:ro.boot.product.vendor.sku=crow
     setprop ro.soc.model crow
 
 on post-fs
-    # set RLIMIT_MEMLOCK to 64MB
-    setrlimit 8 67108864 67108864
     #Execute virtualization manager
     enable vendor.qvirtmgr
     start  vendor.qvirtmgr
