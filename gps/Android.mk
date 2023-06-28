@@ -3,7 +3,6 @@ ifneq ($(BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE),)
 # Set required flags
 GNSS_CFLAGS := \
     -Werror \
-    -Wformat \
     -Wformat-extra-args \
     -Wunused-label \
     -Wunused-variable \
@@ -22,7 +21,8 @@ GNSS_CFLAGS := \
     -Wno-error=parentheses-equality \
     -Wno-error=undefined-bool-conversion \
     -Wno-error=tautological-compare \
-    -Wno-error=switch
+    -Wno-error=switch \
+    -Wno-format
 
 GNSS_HIDL_LEGACY_MEASURMENTS_TARGET_LIST += msm8937
 GNSS_HIDL_LEGACY_MEASURMENTS_TARGET_LIST += msm8953
