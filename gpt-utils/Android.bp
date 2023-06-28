@@ -16,7 +16,7 @@
 
 
 cc_library {
-    name: "libgptutils.moto_taro",
+    name: "libgptutils.moto_kalama",
     vendor: true,
     recovery_available: true,
     shared_libs: [

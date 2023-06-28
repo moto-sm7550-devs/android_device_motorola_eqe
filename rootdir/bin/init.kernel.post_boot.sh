@@ -105,7 +105,9 @@ function configure_read_ahead_kb_values() {
 		echo $ra_kb > /sys/block/mmcblk0rpmb/bdi/read_ahead_kb
 	fi
 	for dm in $dmpts; do
-		echo $ra_kb > $dm
+		if [ `cat $(dirname $dm)/../removable` -eq 0 ]; then
+			echo $ra_kb > $dm
+		fi
 	done
 }
 
@@ -158,31 +160,20 @@ function configure_memory_parameters() {
 	else
 		echo 4096 > /proc/sys/vm/min_free_kbytes
 	fi
-
-	# yangbq2 disable wbf
-	echo 0 > /proc/sys/vm/watermark_boost_factor
 }
 
 configure_memory_parameters
 
-if [ -f /sys/devices/soc0/chip_family ]; then
-	chipfamily=`cat /sys/devices/soc0/chip_family`
+if [ -f /sys/devices/soc0/soc_id ]; then
+	platformid=`cat /sys/devices/soc0/soc_id`
 fi
 
-case "$chipfamily" in
-    "0x74")
-	/vendor/bin/sh /vendor/bin/init.kernel.post_boot-taro.sh
-	;;
-
-    "0x7B"|"0x7b")
-	/vendor/bin/sh /vendor/bin/init.kernel.post_boot-diwali.sh
-	;;
-
-    "0x82")
-	/vendor/bin/sh /vendor/bin/init.kernel.post_boot-cape.sh
-	;;
-     *)
-	echo "***WARNING***: Invalid chip family\n\t No postboot settings applied!!\n"
-	;;
+case "$platformid" in
+	"519"|"536"|"600"|"601")
+		/vendor/bin/sh /vendor/bin/init.kernel.post_boot-kalama.sh
+		;;
+	*)
+		echo "***WARNING***: Invalid SoC ID\n\t No postboot settings applied!!\n"
+		;;
 esac
 

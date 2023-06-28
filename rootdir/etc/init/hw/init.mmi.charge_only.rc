@@ -2,16 +2,16 @@ on init
     setprop vendor.usb.adb_early ${ro.boot.adb_early:-"0"}
 
 on charger
-    setprop vendor.usb.charging.func.name moto_mass_storage
+    setprop vendor.usb.charging.func.name fastboot
 
 # Wait for the USB init shell script to finish, to prevent enumeration issues
 on property:init.svc.vendor.mmi-usb-sh=stopped && property:ro.boot.mode=charger && property:vendor.usb.adb_early=0
     setprop sys.usb.configfs 1
-    setprop sys.usb.config charging
+    setprop sys.usb.config fastboot
 
 on property:init.svc.vendor.mmi-usb-sh=stopped && property:ro.boot.mode=charger && property:vendor.usb.adb_early=1
     setprop sys.usb.configfs 1
-    setprop sys.usb.config charging,adb
+    setprop sys.usb.config adb
 
 on moto-charger
     stop vendor.sensors
@@ -25,23 +25,31 @@ on moto-charger
     start vendor.thermal-com
     start system_suspend
 
-    # Enable only CPU core 0 to keep current drain to a minimum
-    write /sys/devices/system/cpu/cpu0/online 1
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "interactive"
+    # Enable only CPU core 3 to keep current drain to a minimum
+    write /sys/devices/system/cpu/cpufreq/policy3/scaling_governor "walt"
+    write /sys/devices/system/cpu/cpufreq/policy3/walt/down_rate_limit_us 0
+    write /sys/devices/system/cpu/cpufreq/policy3/walt/up_rate_limit_us 0
+    write /sys/devices/system/cpu/cpufreq/policy3/walt/hispeed_freq 1555200
+    write /sys/devices/system/cpu/cpufreq/policy3/scaling_min_freq 537600
+    write /sys/devices/system/cpu/cpufreq/policy3/walt/pl 1
+    write /proc/sys/walt/input_boost/input_boost_freq "1382800 0 0 0 0 0 0 0"
+    write /proc/sys/walt/input_boost/input_boost_ms 100
+    write /sys/devices/system/cpu/cpu0/online 0
     write /sys/devices/system/cpu/cpu1/online 0
     write /sys/devices/system/cpu/cpu2/online 0
-    write /sys/devices/system/cpu/cpu3/online 0
+    write /sys/devices/system/cpu/cpu3/online 1
     write /sys/devices/system/cpu/cpu4/online 0
     write /sys/devices/system/cpu/cpu5/online 0
     write /sys/devices/system/cpu/cpu6/online 0
     write /sys/devices/system/cpu/cpu7/online 0
 
-service vendor.thermal-com /vendor/bin/thermal-engine-v2 --minimode
-    class charger
-    user root
-    group root system oem_2907
-    socket thermal-send-client stream 0666 system oem_2907
-    socket thermal-recv-client stream 0660 system oem_2907
-    socket thermal-recv-passive-client stream 0666 system oem_2907
-    socket thermal-send-rule stream 0660 system oem_2907
-    disabled
+    #Enable UFS clock scaling back
+    write /sys/bus/platform/devices/1d84000.ufshc/clkscale_enable 1
+    #Enable UFS auto_hibern8 back
+    write /sys/bus/platform/devices/1d84000.ufshc/auto_hibern8 5000
+    #Enable UFS clock gating back
+    write /sys/bus/platform/devices/1d84000.ufshc/clkgate_enable 1
+
+on moto-charger && property:ro.vendor.build.motfactory=1
+    wait /sys/class/power_supply/battery/device/factory_image_mode
+    write /sys/class/power_supply/battery/device/factory_image_mode 1

@@ -12,26 +12,22 @@ setprop ro.vendor.qti.soc_id $soc_id
 
 # For chipsets in QCV family, convert soc_id to soc_name
 # and store it in ro.vendor.qti.soc_name.
-if [ "$soc_id" -eq 457 ] || [ "$soc_id" -eq 482 ] || [ "$soc_id" -eq 552 ]; then
+if [ "$soc_id" -eq 557 ]; then
+    setprop ro.vendor.qti.soc_name pineapple
+    setprop ro.vendor.qti.soc_model SM8650
+elif [ "$soc_id" -eq 519 ] || [ "$soc_id" -eq 536 ] || [ "$soc_id" -eq 600 ] || [ "$soc_id" -eq 601 ]; then
+    setprop ro.vendor.qti.soc_name kalama
+    setprop ro.vendor.qti.soc_model SM8550
+    setprop ro.vendor.media_performance_class 33
+elif [ "$soc_id" -eq 457 ] || [ "$soc_id" -eq 482 ]; then
     setprop ro.vendor.qti.soc_name taro
     setprop ro.vendor.qti.soc_model SM8450
-    setprop ro.vendor.media_performance_class 31
-elif [ "$soc_id" -eq 537 ]; then
-    setprop ro.vendor.qti.soc_name parrot
-    setprop ro.vendor.qti.soc_model SM6450
-elif [ "$soc_id" -eq 568 ]; then
-    setprop ro.vendor.qti.soc_name ravelin
-    setprop ro.vendor.qti.soc_model SM4450
-elif [ "$soc_id" -eq 506 ] || [ "$soc_id" -eq 547 ] || [ "$soc_id" -eq 564 ]; then
+elif [ "$soc_id" -eq 506 ]; then
     setprop ro.vendor.qti.soc_name diwali
     setprop ro.vendor.qti.soc_model SM7450
-elif [ "$soc_id" -eq 591 ]; then
-    setprop ro.vendor.qti.soc_name ukee
-    setprop ro.vendor.qti.soc_model SM7475
-elif [ "$soc_id" -eq 530 ] || [ "$soc_id" -eq 531 ] || [ "$soc_id" -eq 540 ]; then
+elif [ "$soc_id" -eq 530 ] || [ "$soc_id" -eq 531 ] ; then
     setprop ro.vendor.qti.soc_name cape
     setprop ro.vendor.qti.soc_model SM8475
-    setprop ro.vendor.media_performance_class 31
 elif [ "$soc_id" -eq 415 ] || [ "$soc_id" -eq 439 ] || [ "$soc_id" -eq 456 ] ||
    [ "$soc_id" -eq 501 ] || [ "$soc_id" -eq 502 ]; then
     setprop ro.vendor.qti.soc_name lahaina

@@ -208,8 +208,7 @@ setup_permissions()
 						key_files=$(prepend f54 `ls $touch_path/f54/ 2>/dev/null`)
 						key_files=$key_files"reporting query stats";;
 			focaltech)	key_path="/proc/"
-						key_files="fts_tp_test ftxxxx-debug"
-						;;
+						key_files="ftxxxx-debug";;
 			   ilitek)	key_path="/proc/ilitek"
 						key_files="ioctl";;
 			   goodix)	key_path="/proc/"

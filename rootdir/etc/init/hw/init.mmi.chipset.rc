@@ -1,16 +1,8 @@
 # Charge only mode configuration
 import /vendor/etc/init/hw/init.mmi.charge_only.rc
 
-on post-fs
-    # MOT_LED_CALIBRATION
-    chown camera camera /mnt/vendor/persist/camera/mot_ledcal
-
-on early-init
-    exec u:r:vendor_modprobe:s0 -- /vendor/bin/modprobe -a -d /vendor/lib/modules exfat
-
-on fs
-    insmod /vendor/lib/modules/bm_adsp_ulog.ko
-    insmod /vendor/lib/modules/mmi_charger.ko
+on init
+    wait_for_prop vendor.all.modules.ready 1
 
 on init && property:ro.boot.default_usb_mode=device
     setprop vendor.usb.controller ${ro.boot.usbcontroller}
@@ -19,18 +11,40 @@ on init && property:ro.boot.default_usb_mode=device
     write /sys/bus/platform/devices/${ro.boot.usb.dwc3_msm:-a600000.ssusb}/mode peripheral
 
 on early-boot
-    #sync power supply with healthd
-    wait /sys/class/power_supply/battery
-    wait /sys/class/power_supply/usb
-    write /sys/devices/platform/soc/soc:mmi,charger/state_sync 1
-    wait /sys/class/udc/${ro.boot.usbcontroller} 20
+    start vendor.mmi-usb-sh
+
+on early-boot && property:ro.bootmode=mot-factory
+    chown system system /sys/private/tlmm_count
+    chown system system /sys/private/tlmm_num
+    chmod 0660 /sys/private/tlmm_count
+    chmod 0660 /sys/private/tlmm_num
 
 on early-boot && property:ro.boot.bm_ulog_enabled=1
     write /sys/module/bm_adsp_ulog/parameters/debug_enabled 1
 
-on charger && property:ro.boot.bm_ulog_enabled=1
+on moto-charger && property:ro.boot.bm_ulog_enabled=1
     write /sys/module/bm_adsp_ulog/parameters/debug_enabled 1
 
 on property:sys.boot_completed=1
     write /sys/devices/platform/soc/soc:mmi,charger/state_sync 1
+
+on property:sys.boot_completed=1 && property:ro.vendor.build.motfactory=1
+    write /sys/class/power_supply/battery/device/factory_image_mode 1
+    chown system system /sys/class/power_supply/battery/device/force_charger_suspend
+
+on property:ro.build.type=userdebug
+    insmod /vendor/lib/modules/watchdogtest.ko
+
+service vendor.qrtr-lookup-sh /vendor/bin/init.mmi.qrtr-lookup.sh
+    class late_start
+    user root
+    group log system
+    oneshot
+    disabled
+
+on property:sys.boot_completed=1 && property:ro.product.is_production=false
+    start vendor.qrtr-lookup-sh
+
+on init
+    write /sys/kernel/cnss/recovery 1
 

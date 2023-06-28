@@ -31,14 +31,14 @@ cc_defaults {
 }
 
 cc_library {
-    name: "bootctrl.taro",
+    name: "bootctrl.kalama",
     defaults: ["bootctrl_hal_defaults"],
-    static_libs: ["libgptutils.moto_taro"],
+    static_libs: ["libgptutils.moto_kalama"],
 }
 
 cc_library_shared {
     name: "android.hardware.boot@1.2-impl-qti",
     stem: "android.hardware.boot@1.0-impl-1.2-qti",
     defaults: ["android.hardware.boot@1.2-impl-qti_defaults"],
-    static_libs: ["libgptutils.moto_taro"],
+    static_libs: ["libgptutils.moto_kalama"],
 }
