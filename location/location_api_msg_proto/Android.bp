@@ -47,7 +47,7 @@ cc_library_shared {
     shared_libs: [
         "libgps.utils",
         "liblog",
-        "libprotobuf-cpp-full",
+        "libprotobuf-cpp-lite",
     ],
 
     srcs: [

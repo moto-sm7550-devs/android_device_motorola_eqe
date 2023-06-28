@@ -1,4 +1,4 @@
-/* Copyright (c) 2018-2020, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2018-2021, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -26,6 +26,42 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #ifndef LOCHAL_CLIENT_HANDLER_H
 #define LOCHAL_CLIENT_HANDLER_H
 
@@ -33,15 +69,9 @@
 #include <mutex>
 #include <log_util.h>
 #include <loc_pla.h>
+#include <unordered_map>
 
-#ifdef NO_UNORDERED_SET_OR_MAP
-    #include <map>
-    #define unordered_map map
-#else
-    #include <unordered_map>
-#endif
-
-#include <LocationAPI.h>
+#include <ILocationAPI.h>
 #include <LocIpc.h>
 #include <LocationApiPbMsgConv.h>
 
@@ -61,6 +91,8 @@ public:
                 mService(service),
                 mName(clientname),
                 mClientType(clientType),
+                mServiceId(-1),
+                mInstanceId(-1),
                 mCapabilityMask(0),
                 mTracking(false),
                 mBatching(false),
@@ -74,8 +106,8 @@ public:
                 mSubscriptionMask(0),
                 mEngineInfoRequestMask(0),
                 mGeofenceIds(nullptr),
-                mIpcSender(createSender(clientname.c_str())) {
-
+                mIpcSender(createSender(clientname.c_str())),
+                mAntennaInfoCb(*this) {
 
         if (mClientType == LOCATION_CLIENT_API) {
             updateSubscription(E_LOC_CB_GNSS_LOCATION_INFO_BIT);
@@ -83,7 +115,12 @@ public:
             mSubscriptionMask = 0;
             mLocationApi = LocationAPI::createInstance(mCallbacks);
         }
-        updateSubscription(0);
+        if (mName.compare(0, sizeof(sEAP)-1, sEAP) == 0) {
+            SockNode::getId1Id2(mName.c_str(), mName.length(),
+                                mServiceId, mInstanceId);
+            LOC_LOGi("EAP client: clientname %s, service id: %d, instance id: %d",
+                     mName.c_str(), mServiceId, mInstanceId);
+        }
     }
 
     static shared_ptr<LocIpcSender> createSender(const string socket);
@@ -94,13 +131,13 @@ public:
     // when client stops the location session, then all callbacks
     // related to location session need to be unsubscribed
     void unsubscribeLocationSessionCb();
-    uint32_t startTracking();
     uint32_t startTracking(LocationOptions & locOptions);
-    void stopTracking();
+    void stopTracking(bool clientExpectingResp);
     void updateTrackingOptions(LocationOptions & locOptions);
     void onGnssEnergyConsumedInfoAvailable(LocAPIGnssEnergyConsumedIndMsg &msg);
     void onControlResponseCb(LocationError err, ELocMsgID msgId);
     void onGnssConfigCb(ELocMsgID configMsgId, const GnssConfig & gnssConfig);
+    void onXtraStatusUpdateCb(const XtraStatus& xtraStatus);
     bool hasPendingEngineInfoRequest(uint32_t mask);
     void addEngineInfoRequst(uint32_t mask);
 
@@ -121,18 +158,33 @@ public:
     uint32_t* getClientIds(size_t count, uint32_t* sessionIds);
     // send terrestrial fix to the requesting LCA client
     void sendTerrestrialFix(LocationError error, const Location& location);
+    void sendSingleFusedFix(LocationError error, const Location& location);
+
+    void getDebugReport();
+    void sendCapabilitiesMsg();
+    void getAntennaInfo();
 
     inline shared_ptr<LocIpcSender> getIpcSender () {return mIpcSender;};
+    inline int getServiceId() {return mServiceId;}  // for EAP client
+    inline int getInstanceId() {return mInstanceId;} // for EAP client
 
     void pingTest();
 
-    bool mTracking;
     bool mBatching;
     BatchingMode mBatchingMode;
     std::queue<ELocMsgID> mPendingMessages;
     std::queue<ELocMsgID> mGfPendingMessages;
 
 private:
+    struct AntennaInfoHalClientCallback : public AntennaInfoCallback {
+        LocHalDaemonClientHandler& mLocHalDaemonClient;
+        inline AntennaInfoHalClientCallback(LocHalDaemonClientHandler& locHalDaemonClient) :
+            AntennaInfoCallback(), mLocHalDaemonClient(locHalDaemonClient) {}
+        inline virtual void operator()(std::vector<GnssAntennaInformation>& antennaInfo) override {
+            mLocHalDaemonClient.onAntennaInfoCb(antennaInfo);
+        }
+    };
+
     inline ~LocHalDaemonClientHandler() {}
 
     // Location API callback functions
@@ -140,21 +192,23 @@ private:
     void onResponseCb(LocationError err, uint32_t id);
     void onCollectiveResponseCallback(size_t count, LocationError *errs, uint32_t *ids);
 
-    void onTrackingCb(Location location);
+    void onTrackingCb(const Location& location);
     void onBatchingCb(size_t count, Location* location, BatchingOptions batchOptions);
     void onBatchingStatusCb(BatchingStatusInfo batchingStatus,
             std::list<uint32_t>& listOfCompletedTrips);
-    void onGnssLocationInfoCb(GnssLocationInfoNotification gnssLocationInfoNotification);
-    void onGeofenceBreachCb(GeofenceBreachNotification geofenceBreachNotification);
+    void onGnssLocationInfoCb(const GnssLocationInfoNotification& gnssLocationInfoNotification);
+    void onGeofenceBreachCb(const GeofenceBreachNotification& geofenceBreachNotification);
     void onEngLocationsInfoCb(uint32_t count,
                               GnssLocationInfoNotification* engLocationsInfoNotification);
     void onGnssNiCb(uint32_t id, GnssNiNotification gnssNiNotification);
-    void onGnssSvCb(GnssSvNotification gnssSvNotification);
+    void onGnssSvCb(const GnssSvNotification &gnssSvNotification);
     void onGnssNmeaCb(GnssNmeaNotification);
-    void onGnssDataCb(GnssDataNotification gnssDataNotification);
-    void onGnssMeasurementsCb(GnssMeasurementsNotification gnssMeasurementsNotification);
-    void onLocationSystemInfoCb(LocationSystemInfo);
+    void onGnssDataCb(const GnssDataNotification& gnssDataNotification);
+    void onGnssMeasurementsCb(const GnssMeasurementsNotification &gnssMeasurementsNotification);
+    void onLocationSystemInfoCb(LocationSystemInfo systemInfo);
+    void onDcReportCb(const GnssDcReportInfo& dcReportInfo);
     void onLocationApiDestroyCompleteCb();
+    void onAntennaInfoCb(std::vector<GnssAntennaInformation>& gnssAntennaInformations);
 
     // send ipc message to this client for serialized payload
     bool sendMessage(const char* msg, size_t msglen, ELocMsgID msg_id) {
@@ -178,15 +232,18 @@ private:
     // name of this client
     const std::string mName;
     ClientType mClientType;
+    int mServiceId;  // For EAP client
+    int mInstanceId; // For EAP client
 
     // LocationAPI interface
     LocationCapabilitiesMask mCapabilityMask;
     uint32_t mSessionId;
     uint32_t mBatchingId;
-    LocationAPI* mLocationApi;
+    ILocationAPI* mLocationApi;
     LocationCallbacks mCallbacks;
     TrackingOptions mOptions;
     BatchingOptions mBatchOptions;
+    bool mTracking; // flag indicates whether client has started tracking session or not
 
     // bitmask to hold this client's subscription
     uint32_t mSubscriptionMask;
@@ -196,6 +253,7 @@ private:
     uint32_t* mGeofenceIds;
     shared_ptr<LocIpcSender> mIpcSender;
     std::unordered_map<uint32_t, uint32_t> mGfIdsMap; //geofence ID map, clientId-->session
+    AntennaInfoHalClientCallback mAntennaInfoCb;
 };
 
 #endif //LOCHAL_CLIENT_HANDLER_H

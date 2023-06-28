@@ -26,6 +26,42 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+ /*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
@@ -99,7 +135,6 @@ typedef struct
 {
   uint32_t               eventId;
   size_t                 eventSize;
-  locClientEventMaskType eventMask;
 }locClientEventIndTableStructT;
 
 pthread_mutex_t  loc_shutdown_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -108,256 +143,214 @@ static const locClientEventIndTableStructT locClientEventIndTable[]= {
 
   // position report ind
   { QMI_LOC_EVENT_POSITION_REPORT_IND_V02,
-    sizeof(qmiLocEventPositionReportIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_POSITION_REPORT_V02 },
+    sizeof(qmiLocEventPositionReportIndMsgT_v02) },
 
   // satellite report ind
   { QMI_LOC_EVENT_GNSS_SV_INFO_IND_V02,
-    sizeof(qmiLocEventGnssSvInfoIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_GNSS_SV_INFO_V02 },
+    sizeof(qmiLocEventGnssSvInfoIndMsgT_v02) },
 
   // NMEA report ind
   { QMI_LOC_EVENT_NMEA_IND_V02,
-    sizeof(qmiLocEventNmeaIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_NMEA_V02 },
+    sizeof(qmiLocEventNmeaIndMsgT_v02) },
 
   //NI event ind
   { QMI_LOC_EVENT_NI_NOTIFY_VERIFY_REQ_IND_V02,
-    sizeof(qmiLocEventNiNotifyVerifyReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_NI_NOTIFY_VERIFY_REQ_V02 },
+    sizeof(qmiLocEventNiNotifyVerifyReqIndMsgT_v02) },
 
   //Time Injection Request Ind
   { QMI_LOC_EVENT_INJECT_TIME_REQ_IND_V02,
-    sizeof(qmiLocEventInjectTimeReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_INJECT_TIME_REQ_V02 },
+    sizeof(qmiLocEventInjectTimeReqIndMsgT_v02) },
 
   //Predicted Orbits Injection Request
   { QMI_LOC_EVENT_INJECT_PREDICTED_ORBITS_REQ_IND_V02,
-    sizeof(qmiLocEventInjectPredictedOrbitsReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_INJECT_PREDICTED_ORBITS_REQ_V02 },
+    sizeof(qmiLocEventInjectPredictedOrbitsReqIndMsgT_v02) },
 
   //Position Injection Request Ind
   { QMI_LOC_EVENT_INJECT_POSITION_REQ_IND_V02,
-    sizeof(qmiLocEventInjectPositionReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_INJECT_POSITION_REQ_V02 } ,
+    sizeof(qmiLocEventInjectPositionReqIndMsgT_v02) },
 
   //Engine State Report Ind
   { QMI_LOC_EVENT_ENGINE_STATE_IND_V02,
-    sizeof(qmiLocEventEngineStateIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_ENGINE_STATE_V02 },
+    sizeof(qmiLocEventEngineStateIndMsgT_v02) },
 
   //Fix Session State Report Ind
   { QMI_LOC_EVENT_FIX_SESSION_STATE_IND_V02,
-    sizeof(qmiLocEventFixSessionStateIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_FIX_SESSION_STATE_V02 },
+    sizeof(qmiLocEventFixSessionStateIndMsgT_v02) },
 
   //Wifi Request Indication
   { QMI_LOC_EVENT_WIFI_REQ_IND_V02,
-    sizeof(qmiLocEventWifiReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_WIFI_REQ_V02 },
+    sizeof(qmiLocEventWifiReqIndMsgT_v02) },
 
   //Sensor Streaming Ready Status Ind
   { QMI_LOC_EVENT_SENSOR_STREAMING_READY_STATUS_IND_V02,
-    sizeof(qmiLocEventSensorStreamingReadyStatusIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_SENSOR_STREAMING_READY_STATUS_V02 },
+    sizeof(qmiLocEventSensorStreamingReadyStatusIndMsgT_v02) },
 
   // Time Sync Request Indication
   { QMI_LOC_EVENT_TIME_SYNC_REQ_IND_V02,
-    sizeof(qmiLocEventTimeSyncReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_TIME_SYNC_REQ_V02 },
+    sizeof(qmiLocEventTimeSyncReqIndMsgT_v02) },
 
   //Set Spi Streaming Report Event
   { QMI_LOC_EVENT_SET_SPI_STREAMING_REPORT_IND_V02,
-    sizeof(qmiLocEventSetSpiStreamingReportIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_SET_SPI_STREAMING_REPORT_V02 },
+    sizeof(qmiLocEventSetSpiStreamingReportIndMsgT_v02) },
 
   //Location Server Connection Request event
   { QMI_LOC_EVENT_LOCATION_SERVER_CONNECTION_REQ_IND_V02,
-    sizeof(qmiLocEventLocationServerConnectionReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_LOCATION_SERVER_CONNECTION_REQ_V02 },
+    sizeof(qmiLocEventLocationServerConnectionReqIndMsgT_v02) },
 
   // NI Geofence Event
   { QMI_LOC_EVENT_NI_GEOFENCE_NOTIFICATION_IND_V02,
-    sizeof(qmiLocEventNiGeofenceNotificationIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_NI_GEOFENCE_NOTIFICATION_V02},
+    sizeof(qmiLocEventNiGeofenceNotificationIndMsgT_v02) },
 
   // Geofence General Alert Event
   { QMI_LOC_EVENT_GEOFENCE_GEN_ALERT_IND_V02,
-    sizeof(qmiLocEventGeofenceGenAlertIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_GEOFENCE_GEN_ALERT_V02},
+    sizeof(qmiLocEventGeofenceGenAlertIndMsgT_v02) },
 
   //Geofence Breach event
   { QMI_LOC_EVENT_GEOFENCE_BREACH_NOTIFICATION_IND_V02,
-    sizeof(qmiLocEventGeofenceBreachIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_GEOFENCE_BREACH_NOTIFICATION_V02},
+    sizeof(qmiLocEventGeofenceBreachIndMsgT_v02) },
 
   //Geofence Batched Breach event
   { QMI_LOC_EVENT_GEOFENCE_BATCHED_BREACH_NOTIFICATION_IND_V02,
-    sizeof(qmiLocEventGeofenceBatchedBreachIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_GEOFENCE_BATCH_BREACH_NOTIFICATION_V02},
+    sizeof(qmiLocEventGeofenceBatchedBreachIndMsgT_v02) },
 
   //Pedometer Control event
   { QMI_LOC_EVENT_PEDOMETER_CONTROL_IND_V02,
-    sizeof(qmiLocEventPedometerControlIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_PEDOMETER_CONTROL_V02 },
+    sizeof(qmiLocEventPedometerControlIndMsgT_v02) },
 
   //Motion Data Control event
   { QMI_LOC_EVENT_MOTION_DATA_CONTROL_IND_V02,
-    sizeof(qmiLocEventMotionDataControlIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_MOTION_DATA_CONTROL_V02 },
+    sizeof(qmiLocEventMotionDataControlIndMsgT_v02) },
 
   //Wifi AP data request event
   { QMI_LOC_EVENT_INJECT_WIFI_AP_DATA_REQ_IND_V02,
-    sizeof(qmiLocEventInjectWifiApDataReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_INJECT_WIFI_AP_DATA_REQ_V02 },
+    sizeof(qmiLocEventInjectWifiApDataReqIndMsgT_v02) },
 
   //Get Batching On Fix Event
   { QMI_LOC_EVENT_LIVE_BATCHED_POSITION_REPORT_IND_V02,
-    sizeof(qmiLocEventLiveBatchedPositionReportIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_LIVE_BATCHED_POSITION_REPORT_V02 },
+    sizeof(qmiLocEventLiveBatchedPositionReportIndMsgT_v02) },
 
   //Get Batching On Full Event
   { QMI_LOC_EVENT_BATCH_FULL_NOTIFICATION_IND_V02,
-    sizeof(qmiLocEventBatchFullIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_BATCH_FULL_NOTIFICATION_V02 },
+    sizeof(qmiLocEventBatchFullIndMsgT_v02) },
 
    //Vehicle Data Readiness event
    { QMI_LOC_EVENT_VEHICLE_DATA_READY_STATUS_IND_V02,
-     sizeof(qmiLocEventVehicleDataReadyIndMsgT_v02),
-     QMI_LOC_EVENT_MASK_VEHICLE_DATA_READY_STATUS_V02 },
+     sizeof(qmiLocEventVehicleDataReadyIndMsgT_v02) },
 
   //Geofence Proximity event
   { QMI_LOC_EVENT_GEOFENCE_PROXIMITY_NOTIFICATION_IND_V02,
-    sizeof(qmiLocEventGeofenceProximityIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_GEOFENCE_PROXIMITY_NOTIFICATION_V02},
+    sizeof(qmiLocEventGeofenceProximityIndMsgT_v02) },
 
     //GNSS Measurement Indication
    { QMI_LOC_EVENT_GNSS_MEASUREMENT_REPORT_IND_V02,
-     sizeof(qmiLocEventGnssSvMeasInfoIndMsgT_v02),
-     QMI_LOC_EVENT_MASK_GNSS_MEASUREMENT_REPORT_V02 },
+     sizeof(qmiLocEventGnssSvMeasInfoIndMsgT_v02) },
 
     //GNSS Measurement Indication
    { QMI_LOC_EVENT_SV_POLYNOMIAL_REPORT_IND_V02,
-    sizeof(qmiLocEventGnssSvPolyIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_GNSS_SV_POLYNOMIAL_REPORT_V02 },
+    sizeof(qmiLocEventGnssSvPolyIndMsgT_v02) },
 
   // for GDT
   { QMI_LOC_EVENT_GDT_UPLOAD_BEGIN_STATUS_REQ_IND_V02,
-    sizeof(qmiLocEventGdtUploadBeginStatusReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_GDT_UPLOAD_BEGIN_REQ_V02,
-  },
+    sizeof(qmiLocEventGdtUploadBeginStatusReqIndMsgT_v02) },
 
   { QMI_LOC_EVENT_GDT_UPLOAD_END_REQ_IND_V02,
-    sizeof(qmiLocEventGdtUploadEndReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_GDT_UPLOAD_END_REQ_V02,
-  },
+    sizeof(qmiLocEventGdtUploadEndReqIndMsgT_v02) },
 
   { QMI_LOC_EVENT_DBT_POSITION_REPORT_IND_V02,
-    sizeof(qmiLocEventDbtPositionReportIndMsgT_v02),
-    0},
+    sizeof(qmiLocEventDbtPositionReportIndMsgT_v02) },
 
   { QMI_LOC_EVENT_GEOFENCE_BATCHED_DWELL_NOTIFICATION_IND_V02,
-    sizeof(qmiLocEventGeofenceBatchedDwellIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_GEOFENCE_BATCH_DWELL_NOTIFICATION_V02},
+    sizeof(qmiLocEventGeofenceBatchedDwellIndMsgT_v02) },
 
   { QMI_LOC_EVENT_GET_TIME_ZONE_INFO_IND_V02,
-    sizeof(qmiLocEventGetTimeZoneReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_GET_TIME_ZONE_REQ_V02},
+    sizeof(qmiLocEventGetTimeZoneReqIndMsgT_v02) },
 
   // Batching Status event
   { QMI_LOC_EVENT_BATCHING_STATUS_IND_V02,
-    sizeof(qmiLocEventBatchingStatusIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_BATCHING_STATUS_V02},
+    sizeof(qmiLocEventBatchingStatusIndMsgT_v02) },
 
   // TDP download
   { QMI_LOC_EVENT_GDT_DOWNLOAD_BEGIN_REQ_IND_V02,
-    sizeof(qmiLocEventGdtDownloadBeginReqIndMsgT_v02),
-    0},
+    sizeof(qmiLocEventGdtDownloadBeginReqIndMsgT_v02) },
 
   { QMI_LOC_EVENT_GDT_RECEIVE_DONE_IND_V02,
-    sizeof(qmiLocEventGdtReceiveDoneIndMsgT_v02),
-    0},
+    sizeof(qmiLocEventGdtReceiveDoneIndMsgT_v02) },
 
   { QMI_LOC_EVENT_GDT_DOWNLOAD_END_REQ_IND_V02,
-    sizeof(qmiLocEventGdtDownloadEndReqIndMsgT_v02),
-    0},
+    sizeof(qmiLocEventGdtDownloadEndReqIndMsgT_v02) },
 
   // SRN Ap data inject request
   { QMI_LOC_EVENT_INJECT_SRN_AP_DATA_REQ_IND_V02,
-    sizeof(qmiLocEventInjectSrnApDataReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_INJECT_SRN_AP_DATA_REQ_V02},
+    sizeof(qmiLocEventInjectSrnApDataReqIndMsgT_v02) },
 
   { QMI_LOC_EVENT_FDCL_SERVICE_REQ_IND_V02,
-    sizeof(qmiLocEventFdclServiceReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_FDCL_SERVICE_REQ_V02},
+    sizeof(qmiLocEventFdclServiceReqIndMsgT_v02) },
 
   // unpropagated position report ind
   { QMI_LOC_EVENT_UNPROPAGATED_POSITION_REPORT_IND_V02,
-    sizeof(qmiLocEventPositionReportIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_UNPROPAGATED_POSITION_REPORT_V02},
+    sizeof(qmiLocEventPositionReportIndMsgT_v02) },
 
   { QMI_LOC_EVENT_BS_OBS_DATA_SERVICE_REQ_IND_V02,
-    sizeof(qmiLocEventBsObsDataServiceReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_BS_OBS_DATA_SERVICE_REQ_V02},
+    sizeof(qmiLocEventBsObsDataServiceReqIndMsgT_v02) },
 
    //GPS Ephemeris Indication
    { QMI_LOC_EVENT_GPS_EPHEMERIS_REPORT_IND_V02,
-    sizeof(qmiLocGpsEphemerisReportIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_EPHEMERIS_REPORT_V02},
+    sizeof(qmiLocGpsEphemerisReportIndMsgT_v02) },
 
    //GLONASS Ephemeris Indication
    { QMI_LOC_EVENT_GLONASS_EPHEMERIS_REPORT_IND_V02,
-    sizeof(qmiLocGloEphemerisReportIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_EPHEMERIS_REPORT_V02},
+    sizeof(qmiLocGloEphemerisReportIndMsgT_v02)},
 
    //BDS Ephemeris Indication
    { QMI_LOC_EVENT_BDS_EPHEMERIS_REPORT_IND_V02,
-    sizeof(qmiLocBdsEphemerisReportIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_EPHEMERIS_REPORT_V02},
+    sizeof(qmiLocBdsEphemerisReportIndMsgT_v02)},
 
    //GAL Ephemeris Indication
    { QMI_LOC_EVENT_GALILEO_EPHEMERIS_REPORT_IND_V02,
-    sizeof(qmiLocGalEphemerisReportIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_EPHEMERIS_REPORT_V02},
+    sizeof(qmiLocGalEphemerisReportIndMsgT_v02)},
 
    //QZSS Ephemeris Indication
    { QMI_LOC_EVENT_QZSS_EPHEMERIS_REPORT_IND_V02,
-    sizeof(qmiLocQzssEphemerisReportIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_EPHEMERIS_REPORT_V02},
+    sizeof(qmiLocQzssEphemerisReportIndMsgT_v02)},
 
     {QMI_LOC_EVENT_REPORT_IND_V02,
-    sizeof(qmiLocEventReportIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_EPHEMERIS_REPORT_V02},
+    sizeof(qmiLocEventReportIndMsgT_v02)},
 
   // loc system info event ind
   { QMI_LOC_SYSTEM_INFO_IND_V02,
-    sizeof(qmiLocSystemInfoIndMsgT_v02),
-    QMI_LOC_SYSTEM_INFO_IND_V02},
+    sizeof(qmiLocSystemInfoIndMsgT_v02)},
 
   // Power Metrics with multiband support
   { QMI_LOC_GET_BAND_MEASUREMENT_METRICS_IND_V02,
-    sizeof(qmiLocGetBandMeasurementMetricsIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_GET_BAND_MEASUREMENT_METRICS_V02},
+    sizeof(qmiLocGetBandMeasurementMetricsIndMsgT_v02)},
 
   // loc system info event ind
   { QMI_LOC_LOCATION_REQUEST_NOTIFICATION_IND_V02,
-    sizeof(qmiLocLocationRequestNotificationIndMsgT_v02),
-    QMI_LOC_LOCATION_REQUEST_NOTIFICATION_IND_V02},
+    sizeof(qmiLocLocationRequestNotificationIndMsgT_v02)},
 
   // XTRA config query request
   { QMI_LOC_EVENT_QUERY_XTRA_INFO_REQ_IND_V02,
-    sizeof(qmiLocEventQueryXtraInfoReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_QUERY_XTRA_INFO_V02},
+    sizeof(qmiLocEventQueryXtraInfoReqIndMsgT_v02)},
 
   // Latency information ind
   { QMI_LOC_LATENCY_INFORMATION_IND_V02,
-    sizeof(qmiLocLatencyInformationIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_LATENCY_INFORMATION_REPORT_V02},
+    sizeof(qmiLocLatencyInformationIndMsgT_v02)},
+
+  // platform power state event ind
+  { QMI_LOC_EVENT_PLATFORM_POWER_STATE_CHANGED_IND_V02,
+    sizeof(qmiLocPlatformPowerStateChangedIndMsgT_v02)},
+
+    // engine Lock information ind
+  { QMI_LOC_EVENT_ENGINE_LOCK_STATE_IND_V02,
+    sizeof(qmiLocEventEngineLockStateIndMsgT_v02)},
 
   // Engine Debug Data ind
   { QMI_LOC_ENGINE_DEBUG_DATA_IND_V02,
-    sizeof(qmiLocEngineDebugDataIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_ENGINE_DEBUG_DATA_REPORT_V02},
+    sizeof(qmiLocEngineDebugDataIndMsgT_v02)},
+
+  // disater and crisis report ind
+  { QMI_LOC_DC_REPORT_IND_V02,
+    sizeof(qmiLocEventDcReportIndMsgT_v02)},
 };
 
 /* table to relate the respInd Id with its size */
@@ -802,6 +795,15 @@ static const locClientRespIndTableStructT locClientRespIndTable[]= {
 
    { QMI_LOC_INJECT_LOCATION_CIVIC_ADDRESS_IND_V02,
      sizeof(qmiLocGenReqStatusIndMsgT_v02) },
+
+   { QMI_LOC_SET_TRIBAND_STATE_IND_V02,
+     sizeof(qmiLocGenReqStatusIndMsgT_v02) },
+
+   { QMI_LOC_GET_TRIBAND_STATE_IND_V02,
+     sizeof(qmiLocGetTribandStateIndMsgT_v02) },
+
+   { QMI_LOC_SET_SDK_FEATURE_CONFIG_IND_V02,
+     sizeof(qmiLocSetSdkFeatureConfigIndMsgT_v02) },
 };
 
 
@@ -1900,6 +1902,24 @@ bool validateRequest(
     case QMI_LOC_INJECT_LOCATION_CIVIC_ADDRESS_REQ_V02:
     {
         *pOutLen = sizeof(qmiLocInjectLocationCivicAddressReqMsgT_v02);
+        break;
+    }
+
+    case QMI_LOC_INJECT_RAW_DATA_REQ_V02:
+    {
+        *pOutLen = sizeof(qmiLocInjectRawDataReqMsgT_v02);
+        break;
+    }
+
+    case QMI_LOC_SET_TRIBAND_STATE_REQ_V02:
+    {
+        *pOutLen = sizeof(qmiLocSetTribandStateReqMsgT_v02);
+        break;
+    }
+
+    case QMI_LOC_SET_SDK_FEATURE_CONFIG_REQ_V02:
+    {
+        *pOutLen = sizeof(qmiLocSetSdkFeatureConfigReqMsgT_v02);
         break;
     }
     // ALL requests with no payload

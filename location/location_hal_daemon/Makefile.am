@@ -20,7 +20,7 @@ requiredlibs = \
     $(LOCATIONAPI_LIBS) \
     $(GPSUTILS_LIBS) \
     $(LOCAPIMSGPROTO_LIBS) \
-    -lprotobuf
+    -lprotobuf-lite
 
 h_sources = \
     LocHalDaemonClientHandler.h \

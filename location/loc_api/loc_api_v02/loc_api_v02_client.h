@@ -26,6 +26,42 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 /** @file loc_api_v02_client.h
 */
 
@@ -826,6 +862,15 @@ typedef union
     const qmiLocInjectLocationCivicAddressReqMsgT_v02
             *pInjectLocationCivicAddressReq;
     /*QMI_LOC_INJECT_LOCATION_CIVIC_ADDRESS_REQ_V02*/
+
+    const qmiLocInjectRawDataReqMsgT_v02
+            *pLocInjectRawDataReq;
+    /*QMI_LOC_INJECT_RAW_DATA_REQ_V02*/
+    const qmiLocSetTribandStateReqMsgT_v02 *pSetTribandStateReq;
+    /*QMI_LOC_SET_TRIBAND_STATE_REQ_V02*/
+
+    const qmiLocSetSdkFeatureConfigReqMsgT_v02
+            *pLocSetSdkFeatureConfigReq;
 }locClientReqUnionType;
 
 
@@ -1159,10 +1204,21 @@ typedef union
    /** Sent by the engine to inform of latency info
     QMI_LOC_LATENCY_INFORMATION_IND_V02 */
 
+   const qmiLocPlatformPowerStateChangedIndMsgT_v02 *pPowerStateChangedIndMsg;
+   /** Sent by the engine to inform power state change
+    QMI_LOC_EVENT_PLATFORM_POWER_STATE_CHANGED_IND_V02 */
+
+   const qmiLocEventEngineLockStateIndMsgT_v02 *pEngineLockStateIndMsg;
+   /** Sent by the engine to notify client about engine lock state
+   QMI_LOC_EVENT_ENGINE_LOCK_STATE_IND_V02 */
+
    const qmiLocEngineDebugDataIndMsgT_v02 *pLocEngDbgDataInfoIndMsg;
    /** Indication Message; Used by the service to
      report engine debug information */
 
+   const qmiLocEventDcReportIndMsgT_v02* pDcReportIndMsg;
+   /** Sent by the engine to inform disaster and crisis report
+    QMI_LOC_EVENT_DC_REPORT_IND_V02 */
 }locClientEventIndUnionType;
 
 

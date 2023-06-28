@@ -88,4 +88,28 @@ typedef struct {
     float    bearingAccuracy;
 } NlpLocation;
 
+typedef enum {
+    OPT_OUT = 0,
+    OPT_IN  = 1,
+} OptInStatus;
+
+typedef enum {
+    TYPE_MOBILE = 0,
+    TYPE_WIFI,
+    TYPE_ETHERNET,
+    TYPE_BLUETOOTH,
+    TYPE_MMS,
+    TYPE_SUPL,
+    TYPE_DUN,
+    TYPE_HIPRI,
+    TYPE_WIMAX,
+    TYPE_PROXY,
+    TYPE_UNKNOWN,
+} NetworkType;
+
+typedef struct {
+    NetworkType networkType;
+    uint64_t networkHandle;
+} NlpNetwork;
+
 #endif /* WIFI_DB_COMMON_H */

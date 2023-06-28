@@ -26,6 +26,42 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+ /*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 // ============================================================================
 // LocationApiMsg.proto
 // Location Api messages definition - structs, enums etc
@@ -34,6 +70,8 @@
 syntax = "proto3";
 
 import "LocationApiDataTypes.proto";
+
+option optimize_for = LITE_RUNTIME;
 
 // ============================================================================
 // Proto file versioning
@@ -44,8 +82,8 @@ enum LocationApiMsgVersion {
     LOCAPI_MSG_VER_MAJOR = 1;
     // Minor - New features / API addition, new message/elemtent addition.
     // Bump the last byte of version i.e. x.2 to x.3
-    // Minor version 6: add nHz measurement subscription
-    LOCAPI_MSG_VER_MINOR = 5;
+    // Minor version 17: Add geodetic datum type in ConfigOutputNmea msg
+    LOCAPI_MSG_VER_MINOR = 17;
 }
 
 // ============================================================================
@@ -114,6 +152,21 @@ enum PBELocMsgID {
     PB_E_LOCAPI_GET_SINGLE_TERRESTRIAL_POS_REQ_MSG_ID = 31;
     PB_E_LOCAPI_GET_SINGLE_TERRESTRIAL_POS_RESP_MSG_ID = 32;
 
+    // Debug report
+    PB_E_LOCAPI_GET_DEBUG_REQ_MSG_ID = 33;
+    PB_E_LOCAPI_GET_DEBUG_RESP_MSG_ID = 34;
+
+    // Disaster and crisis reports
+    PB_E_LOCAPI_DC_REPORT_MSG_ID = 35;
+
+    // Antenna Info
+    PB_E_LOCAPI_GET_ANTENNA_INFO_MSG_ID = 36;
+    PB_E_LOCAPI_ANTENNA_INFO_MSG_ID = 37;
+
+    // Single shot fix request/response msg
+    PB_E_LOCAPI_GET_SINGLE_POS_REQ_MSG_ID = 38;
+    PB_E_LOCAPI_GET_SINGLE_POS_RESP_MSG_ID = 39;
+
     // ping
     PB_E_LOCAPI_PINGTEST_MSG_ID = 99;
 
@@ -131,6 +184,9 @@ enum PBELocMsgID {
     PB_E_INTAPI_CONFIG_ENGINE_RUN_STATE_MSG_ID = 210;
     PB_E_INTAPI_CONFIG_USER_CONSENT_TERRESTRIAL_POSITIONING_MSG_ID = 211;
     PB_E_INTAPI_CONFIG_OUTPUT_NMEA_TYPES_MSG_ID = 212;
+    PB_E_INTAPI_CONFIG_ENGINE_INTEGRITY_RISK_MSG_ID = 213;
+    PB_E_INTAPI_CONFIG_XTRA_PARAMS_MSG_ID = 214;
+    PB_E_INTAPI_INJECT_LOCATION_MSG_ID = 215;
 
     // integration API config retrieval request/response
     PB_E_INTAPI_GET_ROBUST_LOCATION_CONFIG_REQ_MSG_ID  = 300;
@@ -144,6 +200,12 @@ enum PBELocMsgID {
 
     PB_E_INTAPI_GET_CONSTELLATION_SECONDARY_BAND_CONFIG_REQ_MSG_ID  = 306;
     PB_E_INTAPI_GET_CONSTELLATION_SECONDARY_BAND_CONFIG_RESP_MSG_ID  = 307;
+
+    PB_E_INTAPI_GET_XTRA_STATUS_REQ_MSG_ID  = 308;
+    PB_E_INTAPI_GET_XTRA_STATUS_RESP_MSG_ID  = 309;
+
+    PB_E_INTAPI_REGISTER_XTRA_STATUS_UPDATE_REQ_MSG_ID = 310;
+    PB_E_INTAPI_DEREGISTER_XTRA_STATUS_UPDATE_REQ_MSG_ID = 311;
 }
 
 enum PBClientType {
@@ -180,6 +242,8 @@ enum PBLocationCallbacksMask {
     PB_E_LOC_CB_GNSS_MEAS_BIT               = 0x800;
     /**< Register for nHz GNSS Measurements */
     PB_E_LOC_CB_GNSS_NHZ_MEAS_BIT           = 0x1000;
+    /**< Register for disater and crisis report */
+    PB_E_LOC_CB_GNSS_DC_REPORT_BIT          = 0x2000;
 }
 
 enum PBEngineInfoCallbacksMask {
@@ -307,7 +371,9 @@ message PBLocAPIStartTrackingReqMsg {
 }
 
 // defintion for message with msg id of E_LOCAPI_STOP_TRACKING_MSG_ID
-// LocAPIStopTrackingReqMsg - no struct member.
+message PBLocAPIStopTrackingReqMsg {
+    bool clearSubscriptions = 1;
+}
 
 // defintion for message with msg id of PB_E_LOCAPI_UPDATE_CALLBACKS_MSG_ID
 message PBLocAPIUpdateCallbacksReqMsg {
@@ -392,6 +458,7 @@ message PBLocAPILocationIndMsg {
 // defintion for message with msg id of PB_E_LOCAPI_BATCHING_MSG_ID
 message PBLocAPIBatchingIndMsg {
     PBLocAPIBatchNotification batchNotification = 1;
+    PBBatchingMode batchingMode = 2;
 }
 
 // defintion for message with msg id of PB_E_LOCAPI_GEOFENCE_BREACH_MSG_ID
@@ -440,6 +507,11 @@ message PBLocAPILocationSystemInfoIndMsg {
     PBLocationSystemInfo locationSystemInfo = 1;
 }
 
+// defintion for message with msg id of E_LOCAPI_DC_REPORT_MSG_ID
+message PBLocAPIDcReportIndMsg {
+    PBGnssDcReportInfo dcReportInfo = 1;
+}
+
 //*******************************************************************
 // IPC message structure - Single-shot Terrestrial fix
 //*******************************************************************
@@ -450,6 +522,19 @@ message PBLocAPIGetSingleTerrestrialPosReqMsg {
 };
 
 message PBLocAPIGetSingleTerrestrialPosRespMsg {
+    PBLocationError errorCode = 1;
+    PBLocation      location = 2;
+};
+
+//*******************************************************************
+// IPC message structure - Single-shot fix
+//*******************************************************************
+message PBLocAPIGetSinglePosReqMsg {
+    uint32 timeoutMsec = 1;
+    float  horQoS = 2;
+};
+
+message PBLocAPIGetSinglePosRespMsg {
     PBLocationError errorCode = 1;
     PBLocation      location = 2;
 };
@@ -528,6 +613,20 @@ message PBLocConfigUserConsentTerrestrialPositioningReqMsg {
 // PB_E_INTAPI_CONFIG_OUTPUT_NMEA_TYPES_MSG_ID
 message PBLocConfigOutputNmeaTypesReqMsg {
     uint32 nmeaTypesMask = 1;
+    PBGnssGeodeticDatumType nmeaDatumType = 2;
+}
+
+// defintion for message with msg id of
+// PB_E_INTAPI_CONFIG_ENGINE_INTEGRITY_RISK_MSG_ID
+message PBLocConfigEngineIntegrityRiskReqMsg {
+    PBLocApiPositioningEngineMask engType = 1;
+    uint32 integrityRisk = 2;
+}
+
+// defintion for message with msg id of PB_E_INTAPI_CONFIG_XTRA_PARAMS_MSG_ID
+message PBLocConfigXtraReqMsg {
+    bool enable = 1;
+    PBXtraConfigParams xtraParams = 2;
 }
 
 //******************************************************************************
@@ -566,6 +665,49 @@ message PBLocConfigGetMinSvElevationRespMsg {
 // PB_E_INTAPI_GET_CONSTELLATION_SECONDARY_BAND_CONFIG_RESP_MSG_ID
 message PBLocConfigGetConstltnSecondaryBandConfigRespMsg {
     PBGnssSvTypeConfig mSecondaryBandConfig = 1;
+}
+
+// defintion for message with msg id of PB_E_INTAPI_GET_XTRA_STATUS_REQ_MSG_ID
+// no struct member
+
+// defintion for message with msg id of PB_E_INTAPI_GET_XTRA_STATUS_RESP_MSG_ID
+message PBLocConfigGetXtraStatusRespMsg {
+    PBXtraStatusUpdateType mUpdateType = 1;
+    PBXtraStatus           mXtraStatus = 2;;
+}
+
+// defintion for message with msg id of
+// PB_E_INTAPI_REGISTER_XTRA_STATUS_UPDATE_REQ_MSG_ID
+// no struct member
+
+// defintion for message with msg id of
+// PB_E_INTAPI_DEREGISTER_XTRA_STATUS_UPDATE_REQ_MSG_ID
+// no struct member
+
+// defintion for message with msg id of
+// PB_E_LOCAPI_GET_DEBUG_REQ_MSG_ID
+// LocAPIGetDebugReqMsg - no struct member.
+
+// defintion for message with msg id of
+// PB_E_LOCAPI_GET_DEBUG_RESP_MSG_ID
+message PBLocAPIGetDebugRespMsg {
+    PBGnssDebugReport mDebugReport = 1;
+}
+
+// defintion for message with msg id of
+// PB_E_LOCAPI_GET_ANTENNA_INFO_MSG_ID
+// LocAPIGetAntennaInfoMsg - no struct member
+
+// defintion for message with msg id of
+// PB_E_LOCAPI_ANTENNA_INFO_MSG_ID
+message PBLocAPIAntennaInfoMsg {
+    PBAntennaInformation mAntennaInformation = 1;
+}
+
+// defintion for message with msg id of
+// PB_E_INTAPI_INJECT_LOCATION_MSG_ID
+message PBLocIntApiInjectLocationMsg {
+    PBLocation location = 1;
 }
 
 //*****************************

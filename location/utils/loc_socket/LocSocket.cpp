@@ -1,4 +1,4 @@
-/* Copyright (c) 2019 - 2020 The Linux Foundation. All rights reserved.
+/* Copyright (c) 2019 - 2021 The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -26,6 +26,43 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <unistd.h>
 #include <memory>
 #include <sys/types.h>
@@ -104,6 +141,7 @@ public:
             mSock(make_shared<Sock>(::socket(AF_IPC_ROUTER, SOCK_DGRAM, 0))),
             mServiceInfo(0, 0), mAddr(destAddr), mLookupPending(false) {
     }
+
     inline LocIpcQsockSender(int service, int instance) :
             LocIpcSender(),
             mSock(make_shared<Sock>(::socket(AF_IPC_ROUTER, SOCK_DGRAM, 0))),
@@ -169,7 +207,7 @@ unique_ptr<LocIpcRecver> createLocIpcQrtrRecver(const shared_ptr<ILocIpcListener
 
 #else
 
-#define SOCKET_TIMEOUT_SEC 2
+#define SOCKET_SENDER_SEND_TIMEOUT_MSEC 100
 
 static inline __le32 cpu_to_le32(uint32_t x) { return htole32(x); }
 static inline uint32_t le32_to_cpu(__le32 x) { return le32toh(x); }
@@ -183,6 +221,10 @@ protected:
     mutable struct qrtr_ctrl_pkt mCtrlPkt;
     mutable bool mLookupPending;
     bool ctrlCmdAndResponse(enum qrtr_pkt_type cmd) const {
+        LOC_LOGd("cmd: %d, sock valid %d, sock id %d, service id %d, instance id %d",
+                 cmd, mSock->isValid(), mSock->mSid,
+                 le32_to_cpu(mCtrlPkt.server.service),
+                 le32_to_cpu(mCtrlPkt.server.instance));
         if (mSock->isValid()) {
             int rc = 0;
             mCtrlPkt.cmd = cpu_to_le32(cmd);
@@ -193,18 +235,43 @@ protected:
                 int len = 0;
                 struct qrtr_ctrl_pkt pkt;
                 while ((len = ::recv(mSock->mSid, &pkt, sizeof(pkt), 0)) > 0) {
-                    if (len >= (decltype(len))sizeof(pkt) && 0 != pkt.server.service &&
-                            cpu_to_le32(QRTR_TYPE_NEW_SERVER) == pkt.cmd) {
-                        mAddr.sq_node = le32_to_cpu(pkt.server.node);
-                        mAddr.sq_port = le32_to_cpu(pkt.server.port);
-                        LOC_LOGv("server found pkt.cmd %d, service %d, node, %d, port %d",
-                                 le32_to_cpu(pkt.cmd), le32_to_cpu(pkt.server.service),
-                                 mAddr.sq_node, mAddr.sq_port);
-                        break;
+                    if (len >= (decltype(len))sizeof(pkt)) {
+                        qrtr_pkt_type pktType = (qrtr_pkt_type) le32_to_cpu(pkt.cmd);
+                        LOC_LOGd("qrtr new lookup received pkt type: %d, "
+                                 "pkt service id: %d, instance id: %d,"
+                                 "node %d, port %d",
+                                 pktType, le32_to_cpu(pkt.server.service),
+                                 le32_to_cpu(pkt.server.instance),
+                                 le32_to_cpu(pkt.server.node),
+                                 le32_to_cpu(pkt.server.port));
+
+                        switch (pktType){
+                        case QRTR_TYPE_NEW_SERVER:
+                            if (le32_to_cpu(pkt.server.service) == 0 &&
+                                       le32_to_cpu(pkt.server.instance) == 0) {
+                                return false;
+                            } else if ((mCtrlPkt.server.service == pkt.server.service) &&
+                                (mCtrlPkt.server.instance == pkt.server.instance)) {
+                                mAddr.sq_node = le32_to_cpu(pkt.server.node);
+                                mAddr.sq_port = le32_to_cpu(pkt.server.port);
+                                return true;
+                            }
+                            break;
+                        case QRTR_TYPE_DEL_SERVER:
+                            if ((mCtrlPkt.server.service == pkt.server.service) &&
+                                (mCtrlPkt.server.instance == pkt.server.instance)) {
+                                // service of particular service id, instance id gets deleted
+                                return false;
+                            }
+                            break;
+                        default:
+                            break;
+                        }
                     }
                 }
             }
         }
+        LOC_LOGd("cmd: %d, return %d", cmd, mSock->isValid());
         return mSock->isValid();
     }
 
@@ -216,10 +283,13 @@ protected:
     inline virtual ssize_t send(const uint8_t data[], uint32_t length,
                                 int32_t /* msgId */) const override {
         if (mLookupPending) {
+            if (ctrlCmdAndResponse(QRTR_TYPE_NEW_LOOKUP) == false) {
+                return 0;
+            }
             mLookupPending = false;
-            ctrlCmdAndResponse(QRTR_TYPE_NEW_LOOKUP);
         }
-        return mSock->send(data, length, 0, (struct sockaddr*)&mAddr, sizeof(mAddr));
+        int result = mSock->send(data, length, 0, (struct sockaddr*)&mAddr, sizeof(mAddr));
+        return result;
     }
 public:
     inline LocIpcQrtrSender(const sockaddr_qrtr& destAddr) :
@@ -233,11 +303,12 @@ public:
             mAddr({AF_QIPCRTR, 0, 0}),
             mCtrlPkt({}),
             mLookupPending(true) {
-        // set timeout so if failed to send, call will return after 2 seconds timeout
+        // set timeout so if failed to send, call will return after SOCKET_TIMEOUT_MSEC
         // otherwise, call may never return
         timeval timeout;
-        timeout.tv_sec = SOCKET_TIMEOUT_SEC;
-        timeout.tv_usec = 0;
+
+        timeout.tv_sec = SOCKET_SENDER_SEND_TIMEOUT_MSEC / 1000;
+        timeout.tv_usec = SOCKET_SENDER_SEND_TIMEOUT_MSEC % 1000 * 1000;
         setsockopt(mSock->mSid, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
 
         socklen_t sl = sizeof(mAddr);
@@ -262,17 +333,14 @@ public:
     }
 
     inline virtual bool copyDestAddrFrom(const LocIpcSender& otherSender) override {
-        bool retval = false;
         sockaddr_qrtr otherAddr = (reinterpret_cast<const LocIpcQrtrSender&>(otherSender)).mAddr;
         if (mAddr.sq_family != otherAddr.sq_family ||
                 mAddr.sq_node != otherAddr.sq_node ||
                 mAddr.sq_port != otherAddr.sq_port) {
             mAddr = otherAddr;
-            retval = true;
         }
         mLookupPending = false;
-
-        return retval;
+        return true;
     }
 };
 
@@ -343,13 +411,16 @@ public:
                             const shared_ptr<LocIpcQrtrWatcher>& qrtrWatcher) :
             LocIpcQrtrSender(service, instance),
             LocIpcRecver(make_shared<LocIpcQrtrListener>(listener, qrtrWatcher), *this) {
+
         ctrlCmdAndResponse(QRTR_TYPE_NEW_SERVER);
+
         if (nullptr != qrtrWatcher) {
             struct qrtr_ctrl_pkt pkt = {};
             pkt.cmd = cpu_to_le32(QRTR_TYPE_NEW_LOOKUP);
             int rc = 0;
             for (int serviceId : qrtrWatcher->getServicesToWatch()) {
                 pkt.server.service = cpu_to_le32(serviceId);
+                LOC_LOGd("watch for service: %d", pkt.server.service);
                 if ((rc = ::sendto(mSock->mSid, &pkt, sizeof(pkt), 0,
                                    (const struct sockaddr *)&mCtrlPntAddr,
                                    sizeof(mCtrlPntAddr))) < 0) {
@@ -358,6 +429,7 @@ public:
             }
         }
     }
+
     inline ~LocIpcQrtrRecver() { ctrlCmdAndResponse(QRTR_TYPE_DEL_SERVER); }
     inline virtual unique_ptr<LocIpcSender> getLastSender() const override {
         return make_unique<LocIpcQrtrSender>(mAddr);

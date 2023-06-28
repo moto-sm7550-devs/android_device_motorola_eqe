@@ -26,6 +26,42 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -78,8 +114,9 @@ int main(int argc, char *argv[])
 
     LOC_LOGd("starting loc_hal_daemon");
 
-#ifdef INIT_SYSTEM_SYSV
+#if defined(INIT_SYSTEM_SYSV) || defined(OPENWRT_BUILD)
     // set supplementary groups for sysvinit
+    // For openwrt, procd does not have support for supplementary groups. So set here.
     // For systemd, common supplementary groups are set via service files
     char groupNames[LOC_MAX_PARAM_NAME] = "gps radio diag powermgr locclient inet vnw";
 
@@ -106,7 +143,7 @@ int main(int argc, char *argv[])
 
     // check if this process started by root
     if (0 == getuid()) {
-#ifdef INIT_SYSTEM_SYSTEMD
+#if defined(INIT_SYSTEM_SYSTEMD) || defined(OPENWRT_BUILD)
         // started as root.
         LOC_LOGE("Error !!! location_hal_daemon started as root");
         exit(1);
@@ -130,7 +167,7 @@ int main(int argc, char *argv[])
 
         // Set access to netmgr (QCMAP)
         struct __user_cap_data_struct cap_data = {};
-        cap_data.permitted = (1 << CAP_NET_BIND_SERVICE) | (1 << CAP_NET_ADMIN);
+        cap_data.permitted = (1<<CAP_SETGID) | (1 << CAP_NET_BIND_SERVICE) | (1 << CAP_NET_ADMIN);
         cap_data.effective = cap_data.permitted;
         LOC_LOGv("cap_data.permitted: %d", (int)cap_data.permitted);
         if(capset(&cap_hdr, &cap_data)) {

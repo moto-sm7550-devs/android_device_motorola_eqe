@@ -26,6 +26,42 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #ifndef LOCATIONCLIENTAPI_H
 #define LOCATIONCLIENTAPI_H
 
@@ -62,6 +98,138 @@ using std::string;
 
 namespace location_client
 {
+// DEPRECATION - BACKWARD COMPATIBILITY SECTION
+/** Specify the valid fields in GnssLocation.
+ *  <br/>
+ *
+ *  User should determine whether a field in
+ *  GnssLocation is valid or not by checking
+ *  whether the corrsponding bit in
+ *  GnssLocation::gnssInfoFlags is set or
+ *  not. <br/> */
+enum GnssLocationInfoFlagMask { // Recommend use LCAGnssLocationInfoFlagMask by instead
+    /** GnssLocation has valid
+     *  GnssLocation::altitudeMeanSeaLevel. <br/>   */
+    GNSS_LOCATION_INFO_ALTITUDE_MEAN_SEA_LEVEL_BIT      = (1ULL<<0),
+    /** GnssLocation has valid
+     *  GnssLocation::pdop,
+     *  GnssLocation::hdop and
+     *  GnssLocation::vdop. <br/>   */
+    GNSS_LOCATION_INFO_DOP_BIT                          = (1ULL<<1),
+    /** GnssLocation has valid
+     *  GnssLocation::magneticDeviation. <br/>   */
+    GNSS_LOCATION_INFO_MAGNETIC_DEVIATION_BIT           = (1ULL<<2),
+    /** GnssLocation has valid
+     *  GnssLocation::horReliability. <br/>   */
+    GNSS_LOCATION_INFO_HOR_RELIABILITY_BIT              = (1ULL<<3),
+    /** GnssLocation has valid
+     *  GnssLocation::verReliability.  <br/>   */
+    GNSS_LOCATION_INFO_VER_RELIABILITY_BIT              = (1ULL<<4),
+    /** GnssLocation has valid
+     *  GnssLocation::horUncEllipseSemiMajor. <br/>   */
+    GNSS_LOCATION_INFO_HOR_ACCURACY_ELIP_SEMI_MAJOR_BIT = (1ULL<<5),
+    /** GnssLocation has valid
+     *  GnssLocation::horUncEllipseSemiMinor. <br/>   */
+    GNSS_LOCATION_INFO_HOR_ACCURACY_ELIP_SEMI_MINOR_BIT = (1ULL<<6),
+    /** GnssLocation has valid
+     *  GnssLocation::horUncEllipseOrientAzimuth. <br/>   */
+    GNSS_LOCATION_INFO_HOR_ACCURACY_ELIP_AZIMUTH_BIT    = (1ULL<<7),
+    /** GnssLocation has valid
+     *  GnssLocation::svUsedInPosition and
+     *  GnssLocation::measUsageInfo. <br/>   */
+    GNSS_LOCATION_INFO_GNSS_SV_USED_DATA_BIT            = (1ULL<<8),
+    /** GnssLocation has valid
+     *  GnssLocation::navSolutionMask. <br/>   */
+    GNSS_LOCATION_INFO_NAV_SOLUTION_MASK_BIT            = (1ULL<<9),
+    /** GnssLocation has valid
+     *  GnssLocation::posTechMask. <br/>   */
+    GNSS_LOCATION_INFO_POS_TECH_MASK_BIT                = (1ULL<<10),
+    /** Deplicated field as there is no corresponding field in
+     *  GnssLocation. <br/>   */
+    GNSS_LOCATION_INFO_SV_SOURCE_INFO_BIT               = (1ULL<<11),
+    /** GnssLocation has valid
+     *  GnssLocation::altitudeMeanSeaLevel. <br/> */
+    GNSS_LOCATION_INFO_POS_DYNAMICS_DATA_BIT            = (1ULL<<12),
+    /** GnssLocation has valid
+     *  GnssLocation::gdop and
+     *  GnssLocation::tdop. <br/>   */
+    GNSS_LOCATION_INFO_EXT_DOP_BIT                      = (1ULL<<13),
+    /** GnssLocation has valid GnssLocation::northStdDeviation.
+     *  <br/> */
+    GNSS_LOCATION_INFO_NORTH_STD_DEV_BIT                = (1ULL<<14),
+    /** GnssLocation has valid
+     *  GnssLocation::eastStdDeviation. <br/>   */
+    GNSS_LOCATION_INFO_EAST_STD_DEV_BIT                 = (1ULL<<15),
+    /** GnssLocation has valid
+     *  GnssLocation::northVelocity. <br/>   */
+    GNSS_LOCATION_INFO_NORTH_VEL_BIT                    = (1ULL<<16),
+    /** GnssLocation has valid
+     *  GnssLocation::eastVelocity. <br/>   */
+    GNSS_LOCATION_INFO_EAST_VEL_BIT                     = (1ULL<<17),
+    /** GnssLocation has valid
+     *  GnssLocation::upVelocity. <br/>   */
+    GNSS_LOCATION_INFO_UP_VEL_BIT                       = (1ULL<<18),
+    /** GnssLocation has valid
+     *  GnssLocation::northVelocityStdDeviation. <br/>   */
+    GNSS_LOCATION_INFO_NORTH_VEL_UNC_BIT                = (1ULL<<19),
+    /** GnssLocation has valid
+     *  GnssLocation::eastVelocityStdDeviation. <br/>   */
+    GNSS_LOCATION_INFO_EAST_VEL_UNC_BIT                 = (1ULL<<20),
+    /** GnssLocation has valid
+     *  GnssLocation::upVelocityStdDeviation. <br/>   */
+    GNSS_LOCATION_INFO_UP_VEL_UNC_BIT                   = (1ULL<<21),
+    /** GnssLocation has valid
+     *  GnssLocation::leapSeconds. <br/>   */
+    GNSS_LOCATION_INFO_LEAP_SECONDS_BIT                 = (1ULL<<22),
+    /** GnssLocation has valid
+     *  GnssLocation::timeUncMs. <br/>   */
+    GNSS_LOCATION_INFO_TIME_UNC_BIT                     = (1ULL<<23),
+    /** GnssLocation has valid
+     *  GnssLocation::numSvUsedInPosition. <br/>   */
+    GNSS_LOCATION_INFO_NUM_SV_USED_IN_POSITION_BIT      = (1ULL<<24),
+    /** GnssLocation has valid
+     *  GnssLocation::calibrationConfidencePercent. <br/>   */
+    GNSS_LOCATION_INFO_CALIBRATION_CONFIDENCE_PERCENT_BIT = (1ULL<<25),
+    /** GnssLocation has valid
+     *  GnssLocation::calibrationStatus.  <br/>   */
+    GNSS_LOCATION_INFO_CALIBRATION_STATUS_BIT           = (1ULL<<26),
+    /** GnssLocation has valid
+     *  GnssLocation::locOutputEngType.  <br/>   */
+    GNSS_LOCATION_INFO_OUTPUT_ENG_TYPE_BIT              = (1ULL<<27),
+    /** GnssLocation has valid
+     *  GnssLocation::locOutputEngMask. <br/>   */
+    GNSS_LOCATION_INFO_OUTPUT_ENG_MASK_BIT              = (1ULL<<28),
+    /** GnssLocation has valid GnssLocation::conformityIndex.
+     *  <br/> */
+    GNSS_LOCATION_INFO_CONFORMITY_INDEX_BIT             = (1ULL<<29),
+    /** GnssLocation has valid
+     *  GnssLocation::llaVRPBased. <br/>   */
+    GNSS_LOCATION_INFO_LLA_VRP_BASED_BIT                = (1ULL<<30),
+    /** GnssLocation has valid GnssLocation::enuVelocityVRPBased.
+     *  <br/> */
+    GNSS_LOCATION_INFO_ENU_VELOCITY_VRP_BASED_BIT       = (1ULL<<31),
+    /** GnssLocation has valid GnssLocation::drSolutionStatusMask.
+     *  <br/>   */
+    GNSS_LOCATION_INFO_DR_SOLUTION_STATUS_MASK_BIT      = (1ULL<<32),
+    /** GnssLocation has valid GnssLocation::altitudeAssumed.
+     *  <br/> */
+    GNSS_LOCATION_INFO_ALTITUDE_ASSUMED_BIT             = (1ULL<<33),
+    /** GnssLocation has valid GnssLocation::sessionStatus. <br/> */
+    GNSS_LOCATION_INFO_SESSION_STATUS_BIT               = (1ULL<<34),
+    /** GnssLocation has valid GnssLocation::integrityRiskUsed.
+     *  <br/> */
+    GNSS_LOCATION_INFO_INTEGRITY_RISK_USED_BIT          = (1ULL<<35),
+    /** GnssLocation has valid GnssLocation::protectAlongTrack.
+     *  <br/> */
+    GNSS_LOCATION_INFO_PROTECT_ALONG_TRACK_BIT          = (1ULL<<36),
+    /** GnssLocation has valid GnssLocation::protectCrossTrack.
+     *  <br/> */
+    GNSS_LOCATION_INFO_PROTECT_CROSS_TRACK_BIT          = (1ULL<<37),
+    /** GnssLocation has valid GnssLocation::sprotectVertical.
+     *  <br/> */
+    GNSS_LOCATION_INFO_PROTECT_VERTICAL_BIT             = (1ULL<<38),
+};
+// DEPRECATION - BACKWARD COMPATIBILITY SECTION
 class Geofence;
 
 typedef uint64_t LocationCapabilitiesMask;
@@ -155,7 +323,8 @@ enum GnssSvOptionsMask {
     GNSS_SV_OPTIONS_HAS_EPHEMER_BIT             = (1<<0),
     /** Almanac is available for this SV. <br/>   */
     GNSS_SV_OPTIONS_HAS_ALMANAC_BIT             = (1<<1),
-    /** This SV is used in the position fix. <br/>   */
+    /** This SV is used in the position fix that has output
+     *  engine type set to LOC_OUTPUT_ENGINE_SPE. <br/> */
     GNSS_SV_OPTIONS_USED_IN_FIX_BIT             = (1<<2),
     /** This SV has valid GnssSv::carrierFrequencyHz. <br/> */
     GNSS_SV_OPTIONS_HAS_CARRIER_FREQUENCY_BIT   = (1<<3),
@@ -163,7 +332,11 @@ enum GnssSvOptionsMask {
     GNSS_SV_OPTIONS_HAS_GNSS_SIGNAL_TYPE_BIT    = (1<<4),
     /** This SV has valid GnssSv::basebandCarrierToNoiseDbHz.
      *  <br/> */
-    GNSS_SV_OPTIONS_HAS_BASEBAND_CARRIER_TO_NOISE_BIT = (1<<5)
+    GNSS_SV_OPTIONS_HAS_BASEBAND_CARRIER_TO_NOISE_BIT = (1<<5),
+    /** This SV has valid GnssSv::elevation. <br/> */
+    GNSS_SV_OPTIONS_HAS_ELEVATION_BIT                 = (1<<6),
+    /** This SV has valid GnssSv::azimuth. <br/> */
+    GNSS_SV_OPTIONS_HAS_AZIMUTH_BIT                   = (1<<7),
 };
 
 /**
@@ -198,6 +371,8 @@ enum LocationFlagsMask {
     LOCATION_HAS_ELAPSED_REAL_TIME_BIT = (1<<9),
     /** Location has valid Location::elapsedRealTimeUnc. <br/>   */
     LOCATION_HAS_ELAPSED_REAL_TIME_UNC_BIT = (1<<10),
+    /** Location has valid Location::timeUncMs. <br/>   */
+    LOCATION_HAS_TIME_UNC_BIT          = (1<<11),
 };
 
 /**
@@ -397,6 +572,8 @@ enum LocationResponse {
     LOCATION_RESPONSE_REQUEST_ALREADY_IN_PROGRESS = 5,
     /** System is not ready, e.g.: hal daemon is not yet ready. */
     LOCATION_RESPONSE_SYSTEM_NOT_READY = 6,
+    /** LCA doesn't support simultaneous tracking and batching session. Other session is ongoing*/
+    LOCATION_RESPONSE_EXCLUSIVE_SESSION_IN_PROGRESS = 7,
 };
 
 /** Specify the SV constellation type in GnssSv
@@ -428,116 +605,129 @@ enum GnssSvType {
  *  whether the corrsponding bit in
  *  GnssLocation::gnssInfoFlags is set or
  *  not. <br/> */
-enum GnssLocationInfoFlagMask {
+typedef uint64_t LCAGnssLocationInfoFlagMask;
     /** GnssLocation has valid
      *  GnssLocation::altitudeMeanSeaLevel. <br/>   */
-    GNSS_LOCATION_INFO_ALTITUDE_MEAN_SEA_LEVEL_BIT      = (1ULL<<0),
+#define LCA_GNSS_LOCATION_INFO_ALTITUDE_MEAN_SEA_LEVEL_BIT                  (1ULL<<0)
     /** GnssLocation has valid
      *  GnssLocation::pdop,
      *  GnssLocation::hdop and
      *  GnssLocation::vdop. <br/>   */
-    GNSS_LOCATION_INFO_DOP_BIT                          = (1ULL<<1),
+#define LCA_GNSS_LOCATION_INFO_DOP_BIT                                      (1ULL<<1)
     /** GnssLocation has valid
      *  GnssLocation::magneticDeviation. <br/>   */
-    GNSS_LOCATION_INFO_MAGNETIC_DEVIATION_BIT           = (1ULL<<2),
+#define LCA_GNSS_LOCATION_INFO_MAGNETIC_DEVIATION_BIT                       (1ULL<<2)
     /** GnssLocation has valid
      *  GnssLocation::horReliability. <br/>   */
-    GNSS_LOCATION_INFO_HOR_RELIABILITY_BIT              = (1ULL<<3),
+#define LCA_GNSS_LOCATION_INFO_HOR_RELIABILITY_BIT                          (1ULL<<3)
     /** GnssLocation has valid
      *  GnssLocation::verReliability.  <br/>   */
-    GNSS_LOCATION_INFO_VER_RELIABILITY_BIT              = (1ULL<<4),
+#define LCA_GNSS_LOCATION_INFO_VER_RELIABILITY_BIT                          (1ULL<<4)
     /** GnssLocation has valid
      *  GnssLocation::horUncEllipseSemiMajor. <br/>   */
-    GNSS_LOCATION_INFO_HOR_ACCURACY_ELIP_SEMI_MAJOR_BIT = (1ULL<<5),
+#define LCA_GNSS_LOCATION_INFO_HOR_ACCURACY_ELIP_SEMI_MAJOR_BIT             (1ULL<<5)
     /** GnssLocation has valid
      *  GnssLocation::horUncEllipseSemiMinor. <br/>   */
-    GNSS_LOCATION_INFO_HOR_ACCURACY_ELIP_SEMI_MINOR_BIT = (1ULL<<6),
+#define LCA_GNSS_LOCATION_INFO_HOR_ACCURACY_ELIP_SEMI_MINOR_BIT             (1ULL<<6)
     /** GnssLocation has valid
      *  GnssLocation::horUncEllipseOrientAzimuth. <br/>   */
-    GNSS_LOCATION_INFO_HOR_ACCURACY_ELIP_AZIMUTH_BIT    = (1ULL<<7),
+#define LCA_GNSS_LOCATION_INFO_HOR_ACCURACY_ELIP_AZIMUTH_BIT                (1ULL<<7)
     /** GnssLocation has valid
      *  GnssLocation::svUsedInPosition and
      *  GnssLocation::measUsageInfo. <br/>   */
-    GNSS_LOCATION_INFO_GNSS_SV_USED_DATA_BIT            = (1ULL<<8),
+#define LCA_GNSS_LOCATION_INFO_GNSS_SV_USED_DATA_BIT                        (1ULL<<8)
     /** GnssLocation has valid
      *  GnssLocation::navSolutionMask. <br/>   */
-    GNSS_LOCATION_INFO_NAV_SOLUTION_MASK_BIT            = (1ULL<<9),
+#define LCA_GNSS_LOCATION_INFO_NAV_SOLUTION_MASK_BIT                        (1ULL<<9)
     /** GnssLocation has valid
      *  GnssLocation::posTechMask. <br/>   */
-    GNSS_LOCATION_INFO_POS_TECH_MASK_BIT                = (1ULL<<10),
+#define LCA_GNSS_LOCATION_INFO_POS_TECH_MASK_BIT                            (1ULL<<10)
     /** Deplicated field as there is no corresponding field in
      *  GnssLocation. <br/>   */
-    GNSS_LOCATION_INFO_SV_SOURCE_INFO_BIT               = (1ULL<<11),
+#define LCA_GNSS_LOCATION_INFO_SV_SOURCE_INFO_BIT                           (1ULL<<11)
     /** GnssLocation has valid
      *  GnssLocation::altitudeMeanSeaLevel. <br/> */
-    GNSS_LOCATION_INFO_POS_DYNAMICS_DATA_BIT            = (1ULL<<12),
+#define LCA_GNSS_LOCATION_INFO_POS_DYNAMICS_DATA_BIT                        (1ULL<<12)
     /** GnssLocation has valid
      *  GnssLocation::gdop and
      *  GnssLocation::tdop. <br/>   */
-    GNSS_LOCATION_INFO_EXT_DOP_BIT                      = (1ULL<<13),
+#define LCA_GNSS_LOCATION_INFO_EXT_DOP_BIT                                  (1ULL<<13)
     /** GnssLocation has valid GnssLocation::northStdDeviation.
      *  <br/> */
-    GNSS_LOCATION_INFO_NORTH_STD_DEV_BIT                = (1ULL<<14),
+#define LCA_GNSS_LOCATION_INFO_NORTH_STD_DEV_BIT                            (1ULL<<14)
     /** GnssLocation has valid
      *  GnssLocation::eastStdDeviation. <br/>   */
-    GNSS_LOCATION_INFO_EAST_STD_DEV_BIT                 = (1ULL<<15),
+#define LCA_GNSS_LOCATION_INFO_EAST_STD_DEV_BIT                             (1ULL<<15)
     /** GnssLocation has valid
      *  GnssLocation::northVelocity. <br/>   */
-    GNSS_LOCATION_INFO_NORTH_VEL_BIT                    = (1ULL<<16),
+#define LCA_GNSS_LOCATION_INFO_NORTH_VEL_BIT                                (1ULL<<16)
     /** GnssLocation has valid
      *  GnssLocation::eastVelocity. <br/>   */
-    GNSS_LOCATION_INFO_EAST_VEL_BIT                     = (1ULL<<17),
+#define LCA_GNSS_LOCATION_INFO_EAST_VEL_BIT                                 (1ULL<<17)
     /** GnssLocation has valid
      *  GnssLocation::upVelocity. <br/>   */
-    GNSS_LOCATION_INFO_UP_VEL_BIT                       = (1ULL<<18),
+#define LCA_GNSS_LOCATION_INFO_UP_VEL_BIT                                   (1ULL<<18)
     /** GnssLocation has valid
      *  GnssLocation::northVelocityStdDeviation. <br/>   */
-    GNSS_LOCATION_INFO_NORTH_VEL_UNC_BIT                = (1ULL<<19),
+#define LCA_GNSS_LOCATION_INFO_NORTH_VEL_UNC_BIT                            (1ULL<<19)
     /** GnssLocation has valid
      *  GnssLocation::eastVelocityStdDeviation. <br/>   */
-    GNSS_LOCATION_INFO_EAST_VEL_UNC_BIT                 = (1ULL<<20),
+#define LCA_GNSS_LOCATION_INFO_EAST_VEL_UNC_BIT                             (1ULL<<20)
     /** GnssLocation has valid
      *  GnssLocation::upVelocityStdDeviation. <br/>   */
-    GNSS_LOCATION_INFO_UP_VEL_UNC_BIT                   = (1ULL<<21),
+#define LCA_GNSS_LOCATION_INFO_UP_VEL_UNC_BIT                               (1ULL<<21)
     /** GnssLocation has valid
      *  GnssLocation::leapSeconds. <br/>   */
-    GNSS_LOCATION_INFO_LEAP_SECONDS_BIT                 = (1ULL<<22),
+#define LCA_GNSS_LOCATION_INFO_LEAP_SECONDS_BIT                             (1ULL<<22)
     /** GnssLocation has valid
      *  GnssLocation::timeUncMs. <br/>   */
-    GNSS_LOCATION_INFO_TIME_UNC_BIT                     = (1ULL<<23),
+#define LCA_GNSS_LOCATION_INFO_TIME_UNC_BIT                                 (1ULL<<23)
     /** GnssLocation has valid
      *  GnssLocation::numSvUsedInPosition. <br/>   */
-    GNSS_LOCATION_INFO_NUM_SV_USED_IN_POSITION_BIT      = (1ULL<<24),
+#define LCA_GNSS_LOCATION_INFO_NUM_SV_USED_IN_POSITION_BIT                  (1ULL<<24)
     /** GnssLocation has valid
      *  GnssLocation::calibrationConfidencePercent. <br/>   */
-    GNSS_LOCATION_INFO_CALIBRATION_CONFIDENCE_PERCENT_BIT = (1ULL<<25),
+#define LCA_GNSS_LOCATION_INFO_CALIBRATION_CONFIDENCE_PERCENT_BIT           (1ULL<<25)
     /** GnssLocation has valid
      *  GnssLocation::calibrationStatus.  <br/>   */
-    GNSS_LOCATION_INFO_CALIBRATION_STATUS_BIT           = (1ULL<<26),
+#define LCA_GNSS_LOCATION_INFO_CALIBRATION_STATUS_BIT                       (1ULL<<26)
     /** GnssLocation has valid
      *  GnssLocation::locOutputEngType.  <br/>   */
-    GNSS_LOCATION_INFO_OUTPUT_ENG_TYPE_BIT              = (1ULL<<27),
+#define LCA_GNSS_LOCATION_INFO_OUTPUT_ENG_TYPE_BIT                          (1ULL<<27)
     /** GnssLocation has valid
      *  GnssLocation::locOutputEngMask. <br/>   */
-    GNSS_LOCATION_INFO_OUTPUT_ENG_MASK_BIT              = (1ULL<<28),
+#define LCA_GNSS_LOCATION_INFO_OUTPUT_ENG_MASK_BIT                          (1ULL<<28)
     /** GnssLocation has valid GnssLocation::conformityIndex.
      *  <br/> */
-    GNSS_LOCATION_INFO_CONFORMITY_INDEX_BIT             = (1ULL<<29),
+#define LCA_GNSS_LOCATION_INFO_CONFORMITY_INDEX_BIT                         (1ULL<<29)
     /** GnssLocation has valid
      *  GnssLocation::llaVRPBased. <br/>   */
-    GNSS_LOCATION_INFO_LLA_VRP_BASED_BIT                = (1ULL<<30),
+#define LCA_GNSS_LOCATION_INFO_LLA_VRP_BASED_BIT                            (1ULL<<30)
     /** GnssLocation has valid GnssLocation::enuVelocityVRPBased.
      *  <br/> */
-    GNSS_LOCATION_INFO_ENU_VELOCITY_VRP_BASED_BIT       = (1ULL<<31),
+#define LCA_GNSS_LOCATION_INFO_ENU_VELOCITY_VRP_BASED_BIT                   (1ULL<<31)
     /** GnssLocation has valid GnssLocation::drSolutionStatusMask.
      *  <br/>   */
-    GNSS_LOCATION_INFO_DR_SOLUTION_STATUS_MASK_BIT      = (1ULL<<32),
+#define LCA_GNSS_LOCATION_INFO_DR_SOLUTION_STATUS_MASK_BIT                  (1ULL<<32)
     /** GnssLocation has valid GnssLocation::altitudeAssumed.
      *  <br/> */
-    GNSS_LOCATION_INFO_ALTITUDE_ASSUMED_BIT             = (1ULL<<33),
+#define LCA_GNSS_LOCATION_INFO_ALTITUDE_ASSUMED_BIT                         (1ULL<<33)
     /** GnssLocation has valid GnssLocation::sessionStatus. <br/> */
-    GNSS_LOCATION_INFO_SESSION_STATUS_BIT               = (1ULL<<34),
-};
+#define LCA_GNSS_LOCATION_INFO_SESSION_STATUS_BIT                           (1ULL<<34)
+    /** GnssLocation has valid GnssLocation::integrityRiskUsed.
+     *  <br/> */
+#define LCA_GNSS_LOCATION_INFO_INTEGRITY_RISK_USED_BIT                      (1ULL<<35)
+    /** GnssLocation has valid GnssLocation::protectAlongTrack.
+     *  <br/> */
+#define LCA_GNSS_LOCATION_INFO_PROTECT_ALONG_TRACK_BIT                      (1ULL<<36)
+    /** GnssLocation has valid GnssLocation::protectCrossTrack.
+     *  <br/> */
+#define LCA_GNSS_LOCATION_INFO_PROTECT_CROSS_TRACK_BIT                      (1ULL<<37)
+    /** GnssLocation has valid GnssLocation::protectVertical.
+     *  <br/> */
+#define LCA_GNSS_LOCATION_INFO_PROTECT_VERTICAL_BIT                         (1ULL<<38)
+    /** GnssLocation has valid GnssLocation::dgnssStationId. <br/> */
+#define LCA_GNSS_LOCATION_INFO_DGNSS_STATION_ID_BIT                         (1ULL<<39)
 
 /** Specify the reliability level of
  *  GnssLocation::horReliability and
@@ -993,6 +1183,12 @@ struct Location {
      *  presence of LOCATION_HAS_ELAPSED_REAL_TIME_UNC_BIT in
      *  location::flags before retrieving this field. <br/>   */
     uint64_t elapsedRealTimeUncNs;
+    /** Time uncertainty associated with this position.<br/>
+     *  In unit of milli-seconds.<br/>
+     *  This field may not always be available. Please check for the
+     *  presence of LOCATION_HAS_TIME_UNC_BIT in
+     *  location::flags before retrieving this field. <br/> */
+    float timeUncMs;
     /** Method to print the struct to human readable form, for logging.
      *  <br/> */
     string toString() const;
@@ -1001,7 +1197,7 @@ struct Location {
 /** Specify latitude, longitude and altitude info of location.
  *  <br/>
  */
-typedef struct {
+struct LLAInfo {
     /**  Latitude, in unit of degrees, range [-90.0, 90.0]. <br/> */
     double latitude;
 
@@ -1016,7 +1212,7 @@ typedef struct {
     /** Method to print the struct to human readable form, for logging.
      *  <br/> */
     string toString() const;
-} LLAInfo;
+};
 
 /** Specify various status that contributes to the DR poisition
  *  engine. <br/> */
@@ -1128,12 +1324,6 @@ struct GnssLocation : public Location {
     /** Number of leap Seconds at time when this position is
      *  generated. */
     uint8_t leapSeconds;
-    /** Time uncertainty, in unit of milliseconds. <br/>
-     *  For PVT report from SPE engine, confidence leve is at
-     *  99%. <br/>
-     *  For PVT reports from other engines, confidence level is
-     *  undefined. <br/> */
-    float timeUncMs;
     /** Sensor calibration confidence percent, range [0, 100].
      *  <br/> */
     uint8_t calibrationConfidencePercent;
@@ -1171,6 +1361,33 @@ struct GnssLocation : public Location {
     /** Indicates whether session is success, failure or
      *  intermediate. <br/> */
     LocSessionStatus sessionStatus;
+    /** Integrity risk used for protection level parameters. <br/>
+     *  Unit of 2.5e-10. Valid range is [1 to (4e9-1)].
+     *  </br> Other values means integrity risk is disabled and
+     *  GnssLocation::protectAlongTrack,
+     *  GnssLocation::protectCrossTrack and
+     *  GnssLocation::protectVertical will not be available. <br/>
+     */
+    uint32_t integrityRiskUsed;
+    /** Along-track protection level at specified integrity risk, in
+     *  unit of meter. <br/>
+     */
+    float    protectAlongTrack;
+   /** Cross-track protection level at specified integrity risk, in
+     *  unit of meter. <br/>
+     */
+    float    protectCrossTrack;
+    /** Vertical component protection level at specified integrity
+     *  risk, in unit of meter. <br/>
+     */
+    float    protectVertical;
+    /**<   List of DGNSS station IDs providing corrections. <br/>
+       Range:   <br/>
+       - SBAS --  120 to 158 and 183 to 191. <br/>
+       - Monitoring station -- 1000-2023 (Station ID biased by 1000).<br/>
+       - Other values reserved. <br/>
+    */
+    std::vector<uint16_t> dgnssStationId;
 
     /* Default constructor to initalize GnssLocation structure */
     inline GnssLocation() :
@@ -1189,7 +1406,7 @@ struct GnssLocation : public Location {
             posTechMask((LocationTechnologyMask)0),
             bodyFrameData({}),
             gnssSystemTime({}), measUsageInfo(), leapSeconds(0),
-            timeUncMs(0.0f), calibrationConfidencePercent(0),
+            calibrationConfidencePercent(0),
             calibrationStatus((DrCalibrationStatusMask)0),
             locOutputEngType ((LocOutputEngineType)0),
             locOutputEngMask((PositioningEngineMask)0),
@@ -1197,7 +1414,9 @@ struct GnssLocation : public Location {
             llaVRPBased({}),
             enuVelocityVRPBased{0.0f, 0.0f, 0.0f},
             drSolutionStatusMask((DrSolutionStatusMask)0),
-            altitudeAssumed(false), sessionStatus(LOC_SESS_FAILURE) {
+            altitudeAssumed(false), sessionStatus(LOC_SESS_FAILURE),
+            integrityRiskUsed(0), protectAlongTrack(0.0f),
+            protectCrossTrack(0.0f), protectVertical(0.0f) {
     }
     /** Method to print the struct to human readable form, for logging.
      *  <br/> */
@@ -1254,7 +1473,7 @@ struct GnssSv {
     double basebandCarrierToNoiseDbHz;
     /** GLONASS frequency channel number, range is [1, 14].
      * <br/>
-     * This field is always valid if and ony if sv is of GLONASS.
+     * This field is always valid if and only if sv is of GLONASS.
      * <br/> */
     uint16_t gloFrequency;
     /** Method to print the struct to human readable form, for logging.
@@ -1309,6 +1528,10 @@ enum GnssSignalTypes {
     GNSS_SIGNAL_TYPE_NAVIC_L5 = 18,
     /**  GNSS signal is of BEIDOU B2A_Q RF band.  <br/>   */
     GNSS_SIGNAL_TYPE_BEIDOU_B2A_Q = 19,
+    /**  GNSS signal is of BEIDOU B2B_I RF band.  <br/>   */
+    GNSS_SIGNAL_TYPE_BEIDOU_B2B_I = 20,
+    /**  GNSS signal is of BEIDOU B2B_Q RF band.  <br/>   */
+    GNSS_SIGNAL_TYPE_BEIDOU_B2B_Q = 21,
     /** Maximum number of signal types. <br/>   */
     GNSS_MAX_NUMBER_OF_SIGNAL_TYPES
 };
@@ -1349,6 +1572,33 @@ struct GnssData {
     double        jammerInd[GNSS_MAX_NUMBER_OF_SIGNAL_TYPES];
     /** Automatic gain control metric, in unit of dB.  <br/>   */
     double        agc[GNSS_MAX_NUMBER_OF_SIGNAL_TYPES];
+    /** Method to print the struct to human readable form, for logging.
+     *  <br/> */
+    string toString() const;
+};
+
+/** Disaster and crisis report type that are currently supported
+ *  by the GNSS engine. <br/> */
+enum GnssDcReportType {
+    /** Disaster Prevention information provided by Japan
+     *  Meteolorogical Agency. <br/>  */
+    QZSS_JMA_DISASTER_PREVENTION_INFO = 43,
+    /** Disaster Prevention information provided by other
+     *  organizations. <br/> */
+    QZSS_NON_JMA_DISASTER_PREVENTION_INFO = 44,
+};
+
+/** Specify the type and data payload contained in the disaster
+ *  and crisis report received from GNSS engine. <br/>  */
+struct GnssDcReport {
+    /** disaster and crisis report type, as defined in standard.
+     *  <br/> */
+    GnssDcReportType     dcReportType;
+    /** number of valid bits that client should make use in
+    the payload specififed in GnssDcReport::dcReportData. <br/>  */
+    uint32_t             numValidBits;
+    /** dc report data, packed into uint8_t. <br/>  */
+    std::vector<uint8_t> dcReportData;
     /** Method to print the struct to human readable form, for logging.
      *  <br/> */
     string toString() const;
@@ -1414,10 +1664,10 @@ enum GnssMeasurementsDataFlagsMask{
      *  GnssMeasurementsData::agcLevelDb.  <br/>   */
     GNSS_MEASUREMENTS_DATA_AUTOMATIC_GAIN_CONTROL_BIT       = (1<<17),
     /** GnssMeasurementsData has valid
-     *  GnssMeasurementsData::interSignalBiasNs.  <br/>   */
+     *  GnssMeasurementsData::fullInterSignalBiasNs.  <br/>   */
     GNSS_MEASUREMENTS_DATA_FULL_ISB_BIT                     = (1<<18),
     /** GnssMeasurementsData has valid
-     *  GnssMeasurementsData::interSignalBiasUncertaintyNs.  <br/>   */
+     *  GnssMeasurementsData::fullInterSignalBiasUncertaintyNs.  <br/>   */
     GNSS_MEASUREMENTS_DATA_FULL_ISB_UNCERTAINTY_BIT         = (1<<19),
     /** GnssMeasurementsData has valid
      *  GnssMeasurementsData::cycleslipCount.  <br/>   */
@@ -1425,6 +1675,9 @@ enum GnssMeasurementsDataFlagsMask{
     /** GnssMeasurementsData has valid
      *  GnssMeasurementsData::gnssSignalType. <br/> */
     GNSS_MEASUREMENTS_DATA_GNSS_SIGNAL_TYPE_BIT             = (1<<21),
+    /** GnssMeasurementsData has valid
+     *  GnssMeasurementsData::basebandCarrierToNoiseDbHz. <br/> */
+    GNSS_MEASUREMENTS_DATA_BASEBAND_CARRIER_TO_NOISE_BIT    = (1<<22),
 };
 
 /** Specify GNSS measurement state in
@@ -1603,12 +1856,18 @@ struct GnssMeasurementsData {
     /** GNSS signal type mask of the SV.
      *  Should always be available in measurement report. <br/> */
     GnssSignalTypeMask gnssSignalType;
-    /** GNSS Intersystem Time Bias. <br/> */
-    double interSignalBiasNs;
-    /** GNSS Intersystem Time Bias uncertanity. <br/> */
-    double interSignalBiasUncertaintyNs;
+    /** The full inter-signal bias (ISB) in nanoseconds. <br/>
+     *  This value is the sum of the estimated receiver-side and the
+     *  space-segment-side inter-system bias, inter-frequency bias
+     *  and inter-code bias. <br/>
+     */
+    double fullInterSignalBiasNs;
+    /** 1-sigma uncertainty associated with the full inter-signal
+     *  bias in nanoseconds. <br/>   */
+    double fullInterSignalBiasUncertaintyNs;
     /** Increments when a cycle slip is detected. <br/> */
     uint8_t cycleSlipCount;
+
     /** Method to print the struct to human readable form, for logging.
      *  <br/> */
     string toString() const;
@@ -1784,16 +2043,25 @@ enum TerrestrialTechnologyMask {
     TERRESTRIAL_TECH_GTP_WWAN = 1 << 0,
 };
 
+/** Specify the batching status in BatchingCb. <br/> */
 enum BatchingStatus {
+    /** service is unable to compute positions for batching; */
     BATCHING_STATUS_INACTIVE    = 0,
+    /** service is able to compute positions for batching. */
     BATCHING_STATUS_ACTIVE      = 1,
+    /** trip distance has been traversed for TripBatching */
     BATCHING_STATUS_DONE        = 2
 };
 
+/** Specifies the Geofence breach/dwell event in GeofenceBreachCb. <br/> */
 enum GeofenceBreachTypeMask {
+    /** Indicates that a client entered the Geofence */
     GEOFENCE_BREACH_ENTER_BIT     = (1<<0),
+    /** Indicates that a client left the Geofence */
     GEOFENCE_BREACH_EXIT_BIT      = (1<<1),
+    /** Indicates that a client has dwelled inside the Geofence for a given period */
     GEOFENCE_BREACH_DWELL_IN_BIT  = (1<<2),
+    /** Indicates that a client has dwelled outside the Geofence for a given period */
     GEOFENCE_BREACH_DWELL_OUT_BIT = (1<<3),
 };
 
@@ -1913,6 +2181,16 @@ typedef std::function<void(
 )> GnssMeasurementsCb;
 
 /** @brief
+    GnssDcReportCb is for receiving GnssDcReport information
+    when LocationClientApi is in a positioning session. <br/>
+
+    @param gnssDcReport: GNSS disaster and crisis report. <br/>
+*/
+typedef std::function<void(
+    const GnssDcReport& gnssDcReport
+)> GnssDcReportCb;
+
+/** @brief
     LocationSystemInfoCb is for receiving rare occuring location
     system information update as defined in
     LocationSystemInfo. <br/>
@@ -1939,7 +2217,7 @@ typedef std::function<void(
 
 /** @brief Used by geofence APIs
 
-    @param responses: include Geofence objects and correponding responses.
+    @param responses: include Geofence objects and their correponding responses.
 */
 class Geofence;
 typedef std::function<void(
@@ -1987,6 +2265,9 @@ struct GnssReportCbs {
     /** Callback to receive NHz GnssMeasurements from modem GNSS
      *  engine. <br/> */
     GnssMeasurementsCb gnssNHzMeasurementsCallback;
+    /** Callback to receive disaster and crisis report from modem
+     *  GNSS engine. <br/> */
+    GnssDcReportCb gnssDcReportCallback;
 };
 
 /** Specify the set of callbacks to receive the reports when
@@ -2018,6 +2299,9 @@ struct EngineReportCbs {
     /** Callback to receive NHz GnssMeasurements from modem GNSS
      *  engine. <br/> */
     GnssMeasurementsCb gnssNHzMeasurementsCallback;
+    /** Callback to receive disaster and crisis report from modem
+     *  GNSS engine. <br/> */
+    GnssDcReportCb gnssDcReportCallback;
 };
 
 /**
@@ -2085,12 +2369,20 @@ public:
         <br/>
 
         If locationCallback is nullptr, this call is no op. <br/>
-        Otherwise, if this API is called for first time or after
-        stopPositionSession(), a position session will be started
-        with the specified parameters and callbacks. <br/>
 
-        If called during a session (no matter from which
-        location_client::startPositionSession()), parameters and
+        Otherwise, if this API is called for first time or after
+        previous position/baching/geofence session has been stopped,
+        a position session will be started with the specified
+        parameters and callbacks. <br/>
+
+        If this API is called when the previous
+        position/batching/geofence session has not yet received
+        responseCallback, this API will receive an error code of
+        LOCATION_RESPONSE_REQUEST_ALREADY_IN_PROGRESS via its
+        responseCallback. <br/>
+
+        If called during on-going session after the responseCb has
+        been received for the on-going session, parameters and
         callbacks will be updated, and the session continues but
         with the new set of parameters and callbacks. <br/>
 
@@ -2155,13 +2447,22 @@ public:
                info in format of GnssLocation and other reports,
                e.g.: SV report and NMEA report.
         If gnssReportCallbacks is nullptr, this call is no op. <br/>
+
         Otherwise, if this API is called for first time or after
-        stopPositionSession(), a position session will be started
-        with the specified parameters and callbacks. <br/>
-        If this API is called during a session (no matter from which
-        startPositionSession() API), parameters and callbacks will
-        be updated, and the session continues but with the new set
-        of parameters and callbacks. <br/>
+        previous position/baching/geofence session has been stopped,
+        a position session will be started with the specified
+        parameters and callbacks. <br/>
+
+        If this API is called when the previous
+        position/batching/geofence session has not yet received
+        responseCallback, this API will receive an error code of
+        LOCATION_RESPONSE_REQUEST_ALREADY_IN_PROGRESS via its
+        responseCallback. <br/>
+
+        If called during on-going session after the responseCb has
+        been received for the on-going session, parameters and
+        callbacks will be updated, and the session continues but
+        with the new set of parameters and callbacks. <br/>
 
         @param intervalInMs <br/>
         Time between fixes, or TBF, in milliseconds. <br/>
@@ -2208,14 +2509,23 @@ public:
         report, SV measurement reports. <br/>
 
         If EngineReportCbs is populated with nullptr only, this call
-        is no op. Otherwise...<br/>
-        If this API is called for first time or after
-        stopPositionSession(), a position session will be started
-        with the specified parameters and callbacks. <br/>
-        If this API is called during a session (no matter from which
-        startPositionSession() API), parameters / callback will be
-        updated, and the session continues but with the new set of
-        parameters / callbacks. <br/>
+        is no op. <br/>
+
+        Otherwise, if this API is called for first time or after
+        previous position/baching/geofence session has been stopped,
+        a position session will be started with the specified
+        parameters and callbacks. <br/>
+
+        If this API is called when the previous
+        position/batching/geofence session has not yet received
+        responseCallback, this API will receive an error code of
+        LOCATION_RESPONSE_REQUEST_ALREADY_IN_PROGRESS via its
+        responseCallback. <br/>
+
+        If called during on-going session after the responseCb has
+        been received for the on-going session, parameters /
+        callback will be updated, and the session continues but with
+        the new set of parameters / callbacks. <br/>
 
         @param intervalInMs
         Time between fixes, or TBF, in milliseconds. <br/>
@@ -2283,15 +2593,17 @@ public:
         specified terrestrial technologies. <br/>
 
         For this phase, only TERRESTRIAL_TECH_GTP_WWAN will be
-        supported and this will return cell-based position. <br/.
+        supported and this will return cell-based position. <br/>.
 
         This API can be invoked with on-going tracking session
-        initiated via startPositionSession(). <br/
+        initiated via startPositionSession() and/or single shot
+        terrestrial fix request initiated via getSinglePosition().
+        <br/>
 
         If this API is invoked with single-shot terrestrial position
         already in progress, the request will fail and the
         responseCallback will get invoked with
-        LOCATION_RESPONSE_BUSY. <br/
+        LOCATION_RESPONSE_REQUEST_ALREADY_IN_PROGRESS. <br/>
 
         @param timeoutMsec
         The amount of time that user is willing to wait for
@@ -2324,18 +2636,18 @@ public:
         available. <br/>
 
         This callback will only be invoked when
-        responseCallback is invoked with ResponseCb with processing
-        status set to LOCATION_RESPONSE_SUCCESS. <br/>
+        responseCallback is invoked with processing status set to
+        LOCATION_RESPONSE_SUCCESS. <br/>
 
         Null terrestrialPositionCallback will cancel the current
-        request. If responseCallback is none-null,
+        request. If responseCallback is non-null,
         LOCATION_RESPONSE_SUCCESS will be delivered. <br/>
 
         @param responseCallback
         Callback to receive processing status, e.g.: success or
         failure code: e.g.: timeout. If null responseCallback is
-        passed, client will not be informed of processing status,
-        e.g.:LOCATION_RESPONSE_PARAM_INVALID. <br/>
+        passed, client will not be informed of processing status.
+        <br/>
 
         When the processing status is LOCATION_RESPONSE_SUCCESS, the
         terrestrialPositionCallback will be invoked to deliver the
@@ -2350,14 +2662,84 @@ public:
         If this API is invoked with single-shot terrestrial position
         already in progress, the request will fail and the
         responseCallback will get invoked with
-        LOCATION_RESPONSE_BUSY. <br/> */
+        LOCATION_RESPONSE_REQUEST_ALREADY_IN_PROGRESS. <br/> */
     void getSingleTerrestrialPosition(uint32_t timeoutMsec,
                                       TerrestrialTechnologyMask techMask,
                                       float horQos,
                                       LocationCb terrestrialPositionCallback,
                                       ResponseCb responseCallback);
 
-    /** @example example1:testTrackingApi
+    /** @brief
+        Retrieve single-shot position using the position
+        technologies supported and enabled on the device. <br/>
+
+        This API can be invoked with on-going tracking session
+        initiated via startPositionSession() and single shot
+        terrestrial fix request initiated via
+        getSingleTerrestrialPosition(). <br/>
+
+        @param timeoutMsec
+        The amount of time that user is willing to wait for
+        the the position to meet the QoS requirement. When
+        timeoutMsec has passed, the latest position received will be
+        delivered to the client and responseCallback is invoked with
+        processing status set to LOCATION_RESPONSE_TIMEOUT. If
+        timeoutMsec is set to 0, responseCallback will get invoked
+        with LOCATION_RESPONSE_PARAM_INVALID. <br/>
+
+        @param horQoS
+        horizontal accuracy requirement for the terrestrial fix. If
+        horQoS is set to 0, responseCallback will get invoked with
+        LOCATION_RESPONSE_PARAM_INVALID. <br/>
+
+        @param positionCallback
+        callback to receive the position fix. Some fields in
+        LocationClientApi::Location, e.g.: speed, bearing and their
+        uncertainty may not be available, e.g.: when the position is
+        produced with terrestria position technology. Please check
+        Location::flags for the fields that are available. <br/>
+
+        This callback will only be invoked when
+        responseCallback is invoked with processing status set to
+        LOCATION_RESPONSE_SUCCESS or LOCATION_RESPONSE_TIMEOUT.
+        <br/>
+
+        Null positionCallback will cancel the current request. If
+        responseCallback is non-null, LOCATION_RESPONSE_SUCCESS
+        will be delivered. <br/>
+
+        @param responseCallback
+        Callback to receive processing status, e.g.: success or
+        failure code: e.g.: timeout. If null responseCallback is
+        passed, client will not be informed of processing status.
+        <br/>
+
+        When the processing status is LOCATION_RESPONSE_SUCCESS, the
+        positionCallback will be invoked to deliver the
+        single-shot position report that meets the QoS requirement.
+        When timeoutMsec has passed, the latest position received
+        will be delivered to the client and responseCallback is
+        invoked with processing status set to
+        LOCATION_RESPONSE_TIMEOUT. Please note that the position
+        received for timeout scenarion may not be fresh and it will
+        not satisfy the QoS requirement. <br/>
+
+        If this API is invoked with invalid parameter, e.g.: 0
+        milli-seconds timeout, or horQoS set to zero value, the
+        responseCallback will get invoked with
+        LOCATION_RESPONSE_PARAM_INVALID. <br/>
+
+        If this API is invoked with single-shot position
+        already in progress, the request will fail and the
+        responseCallback will get invoked with
+        LOCATION_RESPONSE_REQUEST_ALREADY_IN_PROGRESS. <br/> */
+    void getSinglePosition(uint32_t timeoutMsec,
+                           float horQos,
+                           LocationCb positionCallback,
+                           ResponseCb responseCallback);
+
+    /** @example example1:testDetailedGnssReportApi
+    *
     * <pre>
     * <code>
     *    // Sample Code
@@ -2365,7 +2747,14 @@ public:
     *     //...
     * }
     * static void onResponseCb(location_client::LocationResponse response) {
-    *     //...
+    *     if (response == LOCATION_RESPONSE_SUCCESS) {
+    *         // successfully started the tracking session
+    *         // expecting to receive detailed GNSS PVT reports and other reports
+    *         // the registered callbacks
+    *     } else {
+    *         // request to start the tracking session failed
+    *         // detained GNSS PVT reports and other report callbacks will not be invoked
+    *     }
     * }
     * static void onGnssLocationCb(const GnssLocation& location) {
     *     //...
@@ -2378,7 +2767,7 @@ public:
     * static void onGnssNmeaCb(uint64_t timestamp, const std::string& nmea) {
     *     //...
     * }
-    * void testTrackingApi() {
+    * void testDetailedGnssReportApi() {
     *     LocationClientApi *pClient = new LocationClientApi(onCapabilitiesCb);
     *     if (nullptr == pClient) {
     *         LOC_LOGe("failed to create LocationClientApi instance");
@@ -2404,6 +2793,129 @@ public:
     *     //...
     *     // stop session
     *     pClient->stopPositionSession();
+    *     //...
+    * }
+    * </code>
+    * </pre>
+    */
+
+    /** @example example2:testEngineReportApi
+    * <pre>
+    * <code>
+    *    // Sample Code
+    * static void onCapabilitiesCb(location_client::LocationCapabilitiesMask mask) {
+    *     //...
+    * }
+    * static void onResponseCb(location_client::LocationResponse response) {
+    *     if (response == LOCATION_RESPONSE_SUCCESS) {
+    *         // successfully started the tracking session
+    *         // expecting to receive engine PVT reports and other reports
+    *         // the registered callbacks
+    *     } else {
+    *         // request to start the tracking session failed
+    *         // engine PVT reports and other report callbacks will not be invoked
+    *     }
+    * }
+    * static void onEngLocationsCb(const std::vector<location_client::GnssLocation>& locations) {
+    *     for (auto gnssLocation : locations) {
+    *          if (gnssLocation.locOutputEngType == LOC_OUTPUT_ENGINE_FUSED) {
+    *               // This is fused report, check engines contributed to the fused report
+    *               if (gnssLocation.locOutputEngMask & STANDARD_POSITIONING_ENGINE) {
+    *                   // standard position engine contributed to the fix
+    *               }
+    *               if (gnssLocation.locOutputEngMask & RECISE_POSITIONING_ENGINE) {
+    *                   // standard position engine contributed to the fix
+    *               }
+    *               if (gnssLocation.locOutputEngMask & DEAD_RECKONING_ENGINE) {
+    *                   // standard position engine contributed to the fix
+    *               }
+    *          } else if (gnssLocation.locOutputEngType == LOC_OUTPUT_ENGINE_SPE) {
+    *               // This is unmodified and prompt SPE report
+    *          } else if (gnssLocation.locOutputEngType == LOC_OUTPUT_ENGINE_PPE) {
+    *              // This is unmodified and prompt PPE report
+    *          }
+    *     }
+    * }
+    *
+    * static void onGnssSvCb(const std::vector<location_client::GnssSv>& gnssSvs) {
+    *     //...
+    * }
+    *
+    * static void onGnssNmeaCb(uint64_t timestamp, const std::string& nmea) {
+    *     //...
+    * }
+    * static void onGnssDataCb(const location_client::GnssData& gnssData) {
+    *     //...
+    * }
+    * static void onGnssMeasurementsCb(const location_client::GnssMeasurements& gnssMeasurements) {
+    *     //...
+    * }
+    *
+    * void testEngineReportApi() {
+    *     LocationClientApi *pClient = new LocationClientApi(onCapabilitiesCb);
+    *     if (nullptr == pClient) {
+    *         LOC_LOGe("failed to create LocationClientApi instance");
+    *         return;
+    *     }
+    *
+    *     uint32_t interval = 1000;
+    *     // Request position from fused engine, SPE and PPE engines
+    *     // Adjust reqEngMask to client need
+    *     LocReqEngineTypeMask reqEngMask = (LOC_REQ_ENGINE_FUSED_BIT | LOC_REQ_ENGINE_SPE_BIT |
+    *                                       LOC_REQ_ENGINE_PPE_BIT);
+    *
+    *     // set callbacks
+    *     EngineReportCbs enginecbs;
+    *     enginecbs.engLocationsCallback = EngineLocationsCb(onEngLocationsCb);
+    *     enginecbs.gnssSvCallback = GnssSvCb(onGnssSvCb);
+    *     enginecbs.gnssNmeaCallback = GnssNmeaCb(onGnssNmeaCb);
+    *     enginecbs.gnssMeasurementsCallback = GnssMeasurementsCb(onGnssMeasurementsCb);
+    *     enginecbs.gnssNHzMeasurementsCallback = GnssMeasurementsCb(onGnssMeasurementsCb);
+    *     enginecbs.gnssDataCallback = GnssDataCb(onGnssDataCb);
+    *
+    *     // start tracking session
+    *     pClient->startPositionSession(interval, reqEngMask, enginecbs, onResponseCb);
+    *     //...
+    *     // stop session
+    *     pClient->stopPositionSession();
+    *     //...
+    * }
+    * </code>
+    * </pre>
+    */
+
+   /** @example example3:testSingleShotTerrestrialFixApi
+    * <pre>
+    * <code>
+    *    // Sample Code
+    * static void onCapabilitiesCb(location_client::LocationCapabilitiesMask mask) {
+    *     //...
+    * }
+    * static void onResponseCb(location_client::LocationResponse response) {
+    *     if (response == LOCATION_RESPONSE_SUCCESS) {
+    *         // successfully requested single shot gtp location
+    *         // onGtpLocationCb() will be invoked once to deliver gtp location
+    *     } else {
+    *         // request for single shot gtp fix failed
+    *         // onGtpLocationCb() will not be invoked
+    *     }
+    * }
+    * static void onGtpLocationCb(const location_client::Location& location) {
+    *   //...
+    * }
+    * void testSingleShotTerrestrialFixApi() {
+    *     LocationClientApi *pClient = new LocationClientApi(onCapabilitiesCb);
+    *     if (nullptr == pClient) {
+    *         LOC_LOGe("failed to create LocationClientApi instance");
+    *         return;
+    *     }
+    *     uint32_t timeoutMsec = 60000,
+    *     uint32_t gtpTechmask = TERRESTRIAL_TECH_GTP_WWAN;
+    *     pClient->getSingleTerrestrialPosition(timeoutMsec,
+    *                                           (TerrestrialTechnologyMask) gtpTechMask,
+    *                                           0.0, onGtpLocationCb, onResponseCb);
+    *     //...
+    * }
     * </code>
     * </pre>
     */
@@ -2411,19 +2923,33 @@ public:
     /* ================================== BATCHING ================================== */
 
     /** @brief starts an outdoor trip mode batching session with specified parameters.
-        Trip mode batching completes on its own when trip distance is covered.
-        The behavior of the call is non contextual. The current state or the history of
-        actions does not influence the end result of this call. For example, calling
-        this function when idle, or calling this function after another startTripBatchingSession()
-        or startRoutineBatchingSession(), or calling this function after stopBatchingSession()
-        achieve the same result, which is one of the below:
-        If batchingCallback is nullptr, this call is no op. Otherwise...
-        If both minInterval and tripDistance are don't care, this call is no op.
-           Otherwise...
-        If called during a session (no matter from which startTripBatchingSession()/
-        startRoutineBatchingSession() API), parameters / callback will be updated,
-        and the session continues but with the new set of parameters / callback.
-        locations are reported on the batchingCallback in batches when batch is full.
+        Client gets callback of batched locations only after the trip distance is covered
+        or the batch buffer is full, whichever occurs first
+
+        Calling this function when idle, or calling this function
+        after another the previous position/batching/geofence
+        session is stopped will achieve the same result, which is
+        one of the below: If batchingCallback is nullptr, this call
+        is no op. If both minInterval and tripDistance are don't
+        care, this call is no op. Otherwise a batching session will
+        be started with the specified parameters and callbacks.
+
+        If this API is called when any previous
+        position/batching/geofence session has not yet received
+        responseCallback, this API will receive an error code of
+        LOCATION_RESPONSE_REQUEST_ALREADY_IN_PROGRESS via its
+        responseCallback.
+
+        If called during on-going session after the responseCb has
+        been received for the on-going session, parameters /
+        callback will be updated. parameters / callback will be
+        updated, and the session continues but with the new set of
+        parameters / callback. locations are reported on the
+        batchingCallback in batches when batch is full or trip distance has been reached.
+
+        By design, LCA doesn't support simultaneous tracking and batching session.
+        If there is tracking session ongoing, routine batching session request will
+        receive error code of LOCATION_RESPONSE_EXCLUSIVE_SESSION_IN_PROGRESS. vice versa.
         @param minInterval
         Time between fixes, or TBF, in milliseconds. The actual
         interval of reports recieved will be no larger than
@@ -2452,18 +2978,31 @@ public:
                                   BatchingCb batchingCallback, ResponseCb responseCallback);
 
     /** @brief starts a routine mode batching session with specified parameters.
-        The behavior of the call is non contextual. The current state or the history of
-        actions does not influence the end result of this call. For example, calling
-        this function when idle, or calling this function after another startTripBatchingSession()
-        or startRoutineBatchingSession(), or calling this function after stopBatchingSession()
-        achieve the same result, which is one of the below:
-        If batchingCallback is nullptr, this call is no op. Otherwise...
-        If both minInterval and minDistance are don't care, this call is no op.
-           Otherwise...
-        If called during a session (no matter from which startTripBatchingSession()/
-        startRoutineBatchingSession() API), parameters / callback will be updated,
-        and the session continues but with the new set of parameters / callback.
-        locations are reported on the batchingCallback in batches when batch is full.
+        Client gets callback of batched locations when batching buffer is full
+
+        Calling this function when idle, or calling this function
+        after another the previous position/batching/geofence
+        session is stopped will achieve the same result, which is
+        one of the below: If batchingCallback is nullptr, this call
+        is no op. If both minInterval and tripDistance are don't
+        care, this call is no op. Otherwise a batching session will
+        be started with the specified parameters and callbacks.
+
+        If this API is called when any previous
+        position/batching/geofence session has not yet received
+        responseCallback, this API will receive an error code of
+        LOCATION_RESPONSE_REQUEST_ALREADY_IN_PROGRESS via its
+        responseCallback.
+
+        By design, LCA doesn't support simultaneous tracking and batching session.
+        If there is tracking session ongoing, routine batching session request will
+        receive error code of LOCATION_RESPONSE_EXCLUSIVE_SESSION_IN_PROGRESS. vice versa.
+
+        If called during on-going session after the responseCb has
+        been received for the on-going session, parameters /
+        callback will be updated, and the session continues but with
+        the new set of parameters / callback. locations are reported
+        on the batchingCallback in batches when batch is full.
         @param minInterval
         Time between fixes, or TBF, in milliseconds. The actual
         interval of reports recieved will be no larger than
@@ -2498,7 +3037,7 @@ public:
     */
     void stopBatchingSession();
 
-    /** @example example2:testBatchingApi
+    /** @example example4:testBatchingApi
     * <pre>
     * <code>
     *    // Sample Code
@@ -2520,51 +3059,73 @@ public:
     */
 
     /* ================================== Geofence ================================== */
-    /** @brief Adds any number of geofences. The geofenceBreachCallback will
+    /** @brief Adds vector of geofences. The geofenceBreachCallback will
         deliver the status of each geofence according to the Geofence parameter for each.
+
+        If this API is called when any previous
+        position/batching/geofence session has not yet received
+        responseCallback, this API will receive an error code of
+        LOCATION_RESPONSE_REQUEST_ALREADY_IN_PROGRESS via its
+        responseCallback.
+
         @param geofences
         Geofence objects, Once addGeofences returns, each Geofence object in the vector would
         be the identifier throughout the remaining communication of that geofence.
         Such a Geofence object can be copied or cloned, but they would all reference
-        the same geofence.
+        the same geofence. Currently, at most 20 geofences are allowed to be added/removed within
+        a single request. But client can call add/removeGeofences multiple times to enable
+        more geofences. For other geofence APIs, the geofence must be copied/cloned from
+        the geofence object in the vector after addGeofences API calls.
+
         @param gfBreachCb
-        callback to receive geofences state change. addGeofences is no op if gfBreachCb is null
+        callback to receive geofences state change. mandatory, no op if gfBreachCb is null
         @param responseCallback
         callback to receive geofence ids and system responses; optional.
+        LCA will check if there is former geofence add request whose responseCallback
+        has not yet been invoked, then the latter add request will return
+        LOCATION_RESPONSE_REQUEST_ALREADY_IN_PROGRESS via responseCallback.
     */
     void addGeofences(std::vector<Geofence>& geofences, GeofenceBreachCb gfBreachCb,
                       CollectiveResponseCb responseCallback);
 
-    /** @brief Removes any number of geofences.
+    /** @brief Removes vector of geofences.
         @param geofences
         Geofence objects, must be originally added to the system. Otherwise it would be no op.
+        The geofences parameter must be copied/cloned from the geofences vector of addGeofences()
+        API which should get called beforehand.
     */
     void removeGeofences(std::vector<Geofence>& geofences);
 
-    /** @brief Modifies any number of geofences.
+    /** @brief Modifies vector of geofences.
         @param geofences
         Geofence objects, must be originally added to the system. Otherwise it would be no op.
         Modifiable fields include breachTypeMask, responsiveness and dwelltime.
         A geofence that has been added to the system may have these fields modified.
         But it is not going to take any effect until modifyGeofences is called with
         the changed geofence passed in.
+        The geofences parameter must be copied/cloned from the geofences vector of addGeofences()
+        API which should get called beforehand.
     */
     void modifyGeofences(std::vector<Geofence>& geofences);
 
-    /** @brief Pauses any number of geofences, which is similar to removeGeofences,
+    /** @brief Pauses vector of geofences, which is similar to removeGeofences,
         only that they can be resumed at any time.
         @param geofences
         Geofence objects, must be originally added to the system. Otherwise it would be no op.
+        The geofences parameter must be copied/cloned from the geofences vector of addGeofences()
+        API which should get called beforehand.
     */
     void pauseGeofences(std::vector<Geofence>& geofences);
 
-    /** @brief Resumes any number of geofences that are currently paused.
+    /** @brief Resumes vector of geofences that are currently paused.
         @param geofences
         Geofence objects, must be originally added to the system. Otherwise it would be no op.
+        The geofences parameter must be copied/cloned from the geofences vector of addGeofences()
+        API which should get called beforehand.
     */
     void resumeGeofences(std::vector<Geofence>& geofences);
 
-    /** @example example3:testGeofenceApi
+    /** @example example5:testGeofenceApi
     * <pre>
     * <code>
     *    // Sample Code
@@ -2633,6 +3194,44 @@ public:
     void getGnssEnergyConsumed(GnssEnergyConsumedCb gnssEnergyConsumedCallback,
                                ResponseCb responseCallback);
 
+
+    /** @example example6:testEnergyConsumedApi
+     * <pre>
+     * <code>
+     *    // Sample Code
+     * static void onCapabilitiesCb(location_client::LocationCapabilitiesMask mask) {
+     *     //...
+     * }
+     * static void onResponseCb(location_client::LocationResponse response) {
+     *     if (response == LOCATION_RESPONSE_SUCCESS) {
+     *         // successfully requested GNSS energy consumed info
+     *         // expecting to receive energy consumed info via ongnssEnergyConsumedInfoCb()
+     *     } else {
+     *         // request to retrieve GNSS energy consumed info failed
+     *         // ongnssEnergyConsumedInfoCb will not be invoked
+     *     }
+     * }
+     * static void ongnssEnergyConsumedInfoCb(const GnssEnergyConsumedInfo& gnssEneryConsumed) {
+     *   if (gnssEneryConsumed.flags & ENERGY_CONSUMED_SINCE_FIRST_BOOT_BIT) {
+     *       print("enery consumed since bootup: " +
+     *             gnssEneryConsumed.totalEnergyConsumedSinceFirstBoot);
+     *   }
+     * }
+     * void testEnergyConsumedApi() {
+     *     LocationClientApi *pClient = new LocationClientApi(onCapabilitiesCb);
+     *     if (nullptr == pClient) {
+     *         LOC_LOGe("failed to create LocationClientApi instance");
+     *         return;
+     *     }
+     *
+     *     pClient->getGnssEnergyConsumed(gnssEnergyConsumedInfoCb,
+     *        gnssEnergyConsumedResponseCb);
+     *     //...
+     * }
+     * </code>
+     * </pre>
+     */
+
     /** @brief
         Register/update listener to receive location system info
         that are not tied with positioning session, e.g.: next leap
@@ -2653,7 +3252,48 @@ public:
         */
     void updateLocationSystemInfoListener(LocationSystemInfoCb locSystemInfoCallback,
                                           ResponseCb responseCallback);
-
+    /** @example example7:testRegisterForSystemEventApi
+    * <pre>
+    * <code>
+    *    // Sample Code
+    * static void onCapabilitiesCb(location_client::LocationCapabilitiesMask mask) {
+    *     //...
+    * }
+    * static void onResponseCb(location_client::LocationResponse response) {
+    *     if (response == LOCATION_RESPONSE_SUCCESS) {
+    *         // successfully registered for system info update
+    *         // expecting to receive current leap second and leap second change event
+    *         via onLocationSystemInfoCb()
+    *     } else {
+    *         // failed to register for system info update
+    *         // onLocationSystemInfoCb() will not be invoked
+    *     }
+    * }
+    * static void onLocationSystemInfoCb(const location_client::LocationSystemInfo& systemInfo) {
+    *   if (systemInfo.systemInfoMask & LEAP_SECOND_SYS_INFO_CURRENT_LEAP_SECONDS_BIT) {
+    *       // current leap second info is valid
+    *   }
+    *   if (systemInfo.systemInfoMask & LEAP_SECOND_SYS_INFO_LEAP_SECOND_CHANGE_BIT) {
+    *       // leap second change event info is valid
+    *   }
+    * }
+    * void testRegisterForSystemEventApi() {
+    *     LocationClientApi *pClient = new LocationClientApi(onCapabilitiesCb);
+    *     if (nullptr == pClient) {
+    *         LOC_LOGe("failed to create LocationClientApi instance");
+    *         return;
+    *     }
+    *     // register for system info update
+    *     pClient->updateLocationSystemInfoListener(onLocationSystemInfoCb,
+    *             onResponseCb);
+    *     ...
+    *     // unregister for system info update when the info is no longer needed
+    *     pClient->updateLocationSystemInfoListener(null, null);
+    *     //...
+    * }
+    * </code>
+    * </pre>
+    */
 
     /** @brief
         Get the year of Hardware information.<br/>
@@ -2681,6 +3321,7 @@ class GeofenceImpl;
 class Geofence {
     friend class GeofenceImpl;
     friend class LocationClientApi;
+    friend class LocationClientApiImpl;
     std::shared_ptr<GeofenceImpl> mGeofenceImpl;
     double mLatitude;
     double mLongitude;

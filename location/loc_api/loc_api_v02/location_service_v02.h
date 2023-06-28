@@ -98,7 +98,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *====*====*====*====*====*====*====*====*====*====*====*====*====*====*====*/
 
 /* This file was generated with Tool version 6.14.7
-   It was generated on: Tue May  3 2022 (Spin 0)
+   It was generated on: Mon May  9 2022 (Spin 0)
    From IDL File: location_service_v02.idl */
 
 /** @defgroup loc_qmi_consts Constant values defined in the IDL */
@@ -124,11 +124,11 @@ extern "C" {
 /** Major Version Number of the IDL used to generate this file */
 #define LOC_V02_IDL_MAJOR_VERS 0x02
 /** Revision Number of the IDL used to generate this file */
-#define LOC_V02_IDL_MINOR_VERS 0x99
+#define LOC_V02_IDL_MINOR_VERS 0x9A
 /** Major Version Number of the qmi_idl_compiler used to generate this file */
 #define LOC_V02_IDL_TOOL_VERS 0x06
 /** Maximum Defined Message ID */
-#define LOC_V02_MAX_MESSAGE_ID 0x00E8
+#define LOC_V02_MAX_MESSAGE_ID 0x00E9
 /**
     @}
   */
@@ -571,6 +571,7 @@ extern "C" {
 #define QMI_LOC_FIX_STATUS_TOO_FEW_SVS_V02 0x02
 #define QMI_LOC_FIX_STATUS_HEPE_CHECK_FAILED_V02 0x04
 #define QMI_LOC_FIX_STATUS_LOW_RELIABILITY_V02 0x08
+#define QMI_LOC_MAX_APP_HASH_LEN_V02 64
 /**
     @}
   */
@@ -24923,6 +24924,120 @@ typedef struct {
     @}
   */
 
+/** @addtogroup loc_qmi_enums
+    @{
+  */
+typedef enum {
+  QMILOCSDKFEATURECONFIGENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
+  eQMI_LOC_SDK_FEATURE_CONFIG_ENABLE_V02 = 0, /**<  Enable Feature  */
+  eQMI_LOC_SDK_FEATURE_CONFIG_DISABLE_V02 = 1, /**<  Disable Feature.  */
+  eQMI_LOC_SDK_FEATURE_CONFIG_SUSPEND_V02 = 2, /**<  Suspend Feature  */
+  eQMI_LOC_SDK_FEATURE_CONFIG_RESUME_V02 = 3, /**<  Resume Feature.  */
+  QMILOCSDKFEATURECONFIGENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
+}qmiLocSdkFeatureConfigEnumT_v02;
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Request Message; Used by the control point to enable/disable/suspend/resume
+                     SDK controlled Location MPSS features. */
+typedef struct {
+
+  /* Optional */
+  /*  SDK feature Config command */
+  uint8_t featureConfig_valid;  /**< Must be set to true if featureConfig is being passed */
+  qmiLocSdkFeatureConfigEnumT_v02 featureConfig;
+  /**<   SDK Feature Config command.
+ Values: \n
+      - eQMI_LOC_SDK_FEATURE_CONFIG_ENABLE (0) --  Enable Feature
+      - eQMI_LOC_SDK_FEATURE_CONFIG_DISABLE (1) --  Disable Feature.
+      - eQMI_LOC_SDK_FEATURE_CONFIG_SUSPEND (2) --  Suspend Feature
+      - eQMI_LOC_SDK_FEATURE_CONFIG_RESUME (3) --  Resume Feature. */
+
+  /* Optional */
+  /*  Application hash */
+  uint8_t appHash_valid;  /**< Must be set to true if appHash is being passed */
+  uint32_t appHash_len;  /**< Must be set to # of elements in appHash */
+  uint8_t appHash[QMI_LOC_MAX_APP_HASH_LEN_V02];
+  /**<   APP hash. \n
+      - Type -- Array of bytes \n
+      - Maximum length of the array -- 64
+  */
+
+  /* Optional */
+  /*  Features Mask */
+  uint8_t featureStatusReport_valid;  /**< Must be set to true if featureStatusReport is being passed */
+  qmiLocFeaturesStatusMaskT_v02 featureStatusReport;
+  /**<   Bitmask indicating the features HLOS is requesting
+ to enable.
+ Valid bitmasks: \n
+      - QMI_LOC_FEATURE_STATUS_CARRIER_PHASE (0x00000001) --  Carrier Phase feature status. \n
+      - QMI_LOC_FEATURE_STATUS_SV_POLYNOMIALS (0x00000002) --  SV Polynomial reporting status.\n
+      - QMI_LOC_FEATURE_STATUS_SV_EPHEMERIS (0x00000004) --  SV Ephemeris reporting status.\n
+      - QMI_LOC_FEATURE_STATUS_SINGLE_FREQUENCY (0x00000008) --  GNSS Single Frequency status.\n
+      - QMI_LOC_FEATURE_STATUS_MULTI_FREQUENCY (0x00000010) --  GNSS Multi Frequency status. \n
+      - QMI_LOC_FEATURE_STATUS_TIME_FREQUENCY (0x00000020) --  Time and Frequency status.\n
+      - QMI_LOC_FEATURE_STATUS_TIME_UNCERTAINTY (0x00000040) --  Time Uncertainty  status. \n
+      - QMI_LOC_FEATURE_STATUS_CLOCK_ESTIMATE (0x00000080) --  Clock Estimate status. \n
+      - QMI_LOC_FEATURE_STATUS_DGNSS (0x00000100) --  DGNSS feature status. \n
+      - QMI_LOC_FEATURE_STATUS_QPPE (0x00000200) --  QPPE feature status.
+ */
+}qmiLocSetSdkFeatureConfigReqMsgT_v02;  /* Message */
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Indication Message; Used by the control point to enable/disable/suspend/resume
+                     SDK controlled Location MPSS features. */
+typedef struct {
+
+  /* Mandatory */
+  /*  Status of Request */
+  qmiLocStatusEnumT_v02 status;
+  /**<   Status of the SDK Feature config request.
+ Values: \n
+      - eQMI_LOC_SUCCESS (0) --  Request was completed successfully \n
+      - eQMI_LOC_GENERAL_FAILURE (1) --  Request failed because of a general failure \n
+      - eQMI_LOC_UNSUPPORTED (2) --  Request failed because it is not supported \n
+      - eQMI_LOC_INVALID_PARAMETER (3) --  Request failed because it contained invalid parameters \n
+      - eQMI_LOC_ENGINE_BUSY (4) --  Request failed because the engine is busy \n
+      - eQMI_LOC_PHONE_OFFLINE (5) --  Request failed because the phone is offline \n
+      - eQMI_LOC_TIMEOUT (6) --  Request failed because it has timed out \n
+      - eQMI_LOC_CONFIG_NOT_SUPPORTED (7) --  Request failed because an undefined configuration was requested \n
+      - eQMI_LOC_INSUFFICIENT_MEMORY (8) --  Request failed because the engine could not allocate sufficient memory for the request \n
+      - eQMI_LOC_MAX_GEOFENCE_PROGRAMMED (9) --  Request failed because the maximum number of Geofences are already programmed \n
+      - eQMI_LOC_XTRA_VERSION_CHECK_FAILURE (10) --  Location service failed because of an XTRA version-based file format check failure \n
+      - eQMI_LOC_GNSS_DISABLED (11) --  Request failed because the location service is disabled   */
+
+  /* Optional */
+  /*  Features Mask */
+  uint8_t featureStatusReport_valid;  /**< Must be set to true if featureStatusReport is being passed */
+  qmiLocFeaturesStatusMaskT_v02 featureStatusReport;
+  /**<   Bitmask indicating the modem feature status for
+ features enabled with licenses.
+ Valid bitmasks: \n
+      - QMI_LOC_FEATURE_STATUS_CARRIER_PHASE (0x00000001) --  Carrier Phase feature status. \n
+      - QMI_LOC_FEATURE_STATUS_SV_POLYNOMIALS (0x00000002) --  SV Polynomial reporting status.\n
+      - QMI_LOC_FEATURE_STATUS_SV_EPHEMERIS (0x00000004) --  SV Ephemeris reporting status.\n
+      - QMI_LOC_FEATURE_STATUS_SINGLE_FREQUENCY (0x00000008) --  GNSS Single Frequency status.\n
+      - QMI_LOC_FEATURE_STATUS_MULTI_FREQUENCY (0x00000010) --  GNSS Multi Frequency status. \n
+      - QMI_LOC_FEATURE_STATUS_TIME_FREQUENCY (0x00000020) --  Time and Frequency status.\n
+      - QMI_LOC_FEATURE_STATUS_TIME_UNCERTAINTY (0x00000040) --  Time Uncertainty  status. \n
+      - QMI_LOC_FEATURE_STATUS_CLOCK_ESTIMATE (0x00000080) --  Clock Estimate status. \n
+      - QMI_LOC_FEATURE_STATUS_DGNSS (0x00000100) --  DGNSS feature status. \n
+      - QMI_LOC_FEATURE_STATUS_QPPE (0x00000200) --  QPPE feature status.
+ */
+}qmiLocSetSdkFeatureConfigIndMsgT_v02;  /* Message */
+/**
+    @}
+  */
+
 /* Conditional compilation tags for message removal */
 //#define REMOVE_QMI_LOC_ADD_CIRCULAR_GEOFENCE_V02
 //#define REMOVE_QMI_LOC_ADD_GEOFENCE_CONTEXT_V02
@@ -25107,6 +25222,7 @@ typedef struct {
 //#define REMOVE_QMI_LOC_SET_PROTOCOL_CONFIG_PARAMETERS_V02
 //#define REMOVE_QMI_LOC_SET_ROBUST_LOCATION_CONFIG_V02
 //#define REMOVE_QMI_LOC_SET_SBAS_CONFIG_V02
+//#define REMOVE_QMI_LOC_SET_SDK_FEATURE_CONFIG_V02
 //#define REMOVE_QMI_LOC_SET_SENSOR_CONTROL_CONFIG_V02
 //#define REMOVE_QMI_LOC_SET_SENSOR_PERFORMANCE_CONTROL_CONFIGURATION_V02
 //#define REMOVE_QMI_LOC_SET_SENSOR_PROPERTIES_V02
@@ -25616,6 +25732,9 @@ typedef struct {
 #define QMI_LOC_GET_TRIBAND_STATE_REQ_V02 0x00E8
 #define QMI_LOC_GET_TRIBAND_STATE_RESP_V02 0x00E8
 #define QMI_LOC_GET_TRIBAND_STATE_IND_V02 0x00E8
+#define QMI_LOC_SET_SDK_FEATURE_CONFIG_REQ_V02 0x00E9
+#define QMI_LOC_SET_SDK_FEATURE_CONFIG_RESP_V02 0x00E9
+#define QMI_LOC_SET_SDK_FEATURE_CONFIG_IND_V02 0x00E9
 /**
     @}
   */

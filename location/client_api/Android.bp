@@ -1,18 +1,19 @@
 
 cc_library_shared {
 
-    name: "liblocation_client_api.impl",
+    name: "liblocation_client_api",
     vendor: true,
 
     //# Libs
     shared_libs: [
         "libgps.utils",
         "liblocation_api_msg",
-        "libprotobuf-cpp-full",
+        "libprotobuf-cpp-lite",
         "liblog",
     ],
 
     srcs: [
+        "src/LocationClientApi.cpp",
         "src/LocationClientApiImpl.cpp",
         "src/LCAReportLoggerUtil.cpp",
     ],

@@ -26,6 +26,42 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #ifndef LOCATIONAPIMSG_H
 #define LOCATIONAPIMSG_H
 
@@ -84,12 +120,9 @@ public:
     SockNode(SockNode&& node) :
             SockNode(node.mId1, node.mId2, move(node.mNodePathnamePrefix)) {
     }
-    static SockNode create(const string fullPathName) {
-        return create(fullPathName.c_str(), fullPathName.size());
-    }
-    static SockNode create(const char* fullPathName, int32_t length = -1) {
+    static int getId1Id2(const char* fullPathName, int32_t length, int32_t& id1, int32_t& id2) {
         uint32_t count = 0;
-        int32_t indx = 0, id1 = -1, id2 = -1;
+        int32_t indx = 0;
 
         if (nullptr == fullPathName) {
             fullPathName = "";
@@ -108,9 +141,20 @@ public:
         } else {
             indx = 0;
         }
+        return indx;
+    }
+
+    static SockNode create(const string fullPathName) {
+        return create(fullPathName.c_str(), fullPathName.size());
+    }
+
+    static SockNode create(const char* fullPathName, int32_t length = -1) {
+        int32_t indx = 0, id1 = -1, id2 = -1;
+        indx = getId1Id2(fullPathName, length, id1, id2);
 
         return SockNode(id1, id2, string(fullPathName, indx));
     }
+
     inline int getId1() const { return mId1; }
     inline int getId2() const { return mId2; }
     inline const string& getNodePathnamePrefix() const { return mNodePathnamePrefix; }
@@ -189,7 +233,6 @@ public:
 
         return string(sEAP).append(1, '_').append(progName, program_name_length);
     }
-
 };
 
 /******************************************************************************
@@ -255,6 +298,21 @@ enum ELocMsgID {
     E_LOCAPI_GET_SINGLE_TERRESTRIAL_POS_REQ_MSG_ID = 31,
     E_LOCAPI_GET_SINGLE_TERRESTRIAL_POS_RESP_MSG_ID = 32,
 
+    // Debug Report
+    E_LOCAPI_GET_DEBUG_REQ_MSG_ID = 33,
+    E_LOCAPI_GET_DEBUG_RESP_MSG_ID = 34,
+
+    // Disater and crisis reports
+    E_LOCAPI_DC_REPORT_MSG_ID = 35,
+
+    // Antenna Info
+    E_LOCAPI_GET_ANTENNA_INFO_MSG_ID = 36,
+    E_LOCAPI_ANTENNA_INFO_MSG_ID = 37,
+
+    // Single fix request/response msg
+    E_LOCAPI_GET_SINGLE_POS_REQ_MSG_ID = 38,
+    E_LOCAPI_GET_SINGLE_POS_RESP_MSG_ID = 39,
+
     // ping
     E_LOCAPI_PINGTEST_MSG_ID = 99,
 
@@ -272,6 +330,9 @@ enum ELocMsgID {
     E_INTAPI_CONFIG_ENGINE_RUN_STATE_MSG_ID = 210,
     E_INTAPI_CONFIG_USER_CONSENT_TERRESTRIAL_POSITIONING_MSG_ID = 211,
     E_INTAPI_CONFIG_OUTPUT_NMEA_TYPES_MSG_ID = 212,
+    E_INTAPI_CONFIG_ENGINE_INTEGRITY_RISK_MSG_ID = 213,
+    E_INTAPI_INJECT_LOCATION_MSG_ID = 214,
+    E_INTAPI_CONFIG_XTRA_PARAMS_MSG_ID = 215,
 
     // integration API config retrieval request/response
     E_INTAPI_GET_ROBUST_LOCATION_CONFIG_REQ_MSG_ID  = 300,
@@ -285,7 +346,15 @@ enum ELocMsgID {
 
     E_INTAPI_GET_CONSTELLATION_SECONDARY_BAND_CONFIG_REQ_MSG_ID = 306,
     E_INTAPI_GET_CONSTELLATION_SECONDARY_BAND_CONFIG_RESP_MSG_ID = 307,
+
+    E_INTAPI_GET_XTRA_STATUS_REQ_MSG_ID = 308,
+    E_INTAPI_GET_XTRA_STATUS_RESP_MSG_ID = 309,
+
+    E_INTAPI_REGISTER_XTRA_STATUS_UPDATE_REQ_MSG_ID = 310,
+    E_INTAPI_DEREGISTER_XTRA_STATUS_UPDATE_REQ_MSG_ID = 311,
 };
+
+const char* LocApiMsgString(ELocMsgID msgId);
 
 typedef uint32_t LocationCallbacksMask;
 enum ELocationCallbacksOption {
@@ -302,6 +371,8 @@ enum ELocationCallbacksOption {
     E_LOC_CB_SIMPLE_LOCATION_INFO_BIT   = (1<<10), /**< Register for simple location */
     E_LOC_CB_GNSS_MEAS_BIT              = (1<<11), /**< Register for GNSS Measurements */
     E_LOC_CB_GNSS_NHZ_MEAS_BIT          = (1<<12), /**< Register for NHZ GNSS Measurements */
+    E_LOC_CB_GNSS_DC_REPORT_BIT         = (1<<13), /**< Register for disaster and crisis reports */
+    E_LOC_CB_ANTENNA_INFO_BIT           = (1<<14)  /**< Register for Antenna Info */
 };
 
 // Mask related to all info that are tied with a position session and need to be unsubscribed
@@ -312,7 +383,13 @@ enum ELocationCallbacksOption {
                                        E_LOC_CB_GNSS_DATA_BIT|E_LOC_CB_GNSS_MEAS_BIT|\
                                        E_LOC_CB_GNSS_NHZ_MEAS_BIT|\
                                        E_LOC_CB_ENGINE_LOCATIONS_INFO_BIT|\
-                                       E_LOC_CB_SIMPLE_LOCATION_INFO_BIT)
+                                       E_LOC_CB_SIMPLE_LOCATION_INFO_BIT |\
+                                       E_LOC_CB_GNSS_DC_REPORT_BIT)
+
+#define LOCATION_BATCHING_SESSION_MASK (E_LOC_CB_BATCHING_BIT|\
+                                        E_LOC_CB_BATCHING_STATUS_BIT)
+
+#define LOCATION_GEOFENCE_SESSION_MASK (E_LOC_CB_GEOFENCE_BREACH_BIT)
 
 typedef uint32_t EngineInfoCallbacksMask;
 enum EEngineInfoCallbacksMask {
@@ -366,6 +443,10 @@ struct GeofenceResponse {
 
 struct CollectiveResPayload {
     std::vector<GeofenceResponse> resp;
+};
+
+struct AntennaInformation {
+    std::vector<GnssAntennaInformation> antennaInfos;
 };
 /******************************************************************************
 IPC message header structure
@@ -548,8 +629,16 @@ struct LocAPIStartTrackingReqMsg: LocAPIMsgHeader
 // defintion for message with msg id of E_LOCAPI_STOP_TRACKING_MSG_ID
 struct LocAPIStopTrackingReqMsg: LocAPIMsgHeader
 {
-    inline LocAPIStopTrackingReqMsg(const char* name, const LocationApiPbMsgConv *pbMsgConv) :
-        LocAPIMsgHeader(name, E_LOCAPI_STOP_TRACKING_MSG_ID, pbMsgConv) { }
+    bool clearSubscriptions;
+
+    inline LocAPIStopTrackingReqMsg(const char* name, const LocationApiPbMsgConv *pbMsgConv,
+                                    bool clearSubsc) :
+        LocAPIMsgHeader(name, E_LOCAPI_STOP_TRACKING_MSG_ID, pbMsgConv),
+        clearSubscriptions(clearSubsc) { }
+
+    LocAPIStopTrackingReqMsg(const char* name,
+        const PBLocAPIStopTrackingReqMsg  &pbStopTrackingReqMsg,
+        const LocationApiPbMsgConv *pbMsgConv);
 
     int serializeToProtobuf(string& protoStr) override;
 };
@@ -787,6 +876,42 @@ struct LocAPIGetSingleTerrestrialPosRespMsg: LocAPIMsgHeader
     int serializeToProtobuf(string& protoStr) override;
 };
 
+struct LocAPIGetSinglePosReqMsg: LocAPIMsgHeader
+{
+    uint32_t mTimeoutMsec;
+    float    mHorQoS;
+
+    inline LocAPIGetSinglePosReqMsg(
+            const char* name, uint32_t timeoutMsec,
+            float horQoS, const LocationApiPbMsgConv *pbMsgConv) :
+        LocAPIMsgHeader(name, E_LOCAPI_GET_SINGLE_POS_REQ_MSG_ID, pbMsgConv),
+        mTimeoutMsec(timeoutMsec), mHorQoS(horQoS) { }
+
+    LocAPIGetSinglePosReqMsg(const char* name,
+            const PBLocAPIGetSinglePosReqMsg &pbLocGetPosReq,
+            const LocationApiPbMsgConv *pbMsgConv);
+
+    int serializeToProtobuf(string& protoStr) override;
+};
+
+struct LocAPIGetSinglePosRespMsg: LocAPIMsgHeader
+{
+    LocationError mErrorCode;
+    Location      mLocation;
+
+    inline LocAPIGetSinglePosRespMsg(
+            const char* name, LocationError errorCode, Location location,
+            const LocationApiPbMsgConv *pbMsgConv) :
+        LocAPIMsgHeader(name, E_LOCAPI_GET_SINGLE_POS_RESP_MSG_ID, pbMsgConv),
+        mErrorCode(errorCode), mLocation(location) { }
+
+    LocAPIGetSinglePosRespMsg(const char* name,
+            const PBLocAPIGetSinglePosRespMsg &pbLocGetPosResp,
+            const LocationApiPbMsgConv *pbMsgConv);
+
+    int serializeToProtobuf(string& protoStr) override;
+};
+
 /******************************************************************************
 IPC message structure - indications
 ******************************************************************************/
@@ -796,7 +921,7 @@ struct LocAPILocationIndMsg: LocAPIMsgHeader
     Location locationNotification;
 
     inline LocAPILocationIndMsg(const char* name,
-        Location& location, const LocationApiPbMsgConv *pbMsgConv) :
+        const Location& location, const LocationApiPbMsgConv *pbMsgConv) :
         LocAPIMsgHeader(name, E_LOCAPI_LOCATION_MSG_ID, pbMsgConv),
         locationNotification(location) { }
     LocAPILocationIndMsg(const char* name, const PBLocAPILocationIndMsg &pbLocApiLocIndMsg,
@@ -809,12 +934,13 @@ struct LocAPILocationIndMsg: LocAPIMsgHeader
 struct LocAPIBatchingIndMsg: LocAPIMsgHeader
 {
     LocAPIBatchNotification batchNotification;
+    BatchingMode batchingMode;
 
     inline LocAPIBatchingIndMsg(const char* name, const LocationApiPbMsgConv *pbMsgConv) :
         LocAPIMsgHeader(name, E_LOCAPI_BATCHING_MSG_ID, pbMsgConv) { }
     inline LocAPIBatchingIndMsg(const char* name, LocAPIBatchNotification& batchNotif,
-            const LocationApiPbMsgConv *pbMsgConv) :
-        LocAPIMsgHeader(name, E_LOCAPI_BATCHING_MSG_ID, pbMsgConv),
+            BatchingMode mode, const LocationApiPbMsgConv *pbMsgConv) :
+        LocAPIMsgHeader(name, E_LOCAPI_BATCHING_MSG_ID, pbMsgConv), batchingMode(mode),
         batchNotification(batchNotif) { }
     LocAPIBatchingIndMsg(const char* name, const PBLocAPIBatchingIndMsg &pbLocApiBatchingIndMsg,
             const LocationApiPbMsgConv *pbMsgConv);
@@ -847,7 +973,7 @@ struct LocAPILocationInfoIndMsg: LocAPIMsgHeader
     GnssLocationInfoNotification gnssLocationInfoNotification;
 
     inline LocAPILocationInfoIndMsg(const char* name,
-        GnssLocationInfoNotification& locationInfo,
+        const GnssLocationInfoNotification& locationInfo,
         const LocationApiPbMsgConv *pbMsgConv) :
         LocAPIMsgHeader(name, E_LOCAPI_LOCATION_INFO_MSG_ID, pbMsgConv),
         gnssLocationInfoNotification(locationInfo) { }
@@ -898,7 +1024,7 @@ struct LocAPISatelliteVehicleIndMsg: LocAPIMsgHeader
     GnssSvNotification gnssSvNotification;
 
     inline LocAPISatelliteVehicleIndMsg(const char* name,
-        GnssSvNotification& svNotification,
+        const GnssSvNotification& svNotification,
         const LocationApiPbMsgConv *pbMsgConv) :
         LocAPIMsgHeader(name, E_LOCAPI_SATELLITE_VEHICLE_MSG_ID, pbMsgConv),
         gnssSvNotification(svNotification) { }
@@ -928,7 +1054,7 @@ struct LocAPIDataIndMsg : LocAPIMsgHeader
     GnssDataNotification gnssDataNotification;
 
     inline LocAPIDataIndMsg(const char* name,
-        GnssDataNotification& dataNotification,
+        const GnssDataNotification& dataNotification,
         const LocationApiPbMsgConv *pbMsgConv) :
         LocAPIMsgHeader(name, E_LOCAPI_DATA_MSG_ID, pbMsgConv),
         gnssDataNotification(dataNotification) { }
@@ -944,7 +1070,7 @@ struct LocAPIMeasIndMsg : LocAPIMsgHeader
     GnssMeasurementsNotification gnssMeasurementsNotification;
 
     inline LocAPIMeasIndMsg(const char* name,
-        GnssMeasurementsNotification& measurementsNotification,
+        const GnssMeasurementsNotification& measurementsNotification,
         const LocationApiPbMsgConv *pbMsgConv) :
         LocAPIMsgHeader(name, E_LOCAPI_MEAS_MSG_ID, pbMsgConv),
         gnssMeasurementsNotification(measurementsNotification) { }
@@ -982,6 +1108,22 @@ struct LocAPILocationSystemInfoIndMsg: LocAPIMsgHeader
     LocAPILocationSystemInfoIndMsg(const char* name,
             const PBLocAPILocationSystemInfoIndMsg &pbLocApiLocSysInfoIndMsg,
             const LocationApiPbMsgConv *pbMsgConv);
+
+    int serializeToProtobuf(string& protoStr) override;
+};
+
+// defintion for message with msg id of E_LOCAPI_DC_REPORT_MSG_ID
+struct LocAPIDcReportIndMsg : LocAPIMsgHeader
+{
+    GnssDcReportInfo dcReportInfo;
+
+    inline LocAPIDcReportIndMsg(const char* name,
+                                const GnssDcReportInfo& gnssDcReportInfo,
+                                const LocationApiPbMsgConv *pbMsgConv) :
+        LocAPIMsgHeader(name, E_LOCAPI_DC_REPORT_MSG_ID, pbMsgConv),
+        dcReportInfo(gnssDcReportInfo) { }
+    LocAPIDcReportIndMsg(const char* name, const PBLocAPIDcReportIndMsg &pbLocAPIDcReportIndMsg,
+                         const LocationApiPbMsgConv *pbMsgConv);
 
     int serializeToProtobuf(string& protoStr) override;
 };
@@ -1203,18 +1345,58 @@ struct LocConfigUserConsentTerrestrialPositioningReqMsg: LocAPIMsgHeader
 struct LocConfigOutputNmeaTypesReqMsg: LocAPIMsgHeader
 {
     GnssNmeaTypesMask mEnabledNmeaTypes;
+    GnssGeodeticDatumType mNmeaDatumType;
 
     inline LocConfigOutputNmeaTypesReqMsg(
             const char* name, GnssNmeaTypesMask enabledNmeaTypes,
+            GnssGeodeticDatumType nmeaDatumType,
             const LocationApiPbMsgConv *pbMsgConv) :
         LocAPIMsgHeader(name,
                         E_INTAPI_CONFIG_OUTPUT_NMEA_TYPES_MSG_ID,
                         pbMsgConv),
-        mEnabledNmeaTypes(enabledNmeaTypes) { }
+            mEnabledNmeaTypes(enabledNmeaTypes),
+            mNmeaDatumType(nmeaDatumType) { }
 
     LocConfigOutputNmeaTypesReqMsg(const char* name,
             const PBLocConfigOutputNmeaTypesReqMsg &pbMsg,
             const LocationApiPbMsgConv *pbMsgConv);
+
+    int serializeToProtobuf(string& protoStr) override;
+};
+
+struct LocConfigEngineIntegrityRiskReqMsg: LocAPIMsgHeader
+{
+    // In this API, only one engine is configured at a time
+    PositioningEngineMask mEngType;
+    uint32_t mIntegrityRisk;
+
+    inline LocConfigEngineIntegrityRiskReqMsg(const char* name,
+                                              PositioningEngineMask engType,
+                                              uint32_t integrityRisk,
+                                              const LocationApiPbMsgConv *pbMsgConv) :
+        LocAPIMsgHeader(name, E_INTAPI_CONFIG_ENGINE_INTEGRITY_RISK_MSG_ID, pbMsgConv),
+        mEngType(engType), mIntegrityRisk(integrityRisk) { }
+
+    LocConfigEngineIntegrityRiskReqMsg(const char* name,
+            const PBLocConfigEngineIntegrityRiskReqMsg &pbConfigEngineIntegrityRiskMsg,
+            const LocationApiPbMsgConv *pbMsgConv);
+
+    int serializeToProtobuf(string& protoStr) override;
+};
+
+struct LocConfigXtraReqMsg: LocAPIMsgHeader
+{
+    bool mEnable;
+    XtraConfigParams mXtraParams;
+
+    inline LocConfigXtraReqMsg(const char* name, bool enable, XtraConfigParams xtraParams,
+                               const LocationApiPbMsgConv *pbMsgConv) :
+        LocAPIMsgHeader(name, E_INTAPI_CONFIG_XTRA_PARAMS_MSG_ID, pbMsgConv),
+        mEnable(enable),
+        mXtraParams(xtraParams) { }
+
+    LocConfigXtraReqMsg(const char* name, const PBLocConfigXtraReqMsg &pbConfigXtraMsg,
+                        const LocationApiPbMsgConv *pbMsgConv);
 
     int serializeToProtobuf(string& protoStr) override;
 };
@@ -1318,6 +1500,121 @@ struct LocConfigGetConstellationSecondaryBandConfigRespMsg: LocAPIMsgHeader
     LocConfigGetConstellationSecondaryBandConfigRespMsg(const char* name,
             const PBLocConfigGetConstltnSecondaryBandConfigRespMsg &pbCfgGetConstSecBandCfgResp,
             const LocationApiPbMsgConv *pbMsgConv);
+
+    int serializeToProtobuf(string& protoStr) override;
+};
+
+struct LocAPIGetDebugReqMsg : LocAPIMsgHeader
+{
+    inline LocAPIGetDebugReqMsg(const char* name,
+            const LocationApiPbMsgConv* pbMsgConv) :
+        LocAPIMsgHeader(name, E_LOCAPI_GET_DEBUG_REQ_MSG_ID, pbMsgConv) { }
+
+    int serializeToProtobuf(string& protoStr) override;
+};
+
+struct LocAPIGetDebugRespMsg : LocAPIMsgHeader
+{
+    GnssDebugReport mDebugReport;
+
+    inline LocAPIGetDebugRespMsg(const char* name,
+            GnssDebugReport debugReport,
+            const LocationApiPbMsgConv* pbMsgConv) :
+        LocAPIMsgHeader(name, E_LOCAPI_GET_DEBUG_RESP_MSG_ID, pbMsgConv),
+        mDebugReport(debugReport) { }
+    LocAPIGetDebugRespMsg(const char* name,
+            const PBLocAPIGetDebugRespMsg& pbMsg,
+            const LocationApiPbMsgConv* pbMsgConv);
+
+    int serializeToProtobuf(string& protoStr) override;
+};
+
+struct LocAPIGetAntennaInfoMsg : LocAPIMsgHeader
+{
+    inline LocAPIGetAntennaInfoMsg(const char* name,
+        const LocationApiPbMsgConv* pbMsgConv) :
+        LocAPIMsgHeader(name, E_LOCAPI_GET_ANTENNA_INFO_MSG_ID, pbMsgConv) { }
+
+    int serializeToProtobuf(string& protoStr) override;
+};
+
+struct LocAPIAntennaInfoMsg : LocAPIMsgHeader
+{
+    AntennaInformation mAntennaInfo;
+
+    inline LocAPIAntennaInfoMsg(const char* name,
+            AntennaInformation& antennaInfo,
+            const LocationApiPbMsgConv* pbMsgConv) :
+        LocAPIMsgHeader(name, E_LOCAPI_ANTENNA_INFO_MSG_ID, pbMsgConv),
+        mAntennaInfo(antennaInfo) { }
+    LocAPIAntennaInfoMsg(const char* name,
+            const PBLocAPIAntennaInfoMsg& pbMsg,
+            const LocationApiPbMsgConv* pbMsgConv);
+
+    int serializeToProtobuf(string& protoStr) override;
+};
+
+struct LocIntApiInjectLocationMsg : LocAPIMsgHeader
+{
+    Location mLocation;
+    inline LocIntApiInjectLocationMsg(const char* name,
+                                      const Location &location,
+                                      const LocationApiPbMsgConv *pbMsgConv) :
+        LocAPIMsgHeader(name, E_INTAPI_INJECT_LOCATION_MSG_ID, pbMsgConv),
+        mLocation(location) { }
+
+    LocIntApiInjectLocationMsg(const char* name,
+                               const PBLocIntApiInjectLocationMsg &pbMsg,
+                               const LocationApiPbMsgConv *pbMsgConv);
+
+    int serializeToProtobuf(string& protoStr) override;
+};
+
+/**************** XTRA related section **********************/
+struct LocConfigGetXtraStatusReqMsg: LocAPIMsgHeader
+{
+    inline LocConfigGetXtraStatusReqMsg(const char* name,
+                                        const LocationApiPbMsgConv *pbMsgConv) :
+        LocAPIMsgHeader(name, E_INTAPI_GET_XTRA_STATUS_REQ_MSG_ID,
+                        pbMsgConv) { }
+
+    int serializeToProtobuf(string& protoStr) override;
+};
+
+struct LocConfigRegisterXtraStatusUpdateReqMsg: LocAPIMsgHeader
+{
+    inline LocConfigRegisterXtraStatusUpdateReqMsg(
+            const char* name, const LocationApiPbMsgConv *pbMsgConv) :
+        LocAPIMsgHeader(name, E_INTAPI_REGISTER_XTRA_STATUS_UPDATE_REQ_MSG_ID,
+                        pbMsgConv) { }
+
+    int serializeToProtobuf(string& protoStr) override;
+};
+
+struct LocConfigDeregisterXtraStatusUpdateReqMsg: LocAPIMsgHeader
+{
+    inline LocConfigDeregisterXtraStatusUpdateReqMsg(
+            const char* name, const LocationApiPbMsgConv *pbMsgConv) :
+        LocAPIMsgHeader(name, E_INTAPI_DEREGISTER_XTRA_STATUS_UPDATE_REQ_MSG_ID,
+                        pbMsgConv) { }
+
+    int serializeToProtobuf(string& protoStr) override;
+};
+
+struct LocConfigGetXtraStatusRespMsg: LocAPIMsgHeader
+{
+    XtraStatusUpdateType mUpdateType;
+    XtraStatus           mXtraStatus;
+
+    inline LocConfigGetXtraStatusRespMsg(const char* name,
+                                         XtraStatusUpdateType updateType,
+                                         XtraStatus           xtraStatus,
+                                         const LocationApiPbMsgConv *pbMsgConv) :
+        LocAPIMsgHeader(name, E_INTAPI_GET_XTRA_STATUS_RESP_MSG_ID, pbMsgConv),
+        mUpdateType(updateType), mXtraStatus(xtraStatus) { }
+    LocConfigGetXtraStatusRespMsg(const char* name,
+                                  const PBLocConfigGetXtraStatusRespMsg &pbGetXtraStatusMsg,
+                                  const LocationApiPbMsgConv *pbMsgConv);
 
     int serializeToProtobuf(string& protoStr) override;
 };

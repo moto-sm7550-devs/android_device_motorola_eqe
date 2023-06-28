@@ -26,9 +26,46 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <stdint.h>
 #include <sys/stat.h>
 #include <dlfcn.h>
+#include <dirent.h>
 #include <memory>
 #include <SystemStatus.h>
 #include <LocationApiMsg.h>
@@ -56,7 +93,7 @@ typedef void  (destroyOSFramework)();
 LocationApiService - static members
 ******************************************************************************/
 LocationApiService* LocationApiService::mInstance = nullptr;
-std::mutex LocationApiService::mMutex;
+std::recursive_mutex LocationApiService::mMutex;
 
 /******************************************************************************
 LocHaldIpcListener
@@ -123,6 +160,25 @@ public:
 };
 
 /******************************************************************************
+LocIpcQrtrWatcher override
+******************************************************************************/
+class HalDaemonQrtrClientWatcher : public LocIpcQrtrWatcher {
+    LocationApiService* mService;
+public:
+    inline HalDaemonQrtrClientWatcher(LocationApiService* service) :
+            LocIpcQrtrWatcher({LOCATION_CLIENT_API_QSOCKET_CLIENT_SERVICE_ID}),
+            mService(service) {
+    }
+    inline virtual void onServiceStatusChange(int serviceId, int instanceId,
+            LocIpcQrtrWatcher::ServiceStatus status, const LocIpcSender& refSender) {
+        if (LocIpcQrtrWatcher::ServiceStatus::DOWN == status) {
+             LOC_LOGi(">-- client deleted by qrtr: (%d, %d)", serviceId, instanceId);
+             mService->deleteEapClientByIds(serviceId, instanceId);
+        }
+    }
+};
+
+/******************************************************************************
 LocationApiService - constructors
 ******************************************************************************/
 LocationApiService::LocationApiService(const configParamToRead & configParamRead) :
@@ -135,7 +191,11 @@ LocationApiService::LocationApiService(const configParamToRead & configParamRead
     mMaintTimer(this),
     mGtpWwanSsLocationApi(nullptr),
     mOptInTerrestrialService(-1),
-    mGtpWwanSsLocationApiCallbacks{}
+    mGtpWwanSsLocationApiCallbacks{},
+    mSingleFixLocationApi(nullptr),
+    mSingleFixTrackingSessionId(0),
+    mSingleFixLocationApiCallbacks{},
+    mSingleFixLastLocation{}
 #ifdef POWERMANAGER_ENABLED
     ,mPowerEventObserver(nullptr)
 #endif
@@ -161,7 +221,7 @@ LocationApiService::LocationApiService(const configParamToRead & configParamRead
         onGnssConfigCallback(sessionId, config);
     };
 
-    mLocationControlApi = LocationControlAPI::createInstance(mControlCallabcks);
+    mLocationControlApi = LocationControlAPI::getInstance(mControlCallabcks);
     if (nullptr == mLocationControlApi) {
         LOC_LOGd("Failed to create LocationControlAPI");
         return;
@@ -211,7 +271,6 @@ LocationApiService::LocationApiService(const configParamToRead & configParamRead
         locationOption.mode = mPositionMode;
 
         pClient->startTracking(locationOption);
-        pClient->mTracking = true;
         loc_boot_kpi_marker("L - Auto Session Start");
         pClient->mPendingMessages.push(E_LOCAPI_START_TRACKING_MSG_ID);
     }
@@ -223,9 +282,11 @@ LocationApiService::LocationApiService(const configParamToRead & configParamRead
     // blocking: set to false
     mIpc.startNonBlockingListening(recver);
 
-    mBlockingRecver = LocIpc::getLocIpcQrtrRecver(make_shared<LocHaldIpcListener>(*this),
+    mBlockingRecver = LocIpc::getLocIpcQrtrRecver(
+            make_shared<LocHaldIpcListener>(*this),
             LOCATION_CLIENT_API_QSOCKET_HALDAEMON_SERVICE_ID,
-            LOCATION_CLIENT_API_QSOCKET_HALDAEMON_INSTANCE_ID);
+            LOCATION_CLIENT_API_QSOCKET_HALDAEMON_INSTANCE_ID,
+            make_shared<HalDaemonQrtrClientWatcher>(this));
     mIpc.startBlockingListening(*mBlockingRecver);
 }
 
@@ -270,8 +331,8 @@ void LocationApiService::processClientMsg(const char* data, uint32_t length) {
     uint32_t payloadSize = pbLocApiMsg.payloadsize();
     // pbLocApiMsg.payload() contains the payload data.
 
-    LOC_LOGi(">-- onReceive Rcvd msg id: %d, remote client: %s, payload size: %d", eLocMsgid,
-            sockName.c_str(), payloadSize);
+    LOC_LOGi(">-- onReceive Rcvd msg id: %d %s, remote client: %s, payload size: %d",
+            eLocMsgid, LocApiMsgString(eLocMsgid), sockName.c_str(), payloadSize);
     LocAPIMsgHeader locApiMsg(sockName.c_str(), eLocMsgid);
 
     // throw away msg that does not come from location hal daemon client, e.g. LCA/LIA
@@ -312,7 +373,12 @@ void LocationApiService::processClientMsg(const char* data, uint32_t length) {
         }
         case E_LOCAPI_STOP_TRACKING_MSG_ID: {
             // stop
-            LocAPIStopTrackingReqMsg msg(sockName.c_str(), &mPbufMsgConv);
+            PBLocAPIStopTrackingReqMsg pbLocApiStopTrackReqMsg;
+            if (0 == pbLocApiStopTrackReqMsg.ParseFromString(pbLocApiMsg.payload())) {
+                LOC_LOGe("Failed to parse pbLocApiStopTrackMsg from payload!!");
+                return;
+            }
+            LocAPIStopTrackingReqMsg msg(sockName.c_str(), pbLocApiStopTrackReqMsg, &mPbufMsgConv);
             stopTracking(reinterpret_cast<LocAPIStopTrackingReqMsg*>(&msg));
             break;
         }
@@ -441,6 +507,16 @@ void LocationApiService::processClientMsg(const char* data, uint32_t length) {
             }
             LocAPIGetSingleTerrestrialPosReqMsg msg(sockName.c_str(), pbMsg, &mPbufMsgConv);
             getSingleTerrestrialPos(&msg);
+            break;
+        }
+        case E_LOCAPI_GET_SINGLE_POS_REQ_MSG_ID: {
+            PBLocAPIGetSinglePosReqMsg pbMsg;
+            if (0 == pbMsg.ParseFromString(pbLocApiMsg.payload())) {
+                LOC_LOGe("Failed to parse PBLocAPIGetSinglePosReqMsg from payload!!");
+                return;
+            }
+            LocAPIGetSinglePosReqMsg msg(sockName.c_str(), pbMsg, &mPbufMsgConv);
+            getSinglePos(&msg);
             break;
         }
         case E_LOCAPI_PINGTEST_MSG_ID: {
@@ -612,6 +688,30 @@ void LocationApiService::processClientMsg(const char* data, uint32_t length) {
             break;
         }
 
+        case E_INTAPI_CONFIG_ENGINE_INTEGRITY_RISK_MSG_ID : {
+            PBLocConfigEngineIntegrityRiskReqMsg pbLocConfEngineIntegrityRisk;
+            if (0 == pbLocConfEngineIntegrityRisk.ParseFromString(pbLocApiMsg.payload())) {
+                LOC_LOGe("Failed to parse pbLocConfEngineIntegrityRisk from payload!!");
+                return;
+            }
+            LocConfigEngineIntegrityRiskReqMsg msg(sockName.c_str(),
+                                                   pbLocConfEngineIntegrityRisk,
+                                                   &mPbufMsgConv);
+            configEngineIntegrityRisk(reinterpret_cast<LocConfigEngineIntegrityRiskReqMsg*>(&msg));
+            break;
+        }
+
+        case E_INTAPI_CONFIG_XTRA_PARAMS_MSG_ID : {
+            PBLocConfigXtraReqMsg pbLocConf;
+            if (0 == pbLocConf.ParseFromString(pbLocApiMsg.payload())) {
+                LOC_LOGe("Failed to parse pbLocConfEngineIntegrityRisk from payload!!");
+                return;
+            }
+            LocConfigXtraReqMsg msg(sockName.c_str(), pbLocConf, &mPbufMsgConv);
+            configXtraParams(reinterpret_cast<LocConfigXtraReqMsg *>(&msg));
+            break;
+        }
+
         case E_INTAPI_GET_ROBUST_LOCATION_CONFIG_REQ_MSG_ID: {
             getGnssConfig(&locApiMsg, GNSS_CONFIG_FLAGS_ROBUST_LOCATION_BIT);
             break;
@@ -633,6 +733,43 @@ void LocationApiService::processClientMsg(const char* data, uint32_t length) {
             break;
         }
 
+        case E_LOCAPI_GET_DEBUG_REQ_MSG_ID: {
+            getDebugReport((const LocAPIGetDebugReqMsg*)&locApiMsg);
+            break;
+        }
+
+        case E_INTAPI_INJECT_LOCATION_MSG_ID: {
+            PBLocIntApiInjectLocationMsg pbMsg;
+            if (0 == pbMsg.ParseFromString(pbLocApiMsg.payload())) {
+                LOC_LOGe("Failed to parse LocIntApiInjectLocationMsg from payload!!");
+                return;
+            }
+            LocIntApiInjectLocationMsg msg(sockName.c_str(), pbMsg, &mPbufMsgConv);
+            injectLocation(reinterpret_cast<LocIntApiInjectLocationMsg*> (&msg));
+            break;
+        }
+
+        case E_LOCAPI_GET_ANTENNA_INFO_MSG_ID: {
+            getAntennaInfo((const LocAPIGetAntennaInfoMsg*)&locApiMsg);
+            break;
+        }
+
+        case E_INTAPI_GET_XTRA_STATUS_REQ_MSG_ID: {
+            getXtraStatus((const LocConfigGetXtraStatusReqMsg*) &locApiMsg);
+            break;
+        }
+
+        case E_INTAPI_REGISTER_XTRA_STATUS_UPDATE_REQ_MSG_ID: {
+            registerXtraStatusUpdate((const LocConfigRegisterXtraStatusUpdateReqMsg*) &locApiMsg);
+            break;
+        }
+
+        case E_INTAPI_DEREGISTER_XTRA_STATUS_UPDATE_REQ_MSG_ID: {
+            deregisterXtraStatusUpdate(
+                    (const LocConfigDeregisterXtraStatusUpdateReqMsg*) &locApiMsg);
+            break;
+        }
+
         default: {
             LOC_LOGe("Unknown message with id: %d ", eLocMsgid);
             break;
@@ -645,30 +782,31 @@ LocationApiService - implementation - registration
 ******************************************************************************/
 void LocationApiService::newClient(LocAPIClientRegisterReqMsg *pMsg) {
 
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     std::string clientname(pMsg->mSocketName);
 
-    // if this name is already used return error
-    if (mClients.find(clientname) != mClients.end()) {
-        LOC_LOGe("invalid client=%s already existing", clientname.c_str());
-        return;
-    }
+    // if this name is already used, we inform client of the capability
+    // to allow callflow to continue on client side
+    LocHalDaemonClientHandler* pClient = getClient(clientname);
+    if (pClient) {
+        LOC_LOGi("client=%s already exists, send capability", clientname.c_str());
+        pClient->sendCapabilitiesMsg();
+    } else {
+        // store it in client property database
+        pClient = new LocHalDaemonClientHandler(this, clientname, pMsg->mClientType);
+        if (!pClient) {
+            LOC_LOGe("failed to register client=%s", clientname.c_str());
+            return;
+        }
 
-    // store it in client property database
-    LocHalDaemonClientHandler *pClient =
-            new LocHalDaemonClientHandler(this, clientname, pMsg->mClientType);
-    if (!pClient) {
-        LOC_LOGe("failed to register client=%s", clientname.c_str());
-        return;
+        mClients.emplace(clientname, pClient);
+        LOC_LOGi(">-- registered new client=%s", clientname.c_str());
     }
-
-    mClients.emplace(clientname, pClient);
-    LOC_LOGi(">-- registered new client=%s", clientname.c_str());
 }
 
 void LocationApiService::deleteClient(LocAPIClientDeregisterReqMsg *pMsg) {
 
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     std::string clientname(pMsg->mSocketName);
     deleteClientbyName(clientname);
 }
@@ -684,15 +822,39 @@ void LocationApiService::deleteClientbyName(const std::string clientname) {
         return;
     }
     mClients.erase(clientname);
-    mTerrestrialFixReqs.erase(clientname);
+
+    // if client is requesting terrestrial fix, stop it
+    if (mTerrestrialFixTimeoutMap.erase(clientname) != 0) {
+        if (mTerrestrialFixTimeoutMap.size() == 0) {
+            mGtpWwanSsLocationApi->stopNetworkLocation(&mGtpWwanPosCallback);
+        }
+    }
+
+    // if client is requesting single shot fix, stop it
+    mSingleFixReqMap.erase(clientname);
+    stopTrackingSessionForSingleFixes();
+
     pClient->cleanup();
 }
+
+void LocationApiService::deleteEapClientByIds(int serviceId, int instanceId) {
+
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+
+    const char* clientName = getClientNameByIds(serviceId, instanceId);
+    if (clientName) {
+        LOC_LOGi(">-- service id: %d, instance id: %d, client name: %s",
+                 serviceId, instanceId, clientName);
+        deleteClientbyName(std::string(clientName));
+    }
+}
+
 /******************************************************************************
 LocationApiService - implementation - tracking
 ******************************************************************************/
 void LocationApiService::startTracking(LocAPIStartTrackingReqMsg *pMsg) {
 
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LocHalDaemonClientHandler* pClient = getClient(pMsg->mSocketName);
     if (!pClient) {
         LOC_LOGe(">-- start invlalid client=%s", pMsg->mSocketName);
@@ -705,65 +867,28 @@ void LocationApiService::startTracking(LocAPIStartTrackingReqMsg *pMsg) {
 
     if (!pClient->startTracking(locationOption)) {
         LOC_LOGe("Failed to start session");
-        return;
     }
-    // success
-    pClient->mTracking = true;
-    pClient->mPendingMessages.push(E_LOCAPI_START_TRACKING_MSG_ID);
-
-    LOC_LOGi(">-- start started session");
-    return;
 }
 
 void LocationApiService::stopTracking(LocAPIStopTrackingReqMsg *pMsg) {
 
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LocHalDaemonClientHandler* pClient = getClient(pMsg->mSocketName);
     if (!pClient) {
         LOC_LOGe(">-- stop invlalid client=%s", pMsg->mSocketName);
         return;
     }
 
-    pClient->mTracking = false;
-    pClient->unsubscribeLocationSessionCb();
-    pClient->stopTracking();
-    pClient->mPendingMessages.push(E_LOCAPI_STOP_TRACKING_MSG_ID);
+    if (pMsg->clearSubscriptions) {
+        pClient->unsubscribeLocationSessionCb();
+    }
+    pClient->stopTracking(!(pMsg->clearSubscriptions));
     LOC_LOGi(">-- stopping session");
-}
-
-// no need to hold the lock as lock has been held on calling functions
-void LocationApiService::suspendAllTrackingSessions() {
-    for (auto client : mClients) {
-        // stop session if running
-        if (client.second && client.second->mTracking) {
-            client.second->stopTracking();
-            client.second->mPendingMessages.push(E_LOCAPI_STOP_TRACKING_MSG_ID);
-            LOC_LOGi("--> suspended");
-        }
-    }
-}
-
-// no need to hold the lock as lock has been held on calling functions
-void LocationApiService::resumeAllTrackingSessions() {
-    for (auto client : mClients) {
-        // start session if not running
-        if (client.second && client.second->mTracking) {
-
-            // resume session with preserved options
-            if (!client.second->startTracking()) {
-                LOC_LOGe("Failed to start session");
-                return;
-            }
-            // success
-            client.second->mPendingMessages.push(E_LOCAPI_START_TRACKING_MSG_ID);
-            LOC_LOGi("--> resumed");
-        }
-    }
 }
 
 void LocationApiService::updateSubscription(LocAPIUpdateCallbacksReqMsg *pMsg) {
 
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LocHalDaemonClientHandler* pClient = getClient(pMsg->mSocketName);
     if (!pClient) {
         LOC_LOGe(">-- updateSubscription invlalid client=%s", pMsg->mSocketName);
@@ -778,7 +903,7 @@ void LocationApiService::updateSubscription(LocAPIUpdateCallbacksReqMsg *pMsg) {
 
 void LocationApiService::updateTrackingOptions(LocAPIUpdateTrackingOptionsReqMsg *pMsg) {
 
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
 
     LocHalDaemonClientHandler* pClient = getClient(pMsg->mSocketName);
     if (pClient) {
@@ -816,7 +941,7 @@ void LocationApiService::getGnssEnergyConsumed(const char* clientSocketName) {
         return;
     }
 
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     bool requestAlreadyPending = false;
     for (auto each : mClients) {
         if ((each.second != nullptr) &&
@@ -856,7 +981,7 @@ void LocationApiService::getConstellationSecondaryBandConfig(
         return;
     }
 
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     // retrieve the constellation enablement/disablement config
     // blacklisted SV info and secondary band config
     uint32_t sessionId = gnssInterface-> gnssGetSecondaryBandConfig();
@@ -866,12 +991,105 @@ void LocationApiService::getConstellationSecondaryBandConfig(
     addConfigRequestToMap(sessionId, pReqMsg);
 }
 
+void LocationApiService::getDebugReport(
+        const LocAPIGetDebugReqMsg* pReqMsg) {
+    LOC_LOGi(">--getDebugReport from %s", pReqMsg->mSocketName);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    LocHalDaemonClientHandler* pClient = getClient(pReqMsg->mSocketName);
+    if (pClient) {
+        pClient->getDebugReport();
+    } else {
+        LOC_LOGe(">-- invalid client=%s", pReqMsg->mSocketName);
+    }
+}
+
+void LocationApiService::getAntennaInfo(const LocAPIGetAntennaInfoMsg* pMsg) {
+    LOC_LOGi(">--getAntennaInfo from %s", pMsg->mSocketName);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    LocHalDaemonClientHandler* pClient = getClient(pMsg->mSocketName);
+    if (pClient) {
+        pClient->getAntennaInfo();
+    } else {
+        LOC_LOGe(">-- invalid client=%s", pMsg->mSocketName);
+    }
+}
+
+void LocationApiService::getXtraStatus(
+        const LocConfigGetXtraStatusReqMsg* pReqMsg) {
+    LOC_LOGi(">--getXtraStatus");
+    GnssInterface* gnssInterface = getGnssInterface();
+    if (!gnssInterface) {
+        LOC_LOGe(">-- null GnssInterface");
+        return;
+    }
+
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    // retrieve xtra status
+    uint32_t sessionId = gnssInterface->gnssGetXtraStatus();
+
+    // if sessionId is 0, e.g.: error callback will be delivered
+    // by addConfigRequestToMap
+    addConfigRequestToMap(sessionId, pReqMsg);
+}
+
+void LocationApiService::registerXtraStatusUpdate(
+            const LocConfigRegisterXtraStatusUpdateReqMsg * pReqMsg) {
+    LOC_LOGi(">--registerXtraStatusUpdate, client %s", pReqMsg->mSocketName);
+
+    // if this is register, update the set
+    mClientsRegForXtraStatus.emplace(pReqMsg->mSocketName);
+
+    GnssInterface* gnssInterface = getGnssInterface();
+    if (!gnssInterface) {
+        LOC_LOGe(">-- null GnssInterface");
+        return;
+    }
+
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    // register xtra status update
+    uint32_t sessionId = gnssInterface->gnssRegisterXtraStatusUpdate(true);
+
+    // if sessionId is 0, e.g.: error callback will be delivered
+    // by addConfigRequestToMap
+    addConfigRequestToMap(sessionId, pReqMsg);
+}
+
+void LocationApiService::deregisterXtraStatusUpdate(
+            const LocConfigDeregisterXtraStatusUpdateReqMsg * pReqMsg) {
+    LOC_LOGi(">--deregisterXtraStatusUpdate, client name %s", pReqMsg->mSocketName);
+
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    mClientsRegForXtraStatus.erase(pReqMsg->mSocketName);
+    if (mClientsRegForXtraStatus.size() == 0) {
+        GnssInterface* gnssInterface = getGnssInterface();
+        if (!gnssInterface) {
+            LOC_LOGe(">-- null GnssInterface");
+            return;
+        }
+
+        // register xtra status update
+        uint32_t sessionId = gnssInterface->gnssRegisterXtraStatusUpdate(false);
+
+        // if sessionId is 0, e.g.: error callback will be delivered
+        // by addConfigRequestToMap
+        addConfigRequestToMap(sessionId, pReqMsg);
+    } else {
+        std::string clientname(pReqMsg->mSocketName);
+        LocHalDaemonClientHandler* pClient = getClient(clientname);
+        if (pClient) {
+            // inform client that request has been processed successfully
+            pClient->onControlResponseCb(LOCATION_ERROR_SUCCESS,
+                                         E_INTAPI_DEREGISTER_XTRA_STATUS_UPDATE_REQ_MSG_ID);
+        }
+    }
+}
+
 /******************************************************************************
 LocationApiService - implementation - batching
 ******************************************************************************/
 void LocationApiService::startBatching(LocAPIStartBatchingReqMsg *pMsg) {
 
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LocHalDaemonClientHandler* pClient = getClient(pMsg->mSocketName);
     if (!pClient) {
         LOC_LOGe(">-- start invalid client=%s", pMsg->mSocketName);
@@ -893,7 +1111,7 @@ void LocationApiService::startBatching(LocAPIStartBatchingReqMsg *pMsg) {
 }
 
 void LocationApiService::stopBatching(LocAPIStopBatchingReqMsg *pMsg) {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LocHalDaemonClientHandler* pClient = getClient(pMsg->mSocketName);
     if (!pClient) {
         LOC_LOGe(">-- stop invalid client=%s", pMsg->mSocketName);
@@ -909,7 +1127,7 @@ void LocationApiService::stopBatching(LocAPIStopBatchingReqMsg *pMsg) {
 }
 
 void LocationApiService::updateBatchingOptions(LocAPIUpdateBatchingOptionsReqMsg *pMsg) {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LocHalDaemonClientHandler* pClient = getClient(pMsg->mSocketName);
     if (pClient) {
         pClient->updateBatchingOptions(pMsg->intervalInMs, pMsg->distanceInMeters,
@@ -924,7 +1142,7 @@ void LocationApiService::updateBatchingOptions(LocAPIUpdateBatchingOptionsReqMsg
 LocationApiService - implementation - geofence
 ******************************************************************************/
 void LocationApiService::addGeofences(LocAPIAddGeofencesReqMsg* pMsg) {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LocHalDaemonClientHandler* pClient = getClient(pMsg->mSocketName);
     if (!pClient) {
         LOC_LOGe(">-- start invlalid client=%s", pMsg->mSocketName);
@@ -977,7 +1195,7 @@ void LocationApiService::addGeofences(LocAPIAddGeofencesReqMsg* pMsg) {
 }
 
 void LocationApiService::removeGeofences(LocAPIRemoveGeofencesReqMsg* pMsg) {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LocHalDaemonClientHandler* pClient = getClient(pMsg->mSocketName);
     if (nullptr == pClient) {
         LOC_LOGe("removeGeofences - Null client!");
@@ -993,7 +1211,7 @@ void LocationApiService::removeGeofences(LocAPIRemoveGeofencesReqMsg* pMsg) {
     free(sessions);
 }
 void LocationApiService::modifyGeofences(LocAPIModifyGeofencesReqMsg* pMsg) {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LocHalDaemonClientHandler* pClient = getClient(pMsg->mSocketName);
     if (nullptr == pClient) {
         LOC_LOGe("modifyGeofences - Null client!");
@@ -1033,7 +1251,7 @@ void LocationApiService::modifyGeofences(LocAPIModifyGeofencesReqMsg* pMsg) {
     free(gfOptions);
 }
 void LocationApiService::pauseGeofences(LocAPIPauseGeofencesReqMsg* pMsg) {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LocHalDaemonClientHandler* pClient = getClient(pMsg->mSocketName);
     if (nullptr == pClient) {
         LOC_LOGe("pauseGeofences - Null client!");
@@ -1049,7 +1267,7 @@ void LocationApiService::pauseGeofences(LocAPIPauseGeofencesReqMsg* pMsg) {
     free(sessions);
 }
 void LocationApiService::resumeGeofences(LocAPIResumeGeofencesReqMsg* pMsg) {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LocHalDaemonClientHandler* pClient = getClient(pMsg->mSocketName);
     if (nullptr == pClient) {
         LOC_LOGe("resumeGeofences - Null client!");
@@ -1068,7 +1286,7 @@ void LocationApiService::resumeGeofences(LocAPIResumeGeofencesReqMsg* pMsg) {
 void LocationApiService::pingTest(LocAPIPingTestReqMsg* pMsg) {
 
     // test only - ignore this request when config is not enabled
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LocHalDaemonClientHandler* pClient = getClient(pMsg->mSocketName);
     if (!pClient) {
         LOC_LOGe(">-- pingTest invlalid client=%s", pMsg->mSocketName);
@@ -1084,7 +1302,7 @@ void LocationApiService::configConstrainedTunc(
     if (!pMsg) {
         return;
     }
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     uint32_t sessionId = mLocationControlApi->configConstrainedTimeUncertainty(
             pMsg->mEnable, pMsg->mTuncConstraint, pMsg->mEnergyBudget);
     LOC_LOGi(">-- enable: %d, tunc constraint %f, energy budget %d, session ID = %d",
@@ -1096,7 +1314,7 @@ void LocationApiService::configConstrainedTunc(
 void LocationApiService::configPositionAssistedClockEstimator(
         const LocConfigPositionAssistedClockEstimatorReqMsg* pMsg)
 {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     if (!pMsg || !mLocationControlApi) {
         return;
     }
@@ -1113,7 +1331,7 @@ void LocationApiService::configConstellations(const LocConfigSvConstellationReqM
     if (!pMsg) {
         return;
     }
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
 
     uint32_t sessionId = mLocationControlApi->configConstellations(
             pMsg->mConstellationEnablementConfig, pMsg->mBlacklistSvConfig);
@@ -1132,7 +1350,7 @@ void LocationApiService::configConstellationSecondaryBand(
     if (!pMsg) {
         return;
     }
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
 
     uint32_t sessionId = mLocationControlApi->configConstellationSecondaryBand(
             pMsg->mSecondaryBandConfig);
@@ -1150,28 +1368,13 @@ void LocationApiService::configAidingDataDeletion(LocConfigAidingDataDeletionReq
     if (!pMsg) {
         return;
     }
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
 
     LOC_LOGi(">-- client %s, deleteAll %d",
              pMsg->mSocketName, pMsg->mAidingData.deleteAll);
 
-    // suspend all sessions before calling delete
-    suspendAllTrackingSessions();
-
     uint32_t sessionId = mLocationControlApi->gnssDeleteAidingData(pMsg->mAidingData);
     addConfigRequestToMap(sessionId, pMsg);
-
-#ifdef POWERMANAGER_ENABLED
-    // We do not need to resume the session if device is suspend/shutdown state
-    // as sessions will resumed when power state changes to resume
-    if ((POWER_STATE_SUSPEND == mPowerState) ||
-        (POWER_STATE_SHUTDOWN == mPowerState)) {
-        return;
-    }
-#endif
-
-    // resume all sessions after calling aiding data deletion
-    resumeAllTrackingSessions();
 }
 
 void LocationApiService::configLeverArm(const LocConfigLeverArmReqMsg* pMsg){
@@ -1179,7 +1382,7 @@ void LocationApiService::configLeverArm(const LocConfigLeverArmReqMsg* pMsg){
     if (!pMsg) {
         return;
     }
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
 
     uint32_t sessionId = mLocationControlApi->configLeverArm(pMsg->mLeverArmConfigInfo);
     addConfigRequestToMap(sessionId, pMsg);
@@ -1190,7 +1393,7 @@ void LocationApiService::configRobustLocation(const LocConfigRobustLocationReqMs
     if (!pMsg) {
         return;
     }
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
 
     LOC_LOGi(">-- client %s, enable %d, enableForE911 %d",
              pMsg->mSocketName, pMsg->mEnable, pMsg->mEnableForE911);
@@ -1205,7 +1408,7 @@ void LocationApiService::configMinGpsWeek(const LocConfigMinGpsWeekReqMsg* pMsg)
     if (!pMsg) {
         return;
     }
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
 
     LOC_LOGi(">-- client %s, minGpsWeek %u",
              pMsg->mSocketName, pMsg->mMinGpsWeek);
@@ -1220,7 +1423,7 @@ void LocationApiService::configMinSvElevation(const LocConfigMinSvElevationReqMs
     if (!pMsg) {
         return;
     }
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LOC_LOGi(">-- client %s, minSvElevation %u", pMsg->mSocketName, pMsg->mMinSvElevation);
 
     GnssConfig gnssConfig = {};
@@ -1235,7 +1438,7 @@ void LocationApiService::configEngineRunState(const LocConfigEngineRunStateReqMs
     if (!pMsg) {
         return;
     }
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
 
     LOC_LOGi(">-- client %s, eng type 0x%x, eng state %d",
              pMsg->mSocketName, pMsg->mEngType, pMsg->mEngState);
@@ -1249,13 +1452,13 @@ void LocationApiService::configUserConsentTerrestrialPositioning(
     if (!pMsg) {
         return;
     }
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
 
     LOC_LOGi(">-- client %s, current user consent %d, new usr consent %d",
              pMsg->mSocketName, mOptInTerrestrialService, pMsg->mUserConsent);
 
     mOptInTerrestrialService = pMsg->mUserConsent;
-    if ((mOptInTerrestrialService == true) && (mGtpWwanSsLocationApi == nullptr)) {
+    if ((mOptInTerrestrialService == 1) && (mGtpWwanSsLocationApi == nullptr)) {
         // set callback functions for Location API
         mGtpWwanSsLocationApiCallbacks.size = sizeof(mGtpWwanSsLocationApiCallbacks);
 
@@ -1289,17 +1492,48 @@ void LocationApiService::configOutputNmeaTypes(const LocConfigOutputNmeaTypesReq
     if (!pMsg) {
         return;
     }
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
 
-    LOC_LOGi(">-- client %s, mEnabledNmeaTypes 0x%x",  pMsg->mSocketName, pMsg->mEnabledNmeaTypes);
-    uint32_t sessionId = mLocationControlApi->configOutputNmeaTypes(pMsg->mEnabledNmeaTypes);
+    LOC_LOGi(">-- client %s, mEnabledNmeaTypes 0x%x, mNmeaDatumType %d",
+             pMsg->mSocketName, pMsg->mEnabledNmeaTypes, pMsg->mNmeaDatumType);
+    uint32_t sessionId = mLocationControlApi->configOutputNmeaTypes(pMsg->mEnabledNmeaTypes,
+                                                                    pMsg->mNmeaDatumType);
+    addConfigRequestToMap(sessionId, pMsg);
+}
+
+void LocationApiService::configEngineIntegrityRisk(const LocConfigEngineIntegrityRiskReqMsg* pMsg) {
+    if (!pMsg) {
+        return;
+    }
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+
+    LOC_LOGi("client %s, eng type 0x%x, integrity risk %d",
+             pMsg->mSocketName, pMsg->mEngType, pMsg->mIntegrityRisk);
+
+    uint32_t sessionId =
+            mLocationControlApi->configEngineIntegrityRisk(pMsg->mEngType, pMsg->mIntegrityRisk);
+    addConfigRequestToMap(sessionId, pMsg);
+}
+
+void LocationApiService::configXtraParams(const LocConfigXtraReqMsg* pMsg) {
+    if (!pMsg) {
+        return;
+    }
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+
+    LOC_LOGi("client %s, xtra enable %d, download interval %d min",
+             pMsg->mSocketName, pMsg->mEnable, pMsg->mXtraParams.xtraDownloadIntervalMinute);
+
+    uint32_t sessionId =
+            mLocationControlApi->configXtraParams(pMsg->mEnable, pMsg->mXtraParams);
+
     addConfigRequestToMap(sessionId, pMsg);
 }
 
 void LocationApiService::getGnssConfig(const LocAPIMsgHeader* pReqMsg,
                                        GnssConfigFlagsBits configFlag) {
 
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     if (!pReqMsg) {
         return;
     }
@@ -1322,10 +1556,25 @@ void LocationApiService::configDeadReckoningEngineParams(const LocConfigDrEngine
     if (!pMsg) {
         return;
     }
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     uint32_t sessionId = mLocationControlApi->configDeadReckoningEngineParams(
             pMsg->mDreConfig);
     addConfigRequestToMap(sessionId, pMsg);
+}
+
+void LocationApiService::injectLocation(
+        const LocIntApiInjectLocationMsg* pMsg) {
+    if (!pMsg) {
+        return;
+    }
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    LocHalDaemonClientHandler* pClient = getClient(pMsg->mSocketName);
+    if (!pClient) {
+        LOC_LOGe(">-- invlalid client=%s", pMsg->mSocketName);
+        return;
+    }
+
+    mLocationControlApi->odcpiInject(pMsg->mLocation);
 }
 
 void LocationApiService::addConfigRequestToMap(
@@ -1352,7 +1601,7 @@ void LocationApiService::addConfigRequestToMap(
 LocationApiService - Location Control API callback functions
 ******************************************************************************/
 void LocationApiService::onControlResponseCallback(LocationError err, uint32_t sessionId) {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LOC_LOGd("--< onControlResponseCallback err=%u id=%u", err, sessionId);
 
     auto configReqData = mConfigReqs.find(sessionId);
@@ -1364,13 +1613,13 @@ void LocationApiService::onControlResponseCallback(LocationError err, uint32_t s
         mConfigReqs.erase(configReqData);
         LOC_LOGd("--< map size %d", mConfigReqs.size());
     } else {
-        LOC_LOGe("--< client not found for session id %d", sessionId);
+        LOC_LOGw("--< client not found for session id %d", sessionId);
     }
 }
 
 void LocationApiService::onControlCollectiveResponseCallback(
     size_t count, LocationError *errs, uint32_t *ids) {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     if (count != 1) {
         LOC_LOGe("--< onControlCollectiveResponseCallback, count is %d, expecting 1", count);
         return;
@@ -1391,30 +1640,45 @@ void LocationApiService::onControlCollectiveResponseCallback(
         mConfigReqs.erase(configReqData);
         LOC_LOGd("--< map size %d", mConfigReqs.size());
     } else {
-        LOC_LOGe("--< client not found for session id %d", sessionId);
+        LOC_LOGw("--< client not found for session id %d", sessionId);
     }
 }
 
 void LocationApiService::onGnssConfigCallback(uint32_t sessionId,
                                               const GnssConfig& config) {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LOC_LOGd("--< onGnssConfigCallback, req cnt %d", mConfigReqs.size());
-
-    auto configReqData = mConfigReqs.find(sessionId);
-    if (configReqData != std::end(mConfigReqs)) {
-        LocHalDaemonClientHandler* pClient = getClient(configReqData->second.clientName);
-        if (pClient) {
-            // invoke the respCb to deliver success status
-            pClient->onControlResponseCb(LOCATION_ERROR_SUCCESS, configReqData->second.configMsgId);
-            // invoke the configCb to deliver the config
-            pClient->onGnssConfigCb(configReqData->second.configMsgId, config);
+    if (sessionId == 0) {
+        // check whether this for xtra status update
+        if (config.flags & GNSS_CONFIG_FLAGS_XTRA_STATUS_BIT) {
+            for (std::string xtraClient : mClientsRegForXtraStatus) {
+                LocHalDaemonClientHandler* pClient = getClient(xtraClient.c_str());
+                if (pClient) {
+                    pClient->onXtraStatusUpdateCb(config.xtraStatus);
+                }
+            }
         }
-        mConfigReqs.erase(configReqData);
-        LOC_LOGd("--< map size %d", mConfigReqs.size());
     } else {
-        LOC_LOGe("--< client not found for session id %d", sessionId);
+        auto configReqData = mConfigReqs.find(sessionId);
+        if (configReqData != std::end(mConfigReqs)) {
+            LocHalDaemonClientHandler* pClient = getClient(configReqData->second.clientName);
+            if (pClient) {
+                LOC_LOGd("--< msg id %d, client %s", configReqData->second.configMsgId,
+                         configReqData->second.clientName.c_str());
+                // invoke the respCb to deliver success status
+                pClient->onControlResponseCb(LOCATION_ERROR_SUCCESS,
+                                             configReqData->second.configMsgId);
+                // invoke the configCb to deliver the config
+                pClient->onGnssConfigCb(configReqData->second.configMsgId, config);
+            }
+            mConfigReqs.erase(configReqData);
+            LOC_LOGd("--< map size %d", mConfigReqs.size());
+        } else {
+            LOC_LOGi("--< client not found for session id %d", sessionId);
+        }
     }
 }
+
 // mandatory callback for location api
 void LocationApiService::onCapabilitiesCallback(LocationCapabilitiesMask mask) {
 }
@@ -1429,23 +1693,55 @@ void LocationApiService::onCollectiveResponseCallback(
 }
 
 void LocationApiService::onGtpWwanTrackingCallback(Location location) {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LOC_LOGd("--< onGtpWwanTrackingCallback optIn=%u loc flags=0x%x", mOptInTerrestrialService,
             location.flags);
 
-    if ((mTerrestrialFixReqs.size() != 0) &&
+    if ((mTerrestrialFixTimeoutMap.size() != 0) &&
             (location.flags & LOCATION_HAS_LAT_LONG_BIT) && (mOptInTerrestrialService == 1)) {
 
-        for (auto it = mTerrestrialFixReqs.begin(); it != mTerrestrialFixReqs.end();) {
+        for (auto it = mTerrestrialFixTimeoutMap.begin(); it != mTerrestrialFixTimeoutMap.end();) {
             LocHalDaemonClientHandler* pClient = getClient(it->first);
             if (pClient) {
                 pClient->sendTerrestrialFix(LOCATION_ERROR_SUCCESS, location);
+            } else {
+                ++it;
             }
-            ++it;
         }
-        mTerrestrialFixReqs.clear();
+        mTerrestrialFixTimeoutMap.clear();
         mGtpWwanSsLocationApi->stopNetworkLocation(&mGtpWwanPosCallback);
     }
+}
+
+// LCA client will get intermediate fixes as well
+void LocationApiService::onGnssLocationInfoCb(const GnssLocationInfoNotification& notification) {
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+
+    const Location &location = notification.location;
+    mSingleFixLastLocation = location;
+    LOC_LOGd("--< onGnssLocationInfoCb loc flags=0x%x, accracy %f, request cnt %d",
+             location.flags, location.accuracy, mSingleFixReqMap.size());
+
+    if ((location.timestamp != 0) && (location.flags & LOCATION_HAS_LAT_LONG_BIT) &&
+            (location.flags & LOCATION_HAS_ACCURACY_BIT)) {
+        for (auto it = mSingleFixReqMap.begin(); it != mSingleFixReqMap.end();) {
+            float horQoS = it->second.horQoS;
+            if (location.accuracy < horQoS) {
+                LocHalDaemonClientHandler* pClient = getClient(it->first);
+                if (pClient) {
+                    LOC_LOGd("send single fix to client %s", it->first.c_str());
+                    pClient->sendSingleFusedFix(LOCATION_ERROR_SUCCESS, location);
+                }
+                it = mSingleFixReqMap.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+
+    // check whether all requests have been filled or not, if so,
+    // stop the tracking session
+    stopTrackingSessionForSingleFixes();
 }
 
 /******************************************************************************
@@ -1453,7 +1749,7 @@ LocationApiService - power event handlers
 ******************************************************************************/
 #ifdef POWERMANAGER_ENABLED
 void LocationApiService::onPowerEvent(PowerStateType powerState) {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LOC_LOGd("--< onPowerEvent %d", powerState);
     mPowerState = powerState;
     /*GnssAdapter handles session management for suspend/resume power events*/
@@ -1465,7 +1761,7 @@ void LocationApiService::onPowerEvent(PowerStateType powerState) {
 LocationApiService - on query callback from location engines
 ******************************************************************************/
 void LocationApiService::onGnssEnergyConsumedCb(uint64_t totalGnssEnergyConsumedSinceFirstBoot) {
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     LOC_LOGd("--< onGnssEnergyConsumedCb");
 
     LocAPIGnssEnergyConsumedIndMsg msg(SERVICE_NAME, totalGnssEnergyConsumedSinceFirstBoot,
@@ -1531,7 +1827,7 @@ void LocationApiService::performMaintenance() {
     // client handler object can become invalid when the client gets
     // deleted by the thread of LocationApiService.
     {
-        std::lock_guard<std::mutex> lock(mMutex);
+        std::lock_guard<std::recursive_mutex> lock(mMutex);
         for (auto client : mClients) {
             if (client.first.compare(AUTO_START_CLIENT_NAME) != 0) {
                 clientsToCheck.emplace(client.first, client.second->getIpcSender());
@@ -1585,11 +1881,10 @@ void LocationApiService::getSingleTerrestrialPos(
         LocAPIGetSingleTerrestrialPosReqMsg* pReqMsg) {
 
     std::string clientName(pReqMsg->mSocketName);
-
     LOC_LOGd(">--getSingleTerrestrialPos, timeout msec %d, tech mask 0x%x, horQoS %f",
              pReqMsg->mTimeoutMsec, pReqMsg->mTechMask, pReqMsg->mHorQoS);
 
-    std::lock_guard<std::mutex> lock(mMutex);
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     // Make sure client has opt-in for the service
     if (mOptInTerrestrialService != 1) {
         LocHalDaemonClientHandler* pClient = getClient(clientName);
@@ -1599,20 +1894,17 @@ void LocationApiService::getSingleTerrestrialPos(
             pClient->sendTerrestrialFix(LOCATION_ERROR_NOT_SUPPORTED, location);
         }
     } else {
-        bool terrestrialSessionStarted = (mTerrestrialFixReqs.size() != 0);
+        bool terrestrialSessionStarted = (mTerrestrialFixTimeoutMap.size() != 0);
 
         // if the request for the client is already pending
         // remove the request first
-        auto it = mTerrestrialFixReqs.find(clientName);
-        if (it != mTerrestrialFixReqs.end()) {
-            mTerrestrialFixReqs.erase(clientName);
-        }
+        mTerrestrialFixTimeoutMap.erase(clientName);
 
-        mTerrestrialFixReqs.emplace(std::piecewise_construct,
-                                    std::forward_as_tuple(clientName),
-                                    std::forward_as_tuple(this, clientName));
-        it = mTerrestrialFixReqs.find(clientName);
-        if (it != mTerrestrialFixReqs.end()) {
+        mTerrestrialFixTimeoutMap.emplace(
+                std::piecewise_construct, std::forward_as_tuple(clientName),
+                std::forward_as_tuple(this, clientName, SINGLE_SHOT_FIX_TIMER_FUSED));
+        auto it = mTerrestrialFixTimeoutMap.find(clientName);
+        if (it != mTerrestrialFixTimeoutMap.end()) {
             it->second.start(pReqMsg->mTimeoutMsec, false);
         }
 
@@ -1623,41 +1915,150 @@ void LocationApiService::getSingleTerrestrialPos(
 }
 
 void LocationApiService::gtpFixRequestTimeout(const std::string& clientName) {
-    std::lock_guard<std::mutex> lock(LocationApiService::mMutex);
+    std::lock_guard<std::recursive_mutex> lock(LocationApiService::mMutex);
 
     LOC_LOGd("timer out processing for client %s", clientName.c_str());
-    auto it = mTerrestrialFixReqs.find(clientName);
-    if (it != mTerrestrialFixReqs.end()) {
+    auto it = mTerrestrialFixTimeoutMap.find(clientName);
+    if (it != mTerrestrialFixTimeoutMap.end()) {
         LocHalDaemonClientHandler* pClient = getClient(clientName);
         if (pClient) {
             // inform client of timeout
             Location location = {};
             pClient->sendTerrestrialFix(LOCATION_ERROR_TIMEOUT, location);
         }
-        mTerrestrialFixReqs.erase(clientName);
+        mTerrestrialFixTimeoutMap.erase(clientName);
         // stop tracking if there is no more request
-        if (mTerrestrialFixReqs.size() == 1) {
+        if (mTerrestrialFixTimeoutMap.size() == 0) {
             mGtpWwanSsLocationApi->stopNetworkLocation(&mGtpWwanPosCallback);
         }
     }
 }
 
-void SingleTerrestrialFixTimer::timeOutCallback() {
-    LOC_LOGd("SingleTerrestrialFix timeout timer fired");
+/******************************************************************************
+LocationApiService - Single Shot Fused fix from SPE and GTP
+******************************************************************************/
+void LocationApiService::getSinglePos(LocAPIGetSinglePosReqMsg* pReqMsg) {
 
-    struct SingleTerrestrialFixTimeoutReq : public LocMsg {
-        SingleTerrestrialFixTimeoutReq(LocationApiService* locationApiService,
-                                       const std::string &clientName) :
+    std::string clientName(pReqMsg->mSocketName);
+    LOC_LOGd(">-- timeout msec %d, horQoS %f, gtp opt in %d",
+             pReqMsg->mTimeoutMsec, pReqMsg->mHorQoS, mOptInTerrestrialService);
+
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    if (mSingleFixLocationApi == nullptr) {
+        // set callback functions for Location API
+        mSingleFixLocationApiCallbacks.size = sizeof(mSingleFixLocationApiCallbacks);
+
+        // mandatory callback
+        mSingleFixLocationApiCallbacks.capabilitiesCb = [this](LocationCapabilitiesMask mask) {
+            onCapabilitiesCallback(mask);
+        };
+        mSingleFixLocationApiCallbacks.responseCb = [this](LocationError err, uint32_t id) {
+            onResponseCb(err, id);
+        };
+        mSingleFixLocationApiCallbacks.collectiveResponseCb =
+                [this](size_t count, LocationError* errs, uint32_t* ids) {
+            onCollectiveResponseCallback(count, errs, ids);
+        };
+        mSingleFixLocationApiCallbacks.gnssLocationInfoCb =
+                [this](const GnssLocationInfoNotification& notification) {
+            onGnssLocationInfoCb(notification);
+        };
+
+        mSingleFixLocationApi = LocationAPI::createInstance(mSingleFixLocationApiCallbacks);
+
+        if (!mSingleFixLocationApi) {
+            LOC_LOGe("failed to create LocationAPI to serve single shot fix requests");
+            return;
+        }
+        mSingleFixLocationApi->enableNetworkProvider();
+    }
+
+    mSingleFixReqMap.erase(clientName);
+
+    if (pReqMsg->mHorQoS != 0.0 && pReqMsg->mTimeoutMsec != 0) {
+        SingleFixReqInfo reqInfo(pReqMsg->mHorQoS,
+                                 new SingleFixTimer(this, clientName, SINGLE_SHOT_FIX_TIMER_FUSED));
+        mSingleFixReqMap.emplace(clientName, std::move(reqInfo));
+
+        auto it = mSingleFixReqMap.find(clientName);
+        if (it != mSingleFixReqMap.end()) {
+            it->second.timeoutTimer->start(pReqMsg->mTimeoutMsec, false);
+        }
+
+        // start tracking with TBF of 1 second
+        if (mSingleFixLocationApi && !mSingleFixTrackingSessionId) {
+            TrackingOptions options = {};
+            options.size = sizeof(options);
+            options.minInterval = 1000;
+            options.minDistance = 0;
+            options.qualityLevelAccepted = QUALITY_ANY_OR_FAILED_FIX;
+            mSingleFixTrackingSessionId = mSingleFixLocationApi->startTracking(options);
+        }
+    } else {
+        LOC_LOGd("cancelling single shot fix reqeust, stop tracking session if no more requests");
+        // client stopped the request
+        // if this is the last client, stop the tracking session
+        stopTrackingSessionForSingleFixes();
+    }
+}
+
+void LocationApiService::stopTrackingSessionForSingleFixes() {
+    // stop tracking if there is no more request
+    if (mSingleFixReqMap.size() == 0) {
+        mSingleFixLastLocation = {};
+        if (mSingleFixLocationApi && mSingleFixTrackingSessionId) {
+            LOC_LOGd("no more single shot client, stop tracking session %d",
+                     mSingleFixTrackingSessionId);
+            mSingleFixLocationApi->stopTracking(mSingleFixTrackingSessionId);
+            mSingleFixTrackingSessionId = 0;
+        } else {
+            LOC_LOGe("no tracking session started to service single shot fix");
+        }
+    }
+}
+
+void LocationApiService::singleFixRequestTimeout(const std::string& clientName) {
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+
+    LOC_LOGd("timer out processing for client %s", clientName.c_str());
+    auto it = mSingleFixReqMap.find(clientName);
+    if (it != mSingleFixReqMap.end()) {
+        LocHalDaemonClientHandler* pClient = getClient(clientName);
+        if (pClient) {
+            LOC_LOGd("send out timer out to client %s", clientName.c_str());
+            // inform client of timeout and send in the latest received location
+            pClient->sendSingleFusedFix(LOCATION_ERROR_TIMEOUT, mSingleFixLastLocation);
+        }
+        mSingleFixReqMap.erase(clientName);
+
+        // stop tracking if there is no more request
+        stopTrackingSessionForSingleFixes();
+    }
+}
+
+void SingleFixTimer::timeOutCallback() {
+    LOC_LOGe("SingleFixTimer timeout timer fired");
+
+    struct SingleFixTimeoutReq : public LocMsg {
+        SingleFixTimeoutReq(LocationApiService* locationApiService,
+                            const std::string &clientName,
+                            SingleShotTimerType timerType) :
                 mLocationApiService(locationApiService),
-                mClientName(clientName) {}
-        virtual ~SingleTerrestrialFixTimeoutReq() {}
+                mClientName(clientName),
+                mTimerType(timerType) {}
+        virtual ~SingleFixTimeoutReq() {}
         void proc() const {
-            mLocationApiService->gtpFixRequestTimeout(mClientName);
+            if (mTimerType == SINGLE_SHOT_FIX_TIMER_TERRESTRIAL) {
+                mLocationApiService->gtpFixRequestTimeout(mClientName);
+            } else if (mTimerType == SINGLE_SHOT_FIX_TIMER_FUSED) {
+                mLocationApiService->singleFixRequestTimeout(mClientName);
+            }
         }
         LocationApiService* mLocationApiService;
         std::string         mClientName;
+        SingleShotTimerType mTimerType;
     };
 
-    mLocationApiService->getMsgTask().sendMsg(new SingleTerrestrialFixTimeoutReq(
-                mLocationApiService, mClientName));
+    mLocationApiService->getMsgTask().sendMsg(new SingleFixTimeoutReq(
+                mLocationApiService, mClientName, mTimerType));
 }

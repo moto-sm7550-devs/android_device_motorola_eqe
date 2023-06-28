@@ -3,8 +3,6 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := libloc_socket
-# activate the following line for debug purposes only, comment out for production
-#LOCAL_SANITIZE_DIAG += $(GNSS_SANITIZE_DIAG)
 LOCAL_MODULE_PATH_32 := $(TARGET_OUT_VENDOR)/lib
 LOCAL_MODULE_PATH_64 := $(TARGET_OUT_VENDOR)/lib64
 LOCAL_MODULE_TAGS := optional

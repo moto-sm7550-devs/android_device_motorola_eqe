@@ -1,4 +1,4 @@
-/* Copyright (c) 2019-2020 The Linux Foundation. All rights reserved.
+/* Copyright (c) 2019-2021 The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -25,9 +25,46 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #define LOG_TAG "LocSvc_LocationIntegrationApi"
 
-
+#include <inttypes.h>
 #include <LocationDataTypes.h>
 #include <LocationIntegrationApi.h>
 #include <LocationIntegrationApiImpl.h>
@@ -79,7 +116,7 @@ bool LocationIntegrationApi::configConstellations(
         blacklistSvConfig.size = sizeof(GnssSvIdConfig);
 
         for (GnssSvIdInfo it : *blacklistedSvIds) {
-            LOC_LOGv("constellation %d, sv id %f", (int) it.constellation, it.svId);
+            LOC_LOGv("constellation %d, sv id %u", (int) it.constellation, it.svId);
             GnssSvTypesMask svTypeMask = (GnssSvTypesMask) 0;
             uint64_t* svMaskPtr = NULL;
             GnssSvId initialSvId = 0;
@@ -391,11 +428,14 @@ bool LocationIntegrationApi::configBodyToSensorMountParams(
     return false;
 }
 
+#define FLOAT_EPSILON 0.0000001
 bool LocationIntegrationApi::configDeadReckoningEngineParams(
         const DeadReckoningEngineConfig& dreConfig) {
 
     if (mApiImpl) {
-        LOC_LOGd("mask 0x%x, roll offset %f, pitch offset %f, yaw offset %f, offset unc %f",
+        LOC_LOGi("mask 0x%x, roll offset %f, pitch offset %f, yaw offset %f, offset unc %f, "
+                 "vehicleSpeedScaleFactor %f, vehicleSpeedScaleFactorUnc %f, "
+                 "gyroScaleFactor %f, gyroScaleFactorUnc %f",
                  dreConfig.validMask,
                  dreConfig.bodyToSensorMountParams.rollOffset,
                  dreConfig.bodyToSensorMountParams.pitchOffset,
@@ -429,8 +469,8 @@ bool LocationIntegrationApi::configDeadReckoningEngineParams(
                     dreConfig.bodyToSensorMountParams.offsetUnc;
         }
         if (dreConfig.validMask & VEHICLE_SPEED_SCALE_FACTOR_VALID) {
-            if (dreConfig.vehicleSpeedScaleFactor < 0.9 ||
-                    dreConfig.vehicleSpeedScaleFactor > 1.1) {
+            if (dreConfig.vehicleSpeedScaleFactor < (0.9 - FLOAT_EPSILON) ||
+                    dreConfig.vehicleSpeedScaleFactor > (1.1 + FLOAT_EPSILON)) {
                 LOC_LOGe("invalid vehicle speed scale factor, range is [0.9, 1,1]");
                 return false;
             }
@@ -438,18 +478,20 @@ bool LocationIntegrationApi::configDeadReckoningEngineParams(
             halConfig.vehicleSpeedScaleFactor = dreConfig.vehicleSpeedScaleFactor;
         }
         if (dreConfig.validMask & VEHICLE_SPEED_SCALE_FACTOR_UNC_VALID) {
-            if (dreConfig.vehicleSpeedScaleFactorUnc < 0.0 ||
-                    dreConfig.vehicleSpeedScaleFactorUnc > 0.1) {
-                LOC_LOGe("invalid vehicle speed scale factor uncertainty, range is [0.0, 0.1]");
+            if (dreConfig.vehicleSpeedScaleFactorUnc < 0.0  ||
+                    dreConfig.vehicleSpeedScaleFactorUnc > (0.1 + FLOAT_EPSILON)) {
+                LOC_LOGe("invalid vehicle speed scale factor uncertainty %10f, range is [0.0, 0.1]",
+                         dreConfig.vehicleSpeedScaleFactorUnc);
                 return false;
             }
             halConfig.validMask |= ::VEHICLE_SPEED_SCALE_FACTOR_UNC_VALID;
             halConfig.vehicleSpeedScaleFactorUnc = dreConfig.vehicleSpeedScaleFactorUnc;
         }
         if (dreConfig.validMask & GYRO_SCALE_FACTOR_VALID) {
-            if (dreConfig.gyroScaleFactor < 0.9 ||
-                    dreConfig.gyroScaleFactor > 1.1) {
-                LOC_LOGe("invalid gyro scale factor, range is [0.9, 1,1]");
+            if (dreConfig.gyroScaleFactor < (0.9 - FLOAT_EPSILON)||
+                    dreConfig.gyroScaleFactor > (1.1 + FLOAT_EPSILON)) {
+                LOC_LOGe("invalid gyro scale factor %10f, range is [0.9, 1,1]",
+                         dreConfig.gyroScaleFactor);
                 return false;
             }
             halConfig.validMask |= ::GYRO_SCALE_FACTOR_VALID;
@@ -457,7 +499,7 @@ bool LocationIntegrationApi::configDeadReckoningEngineParams(
         }
         if (dreConfig.validMask & GYRO_SCALE_FACTOR_UNC_VALID) {
             if (dreConfig.gyroScaleFactorUnc < 0.0 ||
-                    dreConfig.gyroScaleFactorUnc > 0.1) {
+                    dreConfig.gyroScaleFactorUnc > (0.1 + FLOAT_EPSILON)) {
                 LOC_LOGe("invalid gyro scale factor uncertainty, range is [0.0, 0.1]");
                 return false;
             }
@@ -465,7 +507,9 @@ bool LocationIntegrationApi::configDeadReckoningEngineParams(
             halConfig.gyroScaleFactorUnc = dreConfig.gyroScaleFactorUnc;
         }
         LOC_LOGd("mask 0x%" PRIx64 ", roll offset %f, pitch offset %f, "
-                  "yaw offset %f, offset unc %f", halConfig.validMask,
+                  "yaw offset %f, offset unc %f vehicleSpeedScaleFactor %f, "
+                  "vehicleSpeedScaleFactorUnc %f gyroScaleFactor %f gyroScaleFactorUnc %f",
+                 halConfig.validMask,
                  halConfig.bodyToSensorMountParams.rollOffset,
                  halConfig.bodyToSensorMountParams.pitchOffset,
                  halConfig.bodyToSensorMountParams.yawOffset,
@@ -509,12 +553,9 @@ bool LocationIntegrationApi::getMinSvElevation() {
     }
 }
 
-bool LocationIntegrationApi::configEngineRunState(LocIntegrationEngineType engType,
-                                                  LocIntegrationEngineRunState engState) {
-    if (mApiImpl) {
-        PositioningEngineMask halEngType = (PositioningEngineMask)0;
-        LocEngineRunState halEngState = (LocEngineRunState)0;
-        switch (engType) {
+PositioningEngineMask getHalEngType(LocIntegrationEngineType engType) {
+    PositioningEngineMask halEngType = (PositioningEngineMask)0;
+    switch (engType) {
         case LOC_INT_ENGINE_SPE:
             halEngType = STANDARD_POSITIONING_ENGINE;
             break;
@@ -529,9 +570,20 @@ bool LocationIntegrationApi::configEngineRunState(LocIntegrationEngineType engTy
             break;
         default:
             LOC_LOGe("unknown engine type of %d", engType);
+        break;
+    }
+    return halEngType;
+}
+
+bool LocationIntegrationApi::configEngineRunState(LocIntegrationEngineType engType,
+                                                  LocIntegrationEngineRunState engState) {
+    if (mApiImpl) {
+        PositioningEngineMask halEngType = getHalEngType(engType);
+        if (halEngType == (PositioningEngineMask) 0) {
             return false;
         }
 
+        LocEngineRunState halEngState = (LocEngineRunState)0;
         if (engState == LOC_INT_ENGINE_RUN_STATE_PAUSE) {
             halEngState = LOC_ENGINE_RUN_STATE_PAUSE;
         } else if (engState == LOC_INT_ENGINE_RUN_STATE_RESUME) {
@@ -556,7 +608,8 @@ bool LocationIntegrationApi::setUserConsentForTerrestrialPositioning(bool userCo
     }
 }
 
-bool LocationIntegrationApi::configOutputNmeaTypes(NmeaTypesMask enabledNMEATypes) {
+bool LocationIntegrationApi::configOutputNmeaTypes(NmeaTypesMask enabledNMEATypes,
+                                                   GeodeticDatumType nmeaDatumType) {
     if (mApiImpl) {
         uint32_t halNmeaTypes = ::NMEA_TYPE_NONE;
         if (enabledNMEATypes & NMEA_TYPE_GGA) {
@@ -595,7 +648,314 @@ bool LocationIntegrationApi::configOutputNmeaTypes(NmeaTypesMask enabledNMEAType
         if (enabledNMEATypes & NMEA_TYPE_GIGSV) {
             halNmeaTypes |= ::NMEA_TYPE_GIGSV;
         }
-        return (mApiImpl->configOutputNmeaTypes((GnssNmeaTypesMask) halNmeaTypes) == 0);
+        GnssGeodeticDatumType halDatumType = ::GEODETIC_TYPE_WGS_84;
+        if (nmeaDatumType == GEODETIC_TYPE_PZ_90) {
+            halDatumType = ::GEODETIC_TYPE_PZ_90;
+        }
+        LOC_LOGd("datum type 0x%x %d", halNmeaTypes, halDatumType);
+        return (mApiImpl->configOutputNmeaTypes((GnssNmeaTypesMask) halNmeaTypes,
+                                                halDatumType) == 0);
+    } else {
+        LOC_LOGe ("NULL mApiImpl");
+        return false;
+    }
+}
+
+bool LocationIntegrationApi::configEngineIntegrityRisk(
+        LocIntegrationEngineType engType, uint32_t integrityRisk) {
+    if (mApiImpl) {
+        PositioningEngineMask halEngType = getHalEngType(engType);
+        if (halEngType == (PositioningEngineMask) 0) {
+            return false;
+        }
+        return (mApiImpl->configEngineIntegrityRisk(halEngType, integrityRisk) == 0);
+    } else {
+        LOC_LOGe ("NULL mApiImpl");
+        return false;
+    }
+}
+
+// Convert LCA basic loation report to HAL location defined in
+// LocationDataType.h
+static void convertLocation(const location_client::Location& location,
+                            ::Location& halLocation) {
+
+    halLocation = {};
+    halLocation.size = sizeof(halLocation);
+
+    uint32_t flags = 0;
+    halLocation.timestamp = location.timestamp;
+    halLocation.timeUncMs = location.timeUncMs;
+    halLocation.latitude = location.latitude;
+    halLocation.longitude = location.longitude;
+    halLocation.altitude = location.altitude;
+    halLocation.speed = location.speed;
+    halLocation.bearing = location.bearing;
+    halLocation.accuracy = location.horizontalAccuracy;
+    halLocation.verticalAccuracy = location.verticalAccuracy;
+    halLocation.speedAccuracy = location.speedAccuracy;
+    halLocation.bearingAccuracy = location.bearingAccuracy;
+
+    if (location_client::LOCATION_HAS_TIME_UNC_BIT & location.flags) {
+        flags |= ::LOCATION_HAS_TIME_UNC_BIT;
+    }
+    if (location_client::LOCATION_HAS_LAT_LONG_BIT & location.flags) {
+        flags |= ::LOCATION_HAS_LAT_LONG_BIT;
+    }
+    if (location_client::LOCATION_HAS_ALTITUDE_BIT & location.flags) {
+        flags |= ::LOCATION_HAS_ALTITUDE_BIT;
+    }
+    if (location_client::LOCATION_HAS_SPEED_BIT & location.flags) {
+        flags |= ::LOCATION_HAS_SPEED_BIT;
+    }
+    if (location_client::LOCATION_HAS_BEARING_BIT & location.flags) {
+        flags |= ::LOCATION_HAS_BEARING_BIT;
+    }
+    if (location_client::LOCATION_HAS_ACCURACY_BIT & location.flags) {
+        flags |= ::LOCATION_HAS_ACCURACY_BIT;
+    }
+    if (location_client::LOCATION_HAS_VERTICAL_ACCURACY_BIT & location.flags) {
+        flags |= ::LOCATION_HAS_VERTICAL_ACCURACY_BIT;
+    }
+    if (location_client::LOCATION_HAS_SPEED_ACCURACY_BIT & location.flags) {
+        flags |= ::LOCATION_HAS_SPEED_ACCURACY_BIT;
+    }
+    if (location_client::LOCATION_HAS_BEARING_ACCURACY_BIT & location.flags) {
+        flags |= ::LOCATION_HAS_BEARING_ACCURACY_BIT;
+    }
+    halLocation.flags = (::LocationFlagsMask)flags;
+
+    flags = 0;
+    if (location_client::LOCATION_TECHNOLOGY_GNSS_BIT & location.techMask) {
+        flags |= ::LOCATION_TECHNOLOGY_GNSS_BIT;
+    }
+    if (location_client::LOCATION_TECHNOLOGY_CELL_BIT & location.techMask) {
+        flags |= ::LOCATION_TECHNOLOGY_CELL_BIT;
+    }
+    if (location_client::LOCATION_TECHNOLOGY_WIFI_BIT & location.techMask) {
+        flags |= ::LOCATION_TECHNOLOGY_WIFI_BIT;
+    }
+    if (location_client::LOCATION_TECHNOLOGY_SENSORS_BIT & location.techMask) {
+        flags |= ::LOCATION_TECHNOLOGY_SENSORS_BIT;
+    }
+    if (location_client::LOCATION_TECHNOLOGY_REFERENCE_LOCATION_BIT & location.techMask) {
+        flags |= ::LOCATION_TECHNOLOGY_REFERENCE_LOCATION_BIT;
+    }
+    if (location_client::LOCATION_TECHNOLOGY_INJECTED_COARSE_POSITION_BIT & location.techMask) {
+        flags |= ::LOCATION_TECHNOLOGY_INJECTED_COARSE_POSITION_BIT;
+    }
+    if (location_client::LOCATION_TECHNOLOGY_AFLT_BIT & location.techMask) {
+        flags |= ::LOCATION_TECHNOLOGY_AFLT_BIT;
+    }
+    if (location_client::LOCATION_TECHNOLOGY_HYBRID_BIT & location.techMask) {
+        flags |= ::LOCATION_TECHNOLOGY_HYBRID_BIT;
+    }
+    if (location_client::LOCATION_TECHNOLOGY_PPE_BIT & location.techMask) {
+        flags |= ::LOCATION_TECHNOLOGY_PPE_BIT;
+    }
+    if (location_client::LOCATION_TECHNOLOGY_VEH_BIT & location.techMask) {
+        flags |= ::LOCATION_TECHNOLOGY_VEH_BIT;
+    }
+    if (location_client::LOCATION_TECHNOLOGY_VIS_BIT & location.techMask) {
+        flags |= ::LOCATION_TECHNOLOGY_VIS_BIT;
+    }
+    halLocation.techMask = (::LocationTechnologyMask)flags;
+}
+
+#define VALID_INJECTED_LOCATION_FLAGS \
+    (LOCATION_HAS_LAT_LONG_BIT | LOCATION_HAS_ACCURACY_BIT | LOCATION_HAS_TIME_UNC_BIT)
+
+bool LocationIntegrationApi::injectLocation(const location_client::Location& lcaLocation) {
+    ::Location halLocation{};
+
+    convertLocation(lcaLocation, halLocation);
+    if ((halLocation.flags & VALID_INJECTED_LOCATION_FLAGS) != VALID_INJECTED_LOCATION_FLAGS ||
+            (halLocation.timestamp == 0)) {
+        LOC_LOGe("location is invalid: flags=0x%x timestamp=%" PRIu64"",
+                 lcaLocation.flags, lcaLocation.timestamp);
+        return false;
+    }
+    if (mApiImpl) {
+        mApiImpl->odcpiInject(halLocation);
+        return true;
+    } else {
+        LOC_LOGe("NULL mApiImpl");
+        return false;
+    }
+}
+
+::DebugLogLevel getHalLogLevel (DebugLogLevel logLevel) {
+    ::DebugLogLevel halLogLevel = ::DEBUG_LOG_LEVEL_NONE;
+    switch (logLevel) {
+    case DEBUG_LOG_LEVEL_ERROR:
+        halLogLevel = ::DEBUG_LOG_LEVEL_ERROR;
+        break;
+    case DEBUG_LOG_LEVEL_WARNING:
+        halLogLevel = ::DEBUG_LOG_LEVEL_WARNING;
+        break;
+    case DEBUG_LOG_LEVEL_INFO:
+        halLogLevel = ::DEBUG_LOG_LEVEL_INFO;
+        break;
+    case DEBUG_LOG_LEVEL_DEBUG:
+        halLogLevel = ::DEBUG_LOG_LEVEL_DEBUG;
+        break;
+    case DEBUG_LOG_LEVEL_VERBOSE:
+        halLogLevel = ::DEBUG_LOG_LEVEL_VERBOSE;
+        break;
+    default:
+        break;
+    }
+    return halLogLevel;
+}
+
+bool urlHasPortNum(const char* xtraServerURL, int length) {
+    int index = length-1;
+
+    // check for port number at the end of URL
+    do {
+        char c = xtraServerURL[index];
+        if (c >= '0' && c <= '9') {
+            index--;
+        } else {
+            break;
+        }
+    } while (index >= 0);
+
+    if ((index >= 5) && (index < (length-1)) && xtraServerURL[index] == ':') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// sanity check whether XTRA server URL is valid or not
+// 1: start with "https://"
+// 2: end with a port number
+bool isValidXTRAServerURL(const char* xtraServerURL, int length) {
+    // minumum length: https://a.b.c:x
+    if (!xtraServerURL || length < 15) {
+        LOC_LOGe("null or length not valid: %d", length);
+        return false;
+    }
+
+    int retval = strncasecmp(xtraServerURL, "https://", sizeof("https://")-1);
+    if (retval != 0) {
+        LOC_LOGe("url %s does not start with https://", xtraServerURL);
+        return false;
+    } else if (urlHasPortNum(xtraServerURL, length)) {
+        return true;
+    } else {
+        LOC_LOGe("url %s does not have port number", xtraServerURL);
+        return false;
+    }
+}
+
+bool LocationIntegrationApi::configXtraParams(bool enable, XtraConfigParams* configParams) {
+    bool validparam = false;
+    ::XtraConfigParams halConfigParams = {};
+
+    do {
+        if (!mApiImpl) {
+            break;
+        } else if (enable == false) {
+            validparam = true;
+            break;
+        } else if (configParams == nullptr) {
+            LOC_LOGe("no valid param provided to enable xtra");
+            break;
+        }
+
+        LOC_LOGd("xtra params,enable %d, download:%d %d, retry %d %d, debug: %d"
+                 "ca path: %s, xtra server: %s %s %s, ntp server %s %s %s",
+                 enable, configParams->xtraDownloadIntervalMinute,
+                 configParams->xtraDownloadTimeoutSec,
+                 configParams->xtraDownloadRetryIntervalMinute,
+                 configParams->xtraDownloadRetryAttempts,
+                 configParams->xtraDaemonDebugLogLevel,
+                 configParams->xtraCaPath.c_str(),
+                 configParams->xtraServerURLs[0].c_str(), configParams->xtraServerURLs[1].c_str(),
+                 configParams->xtraServerURLs[2].c_str(), configParams->ntpServerURLs[0].c_str(),
+                 configParams->ntpServerURLs[1].c_str(), configParams->ntpServerURLs[2].c_str());
+
+        halConfigParams.xtraDownloadIntervalMinute =
+                configParams->xtraDownloadIntervalMinute;
+
+        halConfigParams.xtraDownloadTimeoutSec =
+                configParams->xtraDownloadTimeoutSec;
+
+        halConfigParams.xtraDownloadRetryIntervalMinute =
+                configParams->xtraDownloadRetryIntervalMinute;
+
+        halConfigParams.xtraDownloadRetryAttempts =
+                configParams->xtraDownloadRetryAttempts;
+
+        if ((halConfigParams.xtraDownloadRetryIntervalMinute == 0) ||
+                (halConfigParams.xtraDownloadRetryAttempts == 0)) {
+            halConfigParams.xtraDownloadRetryIntervalMinute = 0;
+            halConfigParams.xtraDownloadRetryAttempts = 0;
+        }
+
+        // CA path
+        strlcpy(halConfigParams.xtraCaPath, configParams->xtraCaPath.c_str(),
+                sizeof(halConfigParams.xtraCaPath));
+
+        uint32_t totalValidXtraServerURL = 0;
+        for (int index = 0; index < 3; index++) {
+            // check for valid server URL
+            const char * xtraServerURL = configParams->xtraServerURLs[index].c_str();
+            int length = configParams->xtraServerURLs[index].size();
+            if (isValidXTRAServerURL(xtraServerURL, length) == true) {
+                strlcpy(halConfigParams.xtraServerURLs[totalValidXtraServerURL++],
+                        configParams->xtraServerURLs[index].c_str(),
+                        sizeof(halConfigParams.xtraServerURLs[index]));
+            }
+        }
+        halConfigParams.xtraServerURLsCount = totalValidXtraServerURL;
+
+        uint32_t totalValidNtpServerURL = 0;
+        for (int index = 0; index < 3; index++) {
+            // check for valid server URL
+            const char * ntpServerURL = configParams->ntpServerURLs[index].c_str();
+            int length = configParams->ntpServerURLs[index].size();
+            if (urlHasPortNum(ntpServerURL, length) == true) {
+                strlcpy(halConfigParams.ntpServerURLs[totalValidNtpServerURL++],
+                        configParams->ntpServerURLs[index].c_str(),
+                        sizeof(halConfigParams.ntpServerURLs[index]));
+            }
+        }
+        halConfigParams.ntpServerURLsCount = totalValidNtpServerURL;
+
+        halConfigParams.xtraIntegrityDownloadEnable =
+                configParams->xtraIntegrityDownloadEnable;
+        if (halConfigParams.xtraIntegrityDownloadEnable == true) {
+            halConfigParams.xtraIntegrityDownloadIntervalMinute =
+                    configParams->xtraIntegrityDownloadIntervalMinute;
+        }
+        halConfigParams.xtraDaemonDebugLogLevel =
+                getHalLogLevel(configParams->xtraDaemonDebugLogLevel);
+
+        validparam = true;
+    } while (0);
+
+    if (validparam == true) {
+        return (mApiImpl->configXtraParams(enable, halConfigParams) == 0);
+    } else {
+        return false;
+    }
+}
+
+bool LocationIntegrationApi::getXtraStatus() {
+    if (mApiImpl) {
+        return (mApiImpl->getXtraStatus() == 0);
+    } else {
+        LOC_LOGe ("NULL mApiImpl");
+        return false;
+    }
+}
+
+bool LocationIntegrationApi::registerXtraStatusUpdate(bool registerUpdate) {
+    if (mApiImpl) {
+        return (mApiImpl->registerXtraStatusUpdate(registerUpdate) == 0);
     } else {
         LOC_LOGe ("NULL mApiImpl");
         return false;

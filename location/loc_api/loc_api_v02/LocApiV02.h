@@ -26,6 +26,42 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+ /*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #ifndef LOC_API_V_0_2_H
 #define LOC_API_V_0_2_H
 
@@ -36,12 +72,7 @@
 #include <loc_api_v02_client.h>
 #include <vector>
 #include <functional>
-#ifdef NO_UNORDERED_SET_OR_MAP
-    #include <map>
-    #define unordered_map map
-#else
-    #include <unordered_map>
-#endif
+#include <unordered_map>
 
 #define LOC_SEND_SYNC_REQ(NAME, ID, REQ)  \
     int rv = true; \
@@ -76,6 +107,7 @@ typedef struct
     uint16_t gnssSvId;
     qmiLocMeasFieldsValidMaskT_v02 validMask;
     uint8_t cycleSlipCount;
+    uint8_t nHzMeasurement;
 } adrData;
 
 typedef uint64_t GpsSvMeasHeaderFlags;
@@ -103,6 +135,13 @@ typedef uint64_t GpsSvMeasHeaderFlags;
 #define BIAS_BDSB1_BDSB2A_VALID         0x00100000
 #define BIAS_BDSB1_BDSB2A_UNC_VALID     0x00200000
 
+#define BIAS_GPSL1_GPSL2C_VALID         0x00400000
+#define BIAS_GPSL1_GPSL2C_UNC_VALID     0x00800000
+#define BIAS_GALE1_GALE5B_VALID         0x01000000
+#define BIAS_GALE1_GALE5B_UNC_VALID     0x02000000
+#define BIAS_BDSB1_BDSB2BI_VALID        0x04000000
+#define BIAS_BDSB1_BDSB2BI_UNC_VALID    0x08000000
+
 typedef struct {
     uint64_t flags;
 
@@ -111,6 +150,8 @@ typedef struct {
     float gpsL1Unc;
     float gpsL1_gpsL5;
     float gpsL1_gpsL5Unc;
+    float gpsL1_gpsL2c;
+    float gpsL1_gpsL2cUnc;
     float gpsL1_gloG1;
     float gpsL1_gloG1Unc;
     float gpsL1_galE1;
@@ -125,12 +166,16 @@ typedef struct {
     float galE1Unc;
     float galE1_galE5a;
     float galE1_galE5aUnc;
+    float galE1_galE5b;
+    float galE1_galE5bUnc;
     float bdsB1;
     float bdsB1Unc;
     float bdsB1_bdsB1c;
     float bdsB1_bdsB1cUnc;
     float bdsB1_bdsB2a;
     float bdsB1_bdsB2aUnc;
+    float bdsB1_bdsB2bi;
+    float bdsB1_bdsB2biUnc;
 } timeBiases;
 
 /* This class derives from the LocApiBase class.
@@ -160,6 +205,7 @@ private:
   bool mAgcIsPresent;
   timeBiases mTimeBiases;
   std::unordered_map<uint16_t, GnssSvPolynomial> mSvPolynomialMap;
+  qmiLocPlatformPowerStateEnumT_v02 mPlatformPowerState;
 
   size_t mBatchSize, mDesiredBatchSize;
   size_t mTripBatchSize, mDesiredTripBatchSize;
@@ -174,10 +220,13 @@ private:
   ElapsedRealtimeEstimator mMeasElapsedRealTimeCal;
 
   /* Convert event mask from loc eng to loc_api_v02 format */
-  static locClientEventMaskType convertMask(LOC_API_ADAPTER_EVENT_MASK_T mask);
+  static locClientEventMaskType convertLocClientEventMask(LOC_API_ADAPTER_EVENT_MASK_T mask);
 
   /* Convert GPS LOCK from LocationAPI format to QMI format */
   static qmiLocLockEnumT_v02 convertGpsLockFromAPItoQMI(GnssConfigGpsLock lock);
+
+  /* Convert Engine Lock State from QMI format to LocationAPI format */
+  static EngineLockState convertEngineLockState(qmiLocEngineLockStateEnumT_v02 LockState);
 
   /* Convert error from loc_api_v02 to loc eng format*/
   static enum loc_api_adapter_err convertErr(locClientStatusEnumType status);
@@ -317,17 +366,28 @@ private:
       mAgcIsPresent = false;
   }
 
+  bool convertJammerIndicator(
+        const qmiLocEventGnssSvMeasInfoIndMsgT_v02& gnss_measurement_report_ptr,
+        double& agcLevelDb,
+        GnssMeasurementsDataFlagsMask& flags,
+        bool updateFlags = false);
+
+  void convertSvType(
+        const qmiLocEventGnssSvMeasInfoIndMsgT_v02& gnss_measurement_report_ptr,
+        GnssSvType& svType);
+
   void setGnssBiases();
 
   /* convert and report ODCPI request */
   void requestOdcpi(
     const qmiLocEventWifiReqIndMsgT_v02& odcpiReq);
 
-  void registerEventMask(LOC_API_ADAPTER_EVENT_MASK_T adapterMask);
+  void registerEventMask();
   bool sendRequestForAidingData(locClientEventMaskType qmiMask);
-  locClientEventMaskType adjustMaskIfNoSessionOrEngineOff(locClientEventMaskType qmiMask);
+  locClientEventMaskType adjustLocClientEventMask(locClientEventMaskType qmiMask);
   bool cacheGnssMeasurementSupport();
   void registerMasterClient();
+  void getEngineLockStateSync();
   void getRobustLocationConfig(uint32_t sessionId, LocApiResponse* adapterResponse);
   void getMinGpsWeek(uint32_t sessionId, LocApiResponse* adapterResponse);
 
@@ -359,7 +419,14 @@ private:
   void geofenceStatusEvent(const qmiLocEventGeofenceGenAlertIndMsgT_v02* alertInfo);
   void geofenceDwellEvent(const qmiLocEventGeofenceBatchedDwellIndMsgT_v02 *dwellEvent);
   void reportLatencyInfo(const qmiLocLatencyInformationIndMsgT_v02* pLocLatencyInfo);
+  void reportEngineLockStatus(const qmiLocEngineLockStateEnumT_v02 engineLockState);
   void reportEngDebugDataInfo(const qmiLocEngineDebugDataIndMsgT_v02* pLocEngDbgDataInfoIndMsg);
+
+  void reportPowerStateChangeInfo(
+        const qmiLocPlatformPowerStateChangedIndMsgT_v02 *pPowerStateChangedInfo);
+
+  /* report disaster and crisis message */
+  void reportDcMessage(const qmiLocEventDcReportIndMsgT_v02* pDcReportIndMsg);
 
 protected:
   virtual enum loc_api_adapter_err
@@ -492,6 +559,8 @@ public:
                                                      LocApiResponse *adapterResponse=nullptr);
   virtual void getGnssEnergyConsumed();
   virtual void updateSystemPowerState(PowerStateType powerState);
+  virtual void updatePowerConnectState(bool connected);
+
   virtual void requestForAidingData(GnssAidingDataSvMask svDataMask);
   virtual void configRobustLocation(bool enable, bool enableForE911,
                                     LocApiResponse *adapterResponse=nullptr);
@@ -501,6 +570,8 @@ public:
 
   virtual void getParameter(uint32_t sessionId, GnssConfigFlagsMask flags,
                             LocApiResponse* adapterResponse=nullptr);
+  virtual void setTribandState(bool enabled);
+
   /*
   Returns
   Current value of GPS Lock on success
@@ -526,6 +597,8 @@ public:
         qmiLocGNSSConstellEnumT_v02 qmiSecondaryBandConfig,
         GnssSvTypeConfig& secondaryBandConfig);
 
+  virtual void configPrecisePositioning(uint32_t featureId, bool enable,
+          std::string appHash, LocApiResponse* adapterResponse=nullptr);
   /* Requests for SV/Constellation Control */
   virtual LocationError setBlacklistSvSync(const GnssSvIdConfig& config);
   virtual void setBlacklistSv(const GnssSvIdConfig& config,

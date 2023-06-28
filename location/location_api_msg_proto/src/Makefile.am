@@ -10,7 +10,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 requiredlibs = \
     $(GPSUTILS_LIBS) \
-    -lprotobuf
+    -lprotobuf-lite
 
 liblocation_api_msg_proto_la_SOURCES = \
     LocationApiDataTypes.pb.cc \

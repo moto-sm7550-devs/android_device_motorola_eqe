@@ -25,6 +25,43 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #ifndef LOCATION_API_PBMSGCONV_H
 #define LOCATION_API_PBMSGCONV_H
 
@@ -62,6 +99,11 @@ public:
     // DeadReckoningEngineConfig to PBDeadReckoningEngineConfig
     int convertDeadReckoningEngineConfigToPB(const DeadReckoningEngineConfig &drEngConfig,
             PBDeadReckoningEngineConfig *pbDrEngConfig) const;
+    // XtraConfigParams to PBXtraConfigParams
+    int convertXtraConfigParamsToPB(const XtraConfigParams& xtraParams,
+            PBXtraConfigParams* pbXtraParams) const;
+    int convertXtraStatusToPB(const XtraStatus& xtraStatus, PBXtraStatus* pbXtraStatus) const;
+
     // LocationOptions to PBLocationOptions
     int convertLocationOptionsToPB(const LocationOptions &locOpt,
             PBLocationOptions *pbLocOpt) const;
@@ -104,6 +146,15 @@ public:
     // LocationSystemInfo to PBLocationSystemInfo
     int convertLocSysInfoToPB(const LocationSystemInfo &locSysInfo,
             PBLocationSystemInfo *pbLocSysInfo) const;
+    // GnssDebugReport to PBGnssDebugReport
+    int convertGnssDebugReportToPB(const GnssDebugReport& gnssDebugReport,
+            PBGnssDebugReport* pbGnssDebugReport) const;
+    // GnssDcReportInfo to PBGnssDcReportInfo
+    int convertGnssDcReportToPB(const GnssDcReportInfo &dcReportInfo,
+            PBGnssDcReportInfo *pbDcReportInfo) const;
+    // AntennaInformation to PBAntennaInformation
+    int convertAntennaInfoToPB(const AntennaInformation& antennaInfo,
+            PBAntennaInformation* pbAntennaInfo) const;
 
     // Memory cleanup - Free up memory after PB conversion and serializing data
     inline void freeUpPBLocAPIStartTrackingReqMsg(PBLocAPIStartTrackingReqMsg &pbLocApiStartTrack)
@@ -403,6 +454,29 @@ public:
         pbLocCfgGetConstlSecBandRespMsg.clear_msecondarybandconfig();
     }
 
+    inline void freeupPBLocAPIGetDebugRespMsg(
+            PBLocAPIGetDebugRespMsg& pbLocAPIGetDebugRespMsg) const {
+        // PBGnssDebugReport mDebugReport = 1;
+        pbLocAPIGetDebugRespMsg.clear_mdebugreport();
+    }
+
+    inline void freeupPBAntennaInfoMsg(
+            PBLocAPIAntennaInfoMsg& pbLocAPIAntennaInfoMsg) const {
+        // PBAntennaInformation mAntennaInformation = 1;
+        PBAntennaInformation antennaInformation = pbLocAPIAntennaInfoMsg.mantennainformation();
+        antennaInformation.clear_antennainfos();
+        pbLocAPIAntennaInfoMsg.clear_mantennainformation();
+    }
+
+    inline void freeUpPBLocConfigXtraReqMsg(PBLocConfigXtraReqMsg &pbLocConfMsg) const {
+        pbLocConfMsg.clear_xtraparams();
+    }
+
+    inline void freeUpPBLocConfigGetXtraStatusRespMsg(
+            PBLocConfigGetXtraStatusRespMsg &pbLocMsg) const {
+        pbLocMsg.clear_mxtrastatus();
+    }
+
     inline void freeUpPBLocAPIPingTestReqMsg(PBLocAPIPingTestReqMsg &pbLocApiPingTest) const {
         // repeated uint32 data = 2;
         pbLocApiPingTest.clear_data();
@@ -473,6 +547,18 @@ public:
     // PBGnssConfigRobustLocation to GnssConfigRobustLocation
     int pbConvertToGnssConfigRobustLocation(const PBGnssConfigRobustLocation &pbGnssCfgRobLoc,
             GnssConfigRobustLocation &gnssCfgRobLoc) const;
+    // PBGnssDebugReport to GnssDebugReport
+    int pbConvertToGnssDebugReport(const PBGnssDebugReport &pbGnssDebugReport,
+            GnssDebugReport &gnssDebugReport) const;
+    int pbConvertToDcReport(const PBGnssDcReportInfo & pbDcReportInfo,
+                            GnssDcReportInfo & dcReporInfo) const;
+    // PBAntennaInformation to AntennaInformation
+    int pbConvertToAntennaInfo(const PBAntennaInformation& pbAntennaInfo,
+            AntennaInformation& antennaInfo) const;
+    int pbConvertToXtraConfig(const PBXtraConfigParams &pbXtraParams,
+            XtraConfigParams& xtraParams) const;
+    int pbConvertToXtraStatus(const PBXtraStatus &pbXtraStatus,
+            XtraStatus& xtraStatus) const;
 
     // MASK CONVERSION
     // ***************
@@ -517,6 +603,17 @@ public:
     PBLocationError getPBEnumForLocationError(const LocationError &locErr) const;
     PBELocMsgID getPBEnumForELocMsgID(const ELocMsgID &eLocMsgId) const;
     PBClientType getPBEnumForClientType(const ClientType &clientTyp) const;
+    GnssDcReportType getDcReportTypeFromPB(const PBGnssDcReportType& pbDcReportType) const;
+    PBGnssDcReportType getPBEnumForDcReportType(const GnssDcReportType& dcReportType) const;
+
+    DebugLogLevel getDebugLogLevelFromPB(const PBDebugLogLevel &pbLogLevel) const;
+    PBDebugLogLevel getPBEnumForDebugLogLevel(const DebugLogLevel &logLevel) const;
+    XtraStatusUpdateType getXtraStatusUpdateTypeFromPB(
+            const PBXtraStatusUpdateType &pbXtraStatusUpdateType) const;
+    PBXtraStatusUpdateType getPBEnumForXtraStatusUpdateType(
+            const XtraStatusUpdateType &xtraStatusUpdateType) const;
+    XtraDataStatus getXtraDataStatusFromPB(const PBXtraDataStatus &pbXtraDataStatus) const;
+    PBXtraDataStatus getPBEnumForXtraDataStatus(const XtraDataStatus &xtraDataStatus) const;
 
 private:
     bool mPbDebugLogEnabled;
@@ -576,6 +673,24 @@ private:
     // BodyToSensorMountParams to PBLIABodyToSensorMountParams
     int convertBodyToSensorMountParamsToPB(const BodyToSensorMountParams &bodyToSensorMntParams,
             PBLIABodyToSensorMountParams *pbBodyToSensorMntParams) const;
+    int convertGnssDebugLocationToPB(const GnssDebugLocation& debugLocation,
+            PBGnssDebugLocation* pbDebugLocation) const;
+    int convertTimespecToPB(const timespec& utcReported,
+            PBTimespec* pbUtcReported) const;
+    int convertGnssDebugTimeToPB(const GnssDebugTime& gnssDebugTime,
+            PBGnssDebugTime* pbGnssDebugTime) const;
+    int convertGnssDebugSatelliteInfoToPB(
+            const GnssDebugSatelliteInfo& satelliteInfo,
+            PBGnssDebugSatelliteInfo* pbSatelliteInfo) const;
+    int convertGnssAntennaInformationToPB(
+            const GnssAntennaInformation& gnssAntennaInfo,
+            PBGnssAntennaInformation* pbGnssAntennaInfo) const;
+    int convertGnssCoordinateToPB(
+            const GnssCoordinate& gnssCoordinate,
+            PBGnssCoordinate* pbGnssCoordinate) const;
+    int convert2DimensionDoubleVectorToPB(
+            const std::vector<std::vector<double>>& doubleArrays,
+            PB2DimensionDoubleVector* pbDoubleArrarys) const;
 
     // **** helper function for mask conversion to protobuf masks
     // LeverArmTypeMask to PBLIALeverArmTypeMask
@@ -640,6 +755,7 @@ private:
 
     // **** helper function for enum conversion to protobuf enums
     PBGnssSuplMode getPBEnumForGnssSuplMode(const GnssSuplMode &gnssSuplMode) const;
+    PBFixQualityLevel getPBEnumForFixQualityLevel(const FixQualityLevel &qualityLevel) const;
     PBBatchingStatus getPBEnumForBatchingStatus(const BatchingStatus &batchStatus) const;
     PBLocationReliability getPBEnumForLocationReliability(
             const LocationReliability &locReliab) const;
@@ -651,6 +767,13 @@ private:
             const Gnss_LocSvSystemEnumType &gnssLocSvSysEnumType) const;
     // PBLocationSessionStatus from/to loc_sess_status
     PBLocationSessionStatus getPBEnumForLocSessionStatus(const loc_sess_status &status) const;
+    PBGnssEphemerisType getPBEnumForGnssEphemerisType(
+            const GnssEphemerisType& ephemerisType) const;
+    PBGnssEphemerisSource getPBEnumForGnssEphemerisSource(
+            const GnssEphemerisSource& ephemerisSource) const;
+    PBGnssEphemerisHealth getPBEnumForGnssEphemerisHealth(
+            const GnssEphemerisHealth& ephemerisHealth) const;
+
 
     // ** Special enum conversion
     // GnssSvType to PBLocApiGnss_LocSvSystemEnumType
@@ -717,6 +840,8 @@ private:
 
     // **** helper function for enum conversion from protobuf enums to normal format.
     GnssSuplMode getEnumForPBGnssSuplMode(const PBGnssSuplMode &pbGnssSuplMode) const;
+    FixQualityLevel getEnumForPBFixQualityLevel(
+                const PBFixQualityLevel &pbFixQualityLevel) const;
     BatchingStatus getEnumForPBBatchingStatus(const PBBatchingStatus &pbBatchStat) const;
     GnssMeasurementsMultipathIndicator getEnumForPBGnssMeasMultipathIndic(
             const PBGnssMeasurementsMultipathIndicator &pbGnssMeasMultipathIndic) const;
@@ -727,6 +852,12 @@ private:
     LocOutputEngineType getEnumForPBLocOutputEngineType(
             const PBLocApiOutputEngineType &pbLocOpEngType) const;
     loc_sess_status getLocSessionStatusFromPB(const PBLocationSessionStatus &pbStatus) const;
+    GnssEphemerisType getEnumForPBGnssEphemerisType(
+            const PBGnssEphemerisType& pbGnssEphemerisType) const;
+    GnssEphemerisSource getEnumForPBGnssEphemerisSource(
+            const PBGnssEphemerisSource& pbGnssEphemerisSource) const;
+    GnssEphemerisHealth getEnumForPBGnssEphemerisHealth(
+            const PBGnssEphemerisHealth& pbGnssEphemerisHealth) const;
 
     // ** Special enum conversion
     // PBLocApiGnss_LocSvSystemEnumType to GnssSvType
@@ -786,6 +917,26 @@ private:
     int pbConvertToBodyToSensorMountParams(
             const PBLIABodyToSensorMountParams &pbBody2SensorMntParam,
             BodyToSensorMountParams &body2SensorMntParam) const;
+    // Helper function of GnssDebugReport
+    int pbConvertToGnssTimespec(const PBTimespec& pbTimespec,
+            timespec& timespec) const;
+    int pbConvertToGnssDebugTime(const PBGnssDebugTime &pbDebugTime,
+            GnssDebugTime debugTime) const;
+    int pbConvertToGnssDebugLocation(const PBGnssDebugLocation& pbDebugLocation,
+            GnssDebugLocation& debugLocation) const;
+    int pbConvertToGnssDebugSatelliteInfo(
+            const PBGnssDebugSatelliteInfo &pbSatelliteInfo,
+            GnssDebugSatelliteInfo &satelliteInfo) const;
+    // Helper function of AntennaInfo
+    int pbConvertToGnssAntennaInformaiton(
+            const PBGnssAntennaInformation& pbGnssAntennaInfo,
+            GnssAntennaInformation& gnssAntennaInfo) const;
+    int pbConvertToGnssCoordinate(
+            const PBGnssCoordinate& pbGnssCoordinate,
+            GnssCoordinate& gnssCoordinate) const;
+    int pbConvertTo2DimensionDoubleVector(
+            const PB2DimensionDoubleVector& pbDoubleArrarys,
+            std::vector<std::vector<double>>& doubleArrays) const;
 };
 
 #endif /* LOCATION_API_PBMSGCONV_H */
