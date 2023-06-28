@@ -27,6 +27,42 @@
  *
  */
 
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include "DataItemConcreteTypes.h"
 #include <inttypes.h>
 #include <log_util.h>
@@ -102,26 +138,13 @@
 #define TAC_FIELD_NAME "TAC"
 #define MCCMNC_FIELD_NAME "MCCMNC"
 
-#define BTLESCANDETAILS_FIELD_VALID "BTLE_VALID_DEV"
-#define BTLESCANDETAILS_FIELD_RSSI "BTLE_DEV_RSSI"
-#define BTLESCANDETAILS_FIELD_MAC "BTLE_DEV_MAC"
-#define BTLESCANDETAILS_FIELD_SCANREQ "BTLE_SCAN_REQ_TIME"
-#define BTLESCANDETAILS_FIELD_SCANSTART "BTLE_SCAN_START_TIME"
-#define BTLESCANDETAILS_FIELD_SCANRECV "BTLE_SCAN_RECV_TIME"
-#define BTLESCANDETAILS_FIELD_SCANERROR "BTLE_SCAN_ERR"
-
-#define BTSCANDETAILS_FIELD_VALID "BT_VALID_DEV"
-#define BTSCANDETAILS_FIELD_RSSI "BT_DEV_RSSI"
-#define BTSCANDETAILS_FIELD_MAC "BT_DEV_MAC"
-#define BTSCANDETAILS_FIELD_SCANREQ "BT_SCAN_REQ_TIME"
-#define BTSCANDETAILS_FIELD_SCANSTART "BT_SCAN_START_TIME"
-#define BTSCANDETAILS_FIELD_SCANRECV "BT_SCAN_RECV_TIME"
-#define BTSCANDETAILS_FIELD_SCANERROR "BT_SCAN_ERR"
-
 #define OEM_GTP_UPLAOD_TRIGGER_READY_FIELD_NAME "OEM-GTP-UPLOAD-TRIGGER-READY"
 #define BATTERYLEVEL_FIELD_BATTERY_PCT "BATTERY_PCT"
 
 #define IN_EMERGENCY_CALL_FIELD_NAME "IS_EMERGENCY"
+#define PRECISE_LOCATION_ENABLED_FIELD_NAME "PRECISE_LOCATION_ENABLED"
+#define TRACKING_STARTED_FIELD_NAME "TRACKING_STARTED"
+#define NTRIP_STARTED_FIELD_NAME "NTRIP_STARTED"
 
 namespace loc_core
 {
@@ -146,8 +169,23 @@ void ENHDataItem::stringify(string& valueStr) {
         STRINGIFY_ERROR_CHECK_AND_DOWN_CAST(ENHDataItem, ENH_DATA_ITEM_ID);
         valueStr.clear ();
         valueStr = ENH_FIELD_ENABLED;
-        valueStr += ": ";
-        valueStr += (d->mEnabled) ? ("true") : ("false");
+        if (!d->isEnabled()) {
+            switch (mFieldUpdate) {
+                case FIELD_CONSENT:
+                    valueStr += "_FIELD_CONSENT";
+                    break;
+                case FIELD_REGION:
+                    valueStr += "_FIELD_REGION";
+                    break;
+                default:
+                    break;
+            }
+            valueStr += ": ";
+            valueStr += (SET == d->mAction) ? "true" : "false";
+        } else {
+            valueStr += ": ";
+            valueStr += "true";
+        }
     } while (0);
     EXIT_LOG_WITH_ERROR("%d", result);
 }
@@ -237,7 +275,9 @@ void TimeZoneChangeDataItem::stringify(string& valueStr) {
         valueStr.clear ();
         valueStr = TIMEZONECHANGE_FIELD_ENABLED;
         valueStr += ": ";
-        valueStr += "true";
+        char time [30];
+        snprintf (time, 30, "%" PRIi64, d->mCurrTimeMillis);
+        valueStr += string (time);
     } while (0);
     EXIT_LOG_WITH_ERROR("%d", result);
 }
@@ -249,7 +289,9 @@ void TimeChangeDataItem::stringify(string& valueStr) {
         valueStr.clear ();
         valueStr = TIMECHANGE_FIELD_ENABLED;
         valueStr += ": ";
-        valueStr += "true";
+        char time [30];
+        snprintf (time, 30, "%" PRIi64, d->mCurrTimeMillis);
+        valueStr += string (time);
     } while (0);
     EXIT_LOG_WITH_ERROR("%d", result);
 }
@@ -449,103 +491,6 @@ void MccmncDataItem::stringify(string& valueStr) {
     } while (0);
     EXIT_LOG_WITH_ERROR("%d", result);
 }
-void BtLeDeviceScanDetailsDataItem::stringify(string& valueStr) {
-    int32_t result = 0;
-    ENTRY_LOG();
-    do {
-        STRINGIFY_ERROR_CHECK_AND_DOWN_CAST(BtLeDeviceScanDetailsDataItem, BTLE_SCAN_DATA_ITEM_ID);
-        valueStr.clear ();
-        valueStr += BTLESCANDETAILS_FIELD_VALID;
-        valueStr += ": ";
-        valueStr += d->mValidSrnData;
-        valueStr += ", ";
-
-        valueStr += BTLESCANDETAILS_FIELD_RSSI;
-        valueStr += ": ";
-        valueStr += d->mApSrnRssi;
-        valueStr += ", ";
-
-        char t[10];
-        memset (t, '\0', 10);
-        valueStr += BTLESCANDETAILS_FIELD_MAC;
-        valueStr += ": ";
-        snprintf(t, 10, "[%02x:%02x:%02x:%02x:%02x:%02x]", d->mApSrnMacAddress[0],
-                d->mApSrnMacAddress[1], d->mApSrnMacAddress[2], d->mApSrnMacAddress[3],
-                d->mApSrnMacAddress[4], d->mApSrnMacAddress[5]);
-        valueStr += t;
-        valueStr += ", ";
-
-        valueStr += BTLESCANDETAILS_FIELD_SCANREQ;
-        valueStr += ": ";
-        valueStr += d->mApSrnTimestamp;
-        valueStr += ", ";
-
-        valueStr += BTLESCANDETAILS_FIELD_SCANSTART;
-        valueStr += ": ";
-        valueStr += d->mRequestTimestamp;
-        valueStr += ", ";
-
-        valueStr += BTLESCANDETAILS_FIELD_SCANRECV;
-        valueStr += ": ";
-        valueStr += d->mReceiveTimestamp;
-        valueStr += ", ";
-
-        valueStr += BTLESCANDETAILS_FIELD_SCANERROR;
-        valueStr += ": ";
-        valueStr += d->mErrorCause;
-        valueStr += ", ";
-    } while (0);
-    EXIT_LOG_WITH_ERROR("%d", result);
-}
-void BtDeviceScanDetailsDataItem::stringify(string& valueStr) {
-    int32_t result = 0;
-    ENTRY_LOG();
-    do {
-        STRINGIFY_ERROR_CHECK_AND_DOWN_CAST(BtDeviceScanDetailsDataItem, BT_SCAN_DATA_ITEM_ID);
-        valueStr.clear ();
-
-        valueStr += BTSCANDETAILS_FIELD_VALID;
-        valueStr += ": ";
-        valueStr += d->mValidSrnData;
-        valueStr += ", ";
-
-        valueStr += BTSCANDETAILS_FIELD_RSSI;
-        valueStr += ": ";
-        valueStr += d->mApSrnRssi;
-        valueStr += ", ";
-
-        char t[10];
-        memset (t, '\0', 10);
-        valueStr += BTSCANDETAILS_FIELD_MAC;
-        valueStr += ": ";
-        snprintf(t, 10, "[%02x:%02x:%02x:%02x:%02x:%02x]", d->mApSrnMacAddress[0],
-                d->mApSrnMacAddress[1], d->mApSrnMacAddress[2], d->mApSrnMacAddress[3],
-                d->mApSrnMacAddress[4], d->mApSrnMacAddress[5]);
-        valueStr += t;
-        valueStr += ", ";
-
-        valueStr += BTSCANDETAILS_FIELD_SCANREQ;
-        valueStr += ": ";
-        valueStr += d->mApSrnTimestamp;
-        valueStr += ", ";
-
-        valueStr += BTSCANDETAILS_FIELD_SCANSTART;
-        valueStr += ": ";
-        valueStr += d->mRequestTimestamp;
-        valueStr += ", ";
-
-        valueStr += BTSCANDETAILS_FIELD_SCANRECV;
-        valueStr += ": ";
-        valueStr += d->mReceiveTimestamp;
-        valueStr += ", ";
-
-        valueStr += BTSCANDETAILS_FIELD_SCANERROR;
-        valueStr += ": ";
-        valueStr += d->mErrorCause;
-        valueStr += ", ";
-    } while (0);
-    EXIT_LOG_WITH_ERROR("%d", result);
-}
 
 // copy
 int32_t AirplaneModeDataItem::copyFrom(IDataItemCore* src) {
@@ -578,8 +523,17 @@ int32_t ENHDataItem::copyFrom(IDataItemCore* src) {
     ENTRY_LOG();
     do {
         COPIER_ERROR_CHECK_AND_DOWN_CAST(ENHDataItem,  ENH_DATA_ITEM_ID);
-        if (s->mEnabled == d->mEnabled) { result = true; break; }
-        s->mEnabled = d->mEnabled;
+        if (s->mEnhFields == d->mEnhFields) { result = true; break; }
+        switch (d->mAction) {
+            case SET:
+                s->mEnhFields |= (1 << d->mFieldUpdate);
+                break;
+            case CLEAR:
+                s->mEnhFields &= ~(1 << d->mFieldUpdate);
+                break;
+            default:
+                break;
+        }
         result = 0;
     } while (0);
     EXIT_LOG_WITH_ERROR("%d", result);
@@ -860,56 +814,6 @@ int32_t MccmncDataItem::copyFrom(IDataItemCore* src) {
     EXIT_LOG("%d", result);
     return result;
 }
-int32_t BtLeDeviceScanDetailsDataItem::copyFrom(IDataItemCore* src) {
-    int32_t result = -1;
-    ENTRY_LOG();
-    do {
-        COPIER_ERROR_CHECK_AND_DOWN_CAST(BtLeDeviceScanDetailsDataItem, BTLE_SCAN_DATA_ITEM_ID);
-
-        if (s->mValidSrnData != d->mValidSrnData) { s->mValidSrnData = d->mValidSrnData;}
-        if (s->mApSrnRssi != d->mApSrnRssi) { s->mApSrnRssi = d->mApSrnRssi;}
-        if (memcmp(s->mApSrnMacAddress, d->mApSrnMacAddress, sizeof(s->mApSrnMacAddress)) != 0) {
-            memcpy(static_cast<void*>(s->mApSrnMacAddress), static_cast<void*>(d->mApSrnMacAddress),
-                    sizeof(s->mApSrnMacAddress));
-        }
-        if (s->mApSrnTimestamp != d->mApSrnTimestamp) {s->mApSrnTimestamp = d->mApSrnTimestamp;}
-        if (s->mRequestTimestamp != d->mRequestTimestamp) {
-            s->mRequestTimestamp = d->mRequestTimestamp;
-        }
-        if (s->mReceiveTimestamp != d->mReceiveTimestamp) {
-            s->mReceiveTimestamp = d->mReceiveTimestamp;
-        }
-        if (s->mErrorCause != d->mErrorCause) {s->mErrorCause = d->mErrorCause;}
-        result = 0;
-    } while (0);
-    EXIT_LOG("%d", result);
-    return result;
-}
-int32_t BtDeviceScanDetailsDataItem::copyFrom(IDataItemCore* src) {
-    int32_t result = -1;
-    ENTRY_LOG();
-    do {
-        COPIER_ERROR_CHECK_AND_DOWN_CAST(BtDeviceScanDetailsDataItem, BT_SCAN_DATA_ITEM_ID);
-
-        if (s->mValidSrnData != d->mValidSrnData) { s->mValidSrnData = d->mValidSrnData;}
-        if (s->mApSrnRssi != d->mApSrnRssi) { s->mApSrnRssi = d->mApSrnRssi;}
-        if (memcmp(s->mApSrnMacAddress, d->mApSrnMacAddress, sizeof(s->mApSrnMacAddress)) != 0) {
-            memcpy(static_cast<void*>(s->mApSrnMacAddress), static_cast<void*>(d->mApSrnMacAddress),
-                    sizeof(s->mApSrnMacAddress));
-        }
-        if (s->mApSrnTimestamp != d->mApSrnTimestamp) {s->mApSrnTimestamp = d->mApSrnTimestamp;}
-        if (s->mRequestTimestamp != d->mRequestTimestamp) {
-            s->mRequestTimestamp = d->mRequestTimestamp;
-        }
-        if (s->mReceiveTimestamp != d->mReceiveTimestamp) {
-            s->mReceiveTimestamp = d->mReceiveTimestamp;
-        }
-        if (s->mErrorCause != d->mErrorCause) {s->mErrorCause = d->mErrorCause;}
-        result = 0;
-    } while (0);
-    EXIT_LOG("%d", result);
-    return result;
-}
 int32_t InEmergencyCallDataItem::copyFrom(IDataItemCore* src) {
     int32_t result = -1;
     ENTRY_LOG();
@@ -922,4 +826,86 @@ int32_t InEmergencyCallDataItem::copyFrom(IDataItemCore* src) {
     EXIT_LOG("%d", result);
     return result;
 }
+
+void PreciseLocationEnabledDataItem::stringify(string& valueStr) {
+    int32_t result = 0;
+    ENTRY_LOG();
+    do {
+        STRINGIFY_ERROR_CHECK_AND_DOWN_CAST(
+                PreciseLocationEnabledDataItem, PRECISE_LOCATION_ENABLED_DATA_ITEM_ID);
+        valueStr.clear ();
+        valueStr += PRECISE_LOCATION_ENABLED_FIELD_NAME;
+        valueStr += ": ";
+        valueStr += (d->mPreciseLocationEnabled) ? ("true") : ("false");
+    } while (0);
+    EXIT_LOG_WITH_ERROR("%d", result);
+}
+
+int32_t PreciseLocationEnabledDataItem::copyFrom(IDataItemCore* src) {
+    int32_t result = -1;
+    ENTRY_LOG();
+    do {
+        COPIER_ERROR_CHECK_AND_DOWN_CAST(
+                PreciseLocationEnabledDataItem, PRECISE_LOCATION_ENABLED_DATA_ITEM_ID);
+        s->mPreciseLocationEnabled = d->mPreciseLocationEnabled;
+        result = 0;
+    } while (0);
+    EXIT_LOG("%d", result);
+    return result;
+}
+
+void TrackingStartedDataItem::stringify(string& valueStr) {
+    int32_t result = 0;
+    ENTRY_LOG();
+    do {
+        STRINGIFY_ERROR_CHECK_AND_DOWN_CAST(
+                TrackingStartedDataItem, TRACKING_STARTED_DATA_ITEM_ID);
+        valueStr.clear ();
+        valueStr += TRACKING_STARTED_FIELD_NAME;
+        valueStr += ": ";
+        valueStr += (d->mTrackingStarted) ? ("true") : ("false");
+    } while (0);
+    EXIT_LOG_WITH_ERROR("%d", result);
+}
+
+int32_t TrackingStartedDataItem::copyFrom(IDataItemCore* src) {
+    int32_t result = -1;
+    ENTRY_LOG();
+    do {
+        COPIER_ERROR_CHECK_AND_DOWN_CAST(
+                TrackingStartedDataItem, TRACKING_STARTED_DATA_ITEM_ID);
+        s->mTrackingStarted = d->mTrackingStarted;
+        result = 0;
+    } while (0);
+    EXIT_LOG("%d", result);
+    return result;
+}
+
+void NtripStartedDataItem::stringify(string& valueStr) {
+    int32_t result = 0;
+    ENTRY_LOG();
+    do {
+        STRINGIFY_ERROR_CHECK_AND_DOWN_CAST(
+                NtripStartedDataItem, NTRIP_STARTED_DATA_ITEM_ID);
+        valueStr.clear ();
+        valueStr += NTRIP_STARTED_FIELD_NAME;
+        valueStr += ": ";
+        valueStr += (d->mNtripStarted) ? ("true") : ("false");
+    } while (0);
+    EXIT_LOG_WITH_ERROR("%d", result);
+}
+
+int32_t NtripStartedDataItem::copyFrom(IDataItemCore* src) {
+    int32_t result = -1;
+    ENTRY_LOG();
+    do {
+        COPIER_ERROR_CHECK_AND_DOWN_CAST(
+                NtripStartedDataItem, NTRIP_STARTED_DATA_ITEM_ID);
+        s->mNtripStarted = d->mNtripStarted;
+        result = 0;
+    } while (0);
+    EXIT_LOG("%d", result);
+    return result;
+}
+
 } //namespace loc_core

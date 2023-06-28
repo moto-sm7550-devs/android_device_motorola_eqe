@@ -26,6 +26,43 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #define LOG_NDEBUG 0
 #define LOG_TAG "LocSvc_Agps"
 
@@ -291,18 +328,18 @@ void AgpsStateMachine::requestOrReleaseDataConn(bool request){
     AGnssExtStatusIpV4 nifRequest;
     memset(&nifRequest, 0, sizeof(nifRequest));
 
-    nifRequest.type = mAgpsType;
+    nifRequest.type = (AGpsType) mAgpsType;
     nifRequest.apnTypeMask = mApnTypeMask;
     nifRequest.subId = mSubId;
     if (request) {
         LOC_LOGD("AGPS Data Conn Request mAgpsType=%d mApnTypeMask=0x%X",
                  mAgpsType, mApnTypeMask);
-        nifRequest.status = LOC_GPS_REQUEST_AGPS_DATA_CONN;
+        nifRequest.status = AGPS_REQUEST_AGPS_DATA_CONN;
     }
     else{
         LOC_LOGD("AGPS Data Conn Release mAgpsType=%d mApnTypeMask=0x%X",
                  mAgpsType, mApnTypeMask);
-        nifRequest.status = LOC_GPS_RELEASE_AGPS_DATA_CONN;
+        nifRequest.status = AGPS_RELEASE_AGPS_DATA_CONN;
     }
 
     mFrameworkStatusV4Cb(nifRequest);
@@ -521,16 +558,20 @@ void AgpsManager::createAgpsStateMachines(const AgpsCbInfo& cbInfo) {
                     (loc_core::ContextBase::mGps_conf.CAPABILITIES & LOC_GPS_CAPABILITY_MSB));
 
     if (NULL == mInternetNif && (cbInfo.atlType & AGPS_ATL_TYPE_WWAN)) {
-        mInternetNif = new AgpsStateMachine(this, LOC_AGPS_TYPE_WWAN_ANY);
-        mInternetNif->registerFrameworkStatusCallback((AgnssStatusIpV4Cb)cbInfo.statusV4Cb);
+        mInternetNif = new AgpsStateMachine(this, AGPS_TYPE_WWAN_ANY);
+        mInternetNif->registerFrameworkStatusCallback((agnssStatusIpV4Callback)cbInfo.statusV4Cb);
         LOC_LOGD("Internet NIF: %p", mInternetNif);
     }
     if (agpsCapable) {
         if (NULL == mAgnssNif && (cbInfo.atlType & AGPS_ATL_TYPE_SUPL) &&
                 (cbInfo.atlType & AGPS_ATL_TYPE_SUPL_ES)) {
-            mAgnssNif = new AgpsStateMachine(this, LOC_AGPS_TYPE_SUPL);
-            mAgnssNif->registerFrameworkStatusCallback((AgnssStatusIpV4Cb)cbInfo.statusV4Cb);
-            LOC_LOGD("AGNSS NIF: %p", mAgnssNif);
+            mAgnssNif = new AgpsStateMachine(this, AGPS_TYPE_SUPL);
+            LOC_LOGd("AGNSS NIF: %p", mAgnssNif);
+        }
+        LOC_LOGd("cbInfo.cbPriority=%d mCbPriority=%d", cbInfo.cbPriority, mCbPriority);
+        if (cbInfo.cbPriority > mCbPriority) {
+            mCbPriority = cbInfo.cbPriority;
+            mAgnssNif->registerFrameworkStatusCallback((agnssStatusIpV4Callback)cbInfo.statusV4Cb);
         }
     }
 }
@@ -541,14 +582,14 @@ AgpsStateMachine* AgpsManager::getAgpsStateMachine(AGpsExtType agpsType) {
 
     switch (agpsType) {
 
-        case LOC_AGPS_TYPE_INVALID:
-        case LOC_AGPS_TYPE_SUPL:
-        case LOC_AGPS_TYPE_SUPL_ES:
+        case AGPS_TYPE_INVALID:
+        case AGPS_TYPE_SUPL:
+        case AGPS_TYPE_SUPL_ES:
             if (mAgnssNif == NULL) {
                 LOC_LOGE("NULL AGNSS NIF !");
             }
             return mAgnssNif;
-        case LOC_AGPS_TYPE_WWAN_ANY:
+        case AGPS_TYPE_WWAN_ANY:
             if (mInternetNif == NULL) {
                 LOC_LOGE("NULL Internet NIF !");
             }
@@ -562,18 +603,18 @@ AgpsStateMachine* AgpsManager::getAgpsStateMachine(AGpsExtType agpsType) {
 }
 
 void AgpsManager::requestATL(int connHandle, AGpsExtType agpsType,
-                             LocApnTypeMask apnTypeMask, LocSubId subId) {
+                             LocApnTypeMask apnTypeMask, SubId subId) {
 
     LOC_LOGD("AgpsManager::requestATL(): connHandle %d, agpsType 0x%X apnTypeMask: 0x%X",
                connHandle, agpsType, apnTypeMask);
 
     if (0 == loc_core::ContextBase::mGps_conf.USE_EMERGENCY_PDN_FOR_EMERGENCY_SUPL &&
-        LOC_AGPS_TYPE_SUPL_ES == agpsType) {
-        agpsType = LOC_AGPS_TYPE_SUPL;
-        apnTypeMask &= ~LOC_APN_TYPE_MASK_EMERGENCY;
-        apnTypeMask |= LOC_APN_TYPE_MASK_SUPL;
+        AGPS_TYPE_SUPL_ES == agpsType) {
+        agpsType = AGPS_TYPE_SUPL;
+        apnTypeMask &= ~APN_TYPE_EMERGENCY_BIT;
+        apnTypeMask |= APN_TYPE_SUPL_BIT;
         LOC_LOGD("Changed agpsType to non-emergency when USE_EMERGENCY... is 0"
-                 "and removed LOC_APN_TYPE_MASK_EMERGENCY from apnTypeMask"
+                 "and removed APN_TYPE_EMERGENCY_BIT from apnTypeMask"
                  "agpsType 0x%X apnTypeMask : 0x%X",
                  agpsType, apnTypeMask);
     }

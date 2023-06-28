@@ -27,6 +27,42 @@
  *
  */
 
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #ifndef AGPS_H
 #define AGPS_H
 
@@ -44,7 +80,7 @@ using namespace loc_util;
 typedef std::function<void(
         int handle, int isSuccess, char* apn, uint32_t apnLen,
         AGpsBearerType bearerType, AGpsExtType agpsType,
-        LocApnTypeMask mask)> AgpsAtlOpenStatusCb;
+        ApnTypeMask mask)> AgpsAtlOpenStatusCb;
 
 typedef std::function<void(int handle, int isSuccess)> AgpsAtlCloseStatusCb;
 
@@ -102,11 +138,11 @@ public:
      * inactive state. */
     bool mWaitForCloseComplete;
     bool mIsInactive;
-    LocApnTypeMask mApnTypeMask;
+    ApnTypeMask mApnTypeMask;
 
     inline AgpsSubscriber(
             int connHandle, bool waitForCloseComplete, bool isInactive,
-            LocApnTypeMask apnTypeMask) :
+            ApnTypeMask apnTypeMask) :
             mConnHandle(connHandle),
             mWaitForCloseComplete(waitForCloseComplete),
             mIsInactive(isInactive),
@@ -139,7 +175,7 @@ protected:
     /* Current state for this state machine */
     AgpsState mState;
 
-    AgnssStatusIpV4Cb     mFrameworkStatusV4Cb;
+    agnssStatusIpV4Callback     mFrameworkStatusV4Cb;
 private:
     /* AGPS Type for this state machine
        LOC_AGPS_TYPE_ANY           0
@@ -148,7 +184,7 @@ private:
        LOC_AGPS_TYPE_SUPL_ES       5 */
     AGpsExtType mAgpsType;
     LocApnTypeMask mApnTypeMask;
-    LocSubId mSubId;
+    SubId mSubId;
 
     /* APN and IP Type info for AGPS Call */
     char* mAPN;
@@ -171,17 +207,17 @@ public:
     inline char* getAPN() const { return mAPN; }
     inline uint32_t getAPNLen() const { return mAPNLen; }
     inline void setBearer(AGpsBearerType bearer) { mBearer = bearer; }
-    inline LocApnTypeMask getApnTypeMask() const { return mApnTypeMask; }
-    inline void setApnTypeMask(LocApnTypeMask apnTypeMask)
+    inline ApnTypeMask getApnTypeMask() const { return mApnTypeMask; }
+    inline void setApnTypeMask(ApnTypeMask apnTypeMask)
     { mApnTypeMask = apnTypeMask; }
-    inline void setSubId(LocSubId subId) { mSubId = subId; }
+    inline void setSubId(SubId subId) { mSubId = subId; }
     inline AGpsBearerType getBearer() const { return mBearer; }
     inline void setType(AGpsExtType type) { mAgpsType = type; }
     inline AGpsExtType getType() const { return mAgpsType; }
     inline void setCurrentSubscriber(AgpsSubscriber* subscriber)
     { mCurrentSubscriber = subscriber; }
 
-    inline void registerFrameworkStatusCallback(AgnssStatusIpV4Cb frameworkStatusV4Cb) {
+    inline void registerFrameworkStatusCallback(agnssStatusIpV4Callback frameworkStatusV4Cb) {
         mFrameworkStatusV4Cb = frameworkStatusV4Cb;
     }
 
@@ -245,7 +281,8 @@ public:
     /* CONSTRUCTOR */
     AgpsManager():
         mAtlOpenStatusCb(), mAtlCloseStatusCb(),
-        mAgnssNif(NULL), mInternetNif(NULL)/*, mDsNif(NULL)*/ {}
+        mAgnssNif(NULL), mInternetNif(NULL),
+        mCbPriority(AGPS_CB_PRIORITY_NONE)/*, mDsNif(NULL)*/ {}
 
     /* Register callbacks */
     inline void registerATLCallbacks(AgpsAtlOpenStatusCb  atlOpenStatusCb,
@@ -263,7 +300,7 @@ public:
 
     /* Process incoming ATL requests */
     void requestATL(int connHandle, AGpsExtType agpsType,
-                    LocApnTypeMask apnTypeMask, LocSubId subId);
+                    LocApnTypeMask apnTypeMask, SubId subId);
     void releaseATL(int connHandle);
     /* Process incoming framework data call events */
     void reportAtlOpenSuccess(AGpsExtType agpsType, char* apnName, int apnLen,
@@ -283,6 +320,7 @@ protected:
 private:
     /* Fetch state machine for handling request ATL call */
     AgpsStateMachine* getAgpsStateMachine(AGpsExtType agpsType);
+    AgpsCbPriority mCbPriority;
 };
 
 /* Request SUPL/INTERNET/SUPL_ES ATL
@@ -295,11 +333,11 @@ struct AgpsMsgRequestATL: public LocMsg {
     int mConnHandle;
     AGpsExtType mAgpsType;
     LocApnTypeMask mApnTypeMask;
-    LocSubId mSubId;
+    SubId mSubId;
 
     inline AgpsMsgRequestATL(AgpsManager* agpsManager, int connHandle,
             AGpsExtType agpsType, LocApnTypeMask apnTypeMask,
-            LocSubId subId) :
+            SubId subId) :
             LocMsg(), mAgpsManager(agpsManager), mConnHandle(connHandle),
             mAgpsType(agpsType), mApnTypeMask(apnTypeMask), mSubId(subId){
 

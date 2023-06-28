@@ -26,6 +26,41 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 #define LOG_TAG "LocSvc_SystemStatusOsObserver"
 
 #include <algorithm>
@@ -349,82 +384,6 @@ void SystemStatusOsObserver::notify(const unordered_set<IDataItemCore*>& dlist)
 
         if (!dataItemVec.empty()) {
             mContext.mMsgTask->sendMsg(new HandleNotify(this, dataItemVec));
-        }
-    }
-}
-
-/******************************************************************************
- IFrameworkActionReq Overrides
-******************************************************************************/
-void SystemStatusOsObserver::turnOn(DataItemId dit, int timeOut)
-{
-    if (nullptr == mContext.mFrameworkActionReqObj) {
-        LOC_LOGe("Framework action request object is NULL");
-        return;
-    }
-
-    // Check if data item exists in mActiveRequestCount
-    DataItemIdToInt::iterator citer = mActiveRequestCount.find(dit);
-    if (citer == mActiveRequestCount.end()) {
-        // Data item not found in map
-        // Add reference count as 1 and add dataitem to map
-        pair<DataItemId, int> cpair(dit, 1);
-        mActiveRequestCount.insert(cpair);
-        LOC_LOGd("Sending turnOn request");
-
-        // Send action turn on to framework
-        struct HandleTurnOnMsg : public LocMsg {
-            HandleTurnOnMsg(IFrameworkActionReq* framework,
-                    DataItemId dit, int timeOut) :
-                    mFrameworkActionReqObj(framework), mDataItemId(dit), mTimeOut(timeOut) {}
-            virtual ~HandleTurnOnMsg() {}
-            void proc() const {
-                mFrameworkActionReqObj->turnOn(mDataItemId, mTimeOut);
-            }
-            IFrameworkActionReq* mFrameworkActionReqObj;
-            DataItemId mDataItemId;
-            int mTimeOut;
-        };
-        mContext.mMsgTask->sendMsg(
-                new (nothrow) HandleTurnOnMsg(mContext.mFrameworkActionReqObj, dit, timeOut));
-    }
-    else {
-        // Found in map, update reference count
-        citer->second++;
-        LOC_LOGd("turnOn - Data item:%d Num_refs:%d", dit, citer->second);
-    }
-}
-
-void SystemStatusOsObserver::turnOff(DataItemId dit)
-{
-    if (nullptr == mContext.mFrameworkActionReqObj) {
-        LOC_LOGe("Framework action request object is NULL");
-        return;
-    }
-
-    // Check if data item exists in mActiveRequestCount
-    DataItemIdToInt::iterator citer = mActiveRequestCount.find(dit);
-    if (citer != mActiveRequestCount.end()) {
-        // found
-        citer->second--;
-        LOC_LOGd("turnOff - Data item:%d Remaining:%d", dit, citer->second);
-        if(citer->second == 0) {
-            // if this was last reference, remove item from map and turn off module
-            mActiveRequestCount.erase(citer);
-
-            // Send action turn off to framework
-            struct HandleTurnOffMsg : public LocMsg {
-                HandleTurnOffMsg(IFrameworkActionReq* framework, DataItemId dit) :
-                    mFrameworkActionReqObj(framework), mDataItemId(dit) {}
-                virtual ~HandleTurnOffMsg() {}
-                void proc() const {
-                    mFrameworkActionReqObj->turnOff(mDataItemId);
-                }
-                IFrameworkActionReq* mFrameworkActionReqObj;
-                DataItemId mDataItemId;
-            };
-            mContext.mMsgTask->sendMsg(
-                    new (nothrow) HandleTurnOffMsg(mContext.mFrameworkActionReqObj, dit));
         }
     }
 }

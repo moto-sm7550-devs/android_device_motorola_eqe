@@ -26,7 +26,6 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-
 /*
 Changes from Qualcomm Innovation Center are provided under the following license:
 
@@ -62,6 +61,7 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 #define LOG_NDEBUG 0
 #define LOG_TAG "LocSvc_MeasurementAPIClient"
 
@@ -82,18 +82,19 @@ namespace implementation {
 using ::android::hardware::gnss::V1_0::IGnssMeasurement;
 using ::android::hardware::gnss::V2_0::IGnssMeasurementCallback;
 
-static void convertGnssData(GnssMeasurementsNotification& in,
+static void convertGnssData(const GnssMeasurementsNotification& in,
         V1_0::IGnssMeasurementCallback::GnssData& out);
-static void convertGnssData_1_1(GnssMeasurementsNotification& in,
+static void convertGnssData_1_1(const GnssMeasurementsNotification& in,
         V1_1::IGnssMeasurementCallback::GnssData& out);
-static void convertGnssData_2_0(GnssMeasurementsNotification& in,
+static void convertGnssData_2_0(const GnssMeasurementsNotification& in,
         V2_0::IGnssMeasurementCallback::GnssData& out);
-static void convertGnssMeasurement(GnssMeasurementsData& in,
+static void convertGnssMeasurement(const GnssMeasurementsData& in,
         V1_0::IGnssMeasurementCallback::GnssMeasurement& out);
-static void convertGnssClock(GnssMeasurementsClock& in, IGnssMeasurementCallback::GnssClock& out);
-static void convertGnssMeasurementsCodeType(GnssMeasurementsCodeType& in,
+static void convertGnssClock(const GnssMeasurementsClock& in,
+        IGnssMeasurementCallback::GnssClock& out);
+static void convertGnssMeasurementsCodeType(const GnssMeasurementsCodeType& in,
         ::android::hardware::hidl_string& out);
-static void convertElapsedRealtimeNanos(GnssMeasurementsNotification& in,
+static void convertElapsedRealtimeNanos(const GnssMeasurementsNotification& in,
         ::android::hardware::gnss::V2_0::ElapsedRealtime& elapsedRealtimeNanos);
 
 MeasurementAPIClient::MeasurementAPIClient() :
@@ -185,7 +186,7 @@ MeasurementAPIClient::startTracking(
         mGnssMeasurementCbIface_1_1 != nullptr ||
         mGnssMeasurementCbIface != nullptr) {
         locationCallbacks.gnssMeasurementsCb =
-            [this](GnssMeasurementsNotification gnssMeasurementsNotification) {
+            [this](const GnssMeasurementsNotification &gnssMeasurementsNotification) {
                 onGnssMeasurementsCb(gnssMeasurementsNotification);
             };
     }
@@ -223,7 +224,7 @@ void MeasurementAPIClient::measurementClose() {
 
 // callbacks
 void MeasurementAPIClient::onGnssMeasurementsCb(
-        GnssMeasurementsNotification gnssMeasurementsNotification)
+        const GnssMeasurementsNotification &gnssMeasurementsNotification)
 {
     LOC_LOGD("%s]: (count: %u active: %d)",
             __FUNCTION__, gnssMeasurementsNotification.count, mTracking);
@@ -269,7 +270,7 @@ void MeasurementAPIClient::onGnssMeasurementsCb(
     }
 }
 
-static void convertGnssMeasurement(GnssMeasurementsData& in,
+static void convertGnssMeasurement(const GnssMeasurementsData& in,
         V1_0::IGnssMeasurementCallback::GnssMeasurement& out)
 {
     memset(&out, 0, sizeof(out));
@@ -348,7 +349,8 @@ static void convertGnssMeasurement(GnssMeasurementsData& in,
     out.agcLevelDb = in.agcLevelDb;
 }
 
-static void convertGnssClock(GnssMeasurementsClock& in, IGnssMeasurementCallback::GnssClock& out)
+static void convertGnssClock(const GnssMeasurementsClock& in,
+        IGnssMeasurementCallback::GnssClock& out)
 {
     memset(&out, 0, sizeof(out));
     if (in.flags & GNSS_MEASUREMENTS_CLOCK_FLAGS_LEAP_SECOND_BIT)
@@ -376,7 +378,7 @@ static void convertGnssClock(GnssMeasurementsClock& in, IGnssMeasurementCallback
     out.hwClockDiscontinuityCount = in.hwClockDiscontinuityCount;
 }
 
-static void convertGnssData(GnssMeasurementsNotification& in,
+static void convertGnssData(const GnssMeasurementsNotification& in,
         V1_0::IGnssMeasurementCallback::GnssData& out)
 {
     memset(&out, 0, sizeof(out));
@@ -392,7 +394,7 @@ static void convertGnssData(GnssMeasurementsNotification& in,
     convertGnssClock(in.clock, out.clock);
 }
 
-static void convertGnssData_1_1(GnssMeasurementsNotification& in,
+static void convertGnssData_1_1(const GnssMeasurementsNotification& in,
         V1_1::IGnssMeasurementCallback::GnssData& out)
 {
     memset(&out, 0, sizeof(out));
@@ -415,7 +417,7 @@ static void convertGnssData_1_1(GnssMeasurementsNotification& in,
     convertGnssClock(in.clock, out.clock);
 }
 
-static void convertGnssData_2_0(GnssMeasurementsNotification& in,
+static void convertGnssData_2_0(const GnssMeasurementsNotification& in,
         V2_0::IGnssMeasurementCallback::GnssData& out)
 {
     memset(&out, 0, sizeof(out));
@@ -475,7 +477,7 @@ static void convertGnssData_2_0(GnssMeasurementsNotification& in,
     convertElapsedRealtimeNanos(in, out.elapsedRealtime);
 }
 
-static void convertElapsedRealtimeNanos(GnssMeasurementsNotification& in,
+static void convertElapsedRealtimeNanos(const GnssMeasurementsNotification& in,
         ::android::hardware::gnss::V2_0::ElapsedRealtime& elapsedRealtime)
 {
     if (in.clock.flags & GNSS_MEASUREMENTS_CLOCK_FLAGS_ELAPSED_REAL_TIME_BIT) {
@@ -490,7 +492,7 @@ static void convertElapsedRealtimeNanos(GnssMeasurementsNotification& in,
     }
 }
 
-static void convertGnssMeasurementsCodeType(GnssMeasurementsCodeType& in,
+static void convertGnssMeasurementsCodeType(const GnssMeasurementsCodeType& in,
         ::android::hardware::hidl_string& out)
 {
     switch(in) {

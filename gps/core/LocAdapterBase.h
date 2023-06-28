@@ -93,6 +93,14 @@ namespace loc_core {
 
 class LocAdapterProxyBase;
 
+typedef uint16_t DlpFeatureStatusMask;
+#define DLP_FEATURE_STATUS_QPPE_LIBRARY_PRESENT   0X01
+#define DLP_FEATURE_STATUS_QFE_LIBRARY_PRESENT    0X02
+#define DLP_FEATURE_ENABLED_BY_DEFAULT            0X04
+#define DLP_FEATURE_ENABLED_BY_QESDK              0X08
+#define DLP_FEATURE_STATUS_LIBRARY_PRESENT   (DLP_FEATURE_STATUS_QPPE_LIBRARY_PRESENT | \
+                                              DLP_FEATURE_STATUS_QFE_LIBRARY_PRESENT)
+
 class LocAdapterBase {
 private:
     static uint32_t mSessionIdCounter;
@@ -106,6 +114,8 @@ protected:
     LocAdapterProxyBase* mLocAdapterProxyBase;
     const MsgTask* mMsgTask;
     bool mAdapterAdded;
+    /* === QESDK RTK feature status =================================================== */
+    DlpFeatureStatusMask mDlpFeatureStatusMask;
 
     inline LocAdapterBase(const MsgTask* msgTask) :
         mIsMaster(false), mEvtMask(0), mContext(NULL), mLocApi(NULL),
@@ -200,6 +210,14 @@ public:
     inline bool isEngineCapabilitiesKnown() { return mIsEngineCapabilitiesKnown;}
     inline void setEngineCapabilitiesKnown(bool value) { mIsEngineCapabilitiesKnown = value;}
 
+    inline void startTimeBasedTracking(const TrackingOptions& options,
+                                       LocApiResponse* adapterResponse) {
+        mLocApi->startTimeBasedTracking(options, adapterResponse);
+    }
+    inline void stopTimeBasedTracking(LocApiResponse* adapterResponse) {
+        mLocApi->stopTimeBasedTracking(adapterResponse);
+    }
+
     virtual void handleEngineUpEvent();
     virtual void handleEngineDownEvent();
     virtual void reportPositionEvent(const UlpLocation& location,
@@ -208,11 +226,6 @@ public:
                                      LocPosTechMask loc_technology_mask,
                                      GnssDataNotification* pDataNotify = nullptr,
                                      int msInWeek = -1);
-    virtual void reportEnginePositionsEvent(unsigned int count,
-                                            EngineLocationInfo* locationArr) {
-        (void)count;
-        (void)locationArr;
-    }
     virtual void reportSvEvent(const GnssSvNotification& svNotify);
     virtual void reportDataEvent(const GnssDataNotification& dataNotify, int msInWeek);
     virtual void reportNmeaEvent(const char* nmea, size_t length);
@@ -228,7 +241,7 @@ public:
     virtual bool requestLocation();
     virtual bool requestATL(int connHandle, LocAGpsType agps_type,
                             LocApnTypeMask apn_type_mask,
-                            LocSubId sub_id=LOC_DEFAULT_SUB);
+                            SubId sub_id=DEFAULT_SUB);
     virtual bool releaseATL(int connHandle);
     virtual bool requestNiNotifyEvent(const GnssNiNotification &notify, const void* data,
                                       const LocInEmergency emergencyState);
@@ -272,9 +285,11 @@ public:
     void requestCapabilitiesCommand(LocationAPI* client);
 
     virtual void reportLatencyInfoEvent(const GnssLatencyInfo& gnssLatencyInfo);
+    virtual void handleEngineLockStatusEvent(EngineLockState engineLockState);
     virtual void reportEngDebugDataInfoEvent(GnssEngineDebugDataInfo& gnssEngineDebugDataInfo);
     virtual bool reportQwesCapabilities(
             const std::unordered_map<LocationQwesFeatureType, bool> &featureMap);
+    virtual void reportDcMessage(const GnssDcReportInfo& dcReport);
 };
 
 } // namespace loc_core

@@ -70,6 +70,13 @@ public:
         (void)status;
         (void)loc_technology_mask;
     }
+    inline void startTimeBasedTracking(const TrackingOptions& options,
+                                       LocApiResponse* adapterResponse) {
+        mLocAdapterBase->startTimeBasedTracking(options, adapterResponse);
+    }
+    inline void stopTimeBasedTracking(LocApiResponse* adapterResponse) {
+        mLocAdapterBase->stopTimeBasedTracking(adapterResponse);
+    }
 };
 
 } // namespace loc_core

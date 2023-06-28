@@ -26,21 +26,21 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause-Clear
+*/
+
 #ifndef __LOC_UNORDERDED_SETMAP_H__
 #define __LOC_UNORDERDED_SETMAP_H__
 
 #include <algorithm>
 #include <loc_pla.h>
 
-#ifdef NO_UNORDERED_SET_OR_MAP
-    #include <set>
-    #include <map>
-    #define unordered_set set
-    #define unordered_map map
-#else
-    #include <unordered_set>
-    #include <unordered_map>
-#endif
+#include <unordered_set>
+#include <unordered_map>
 
 using std::unordered_set;
 using std::unordered_map;

@@ -152,10 +152,6 @@ public:
     uint32_t mJammerBds;  // x10
     uint32_t mJammerGal;  // x11
     uint32_t mRecErrorRecovery; // x12
-    uint32_t   mAgcGps;     // x13
-    uint32_t   mAgcGlo;     // x14
-    uint32_t   mAgcBds;     // x15
-    uint32_t   mAgcGal;     // x16
     int32_t  mLeapSeconds;// x17
     int32_t  mLeapSecUnc; // x18
     uint32_t mGloBpAmpI;  // x19
@@ -166,7 +162,7 @@ public:
     uint32_t mGalBpAmpQ;  // x1E
     uint64_t mTimeUncNs;  // x1F
     uint32_t mJammedSignalsMask;
-    std::vector<GnssJammerData> mJammerData;
+    std::vector<int32_t> mJammerInd;
     SystemStatusPQWM1(const GnssEngineDebugDataInfo& info);
     SystemStatusPQWM1() = default;
 };
@@ -181,21 +177,17 @@ SystemStatusPQWM1::SystemStatusPQWM1(const GnssEngineDebugDataInfo& info) {
     mClockFreqBiasUnc = info.clkFreqUnc;
     mXoState = info.xoState;
     mRecErrorRecovery = info.rcvrErrRecovery;
-    if (info.jammerData.size() > 0) {
-        mJammerGps = info.jammerData[GNSS_LOC_SIGNAL_TYPE_GPS_L1CA].jammerInd;
-        mJammerGlo = info.jammerData[GNSS_LOC_SIGNAL_TYPE_GLONASS_G1].jammerInd;
-        mJammerBds = info.jammerData[GNSS_LOC_SIGNAL_TYPE_BEIDOU_B1_I].jammerInd;
-        mJammerGal = info.jammerData[GNSS_LOC_SIGNAL_TYPE_GALILEO_E1_C].jammerInd;
-        mAgcGps = info.jammerData[GNSS_LOC_SIGNAL_TYPE_GPS_L1CA].agc;
-        mAgcGlo = info.jammerData[GNSS_LOC_SIGNAL_TYPE_GLONASS_G1].agc;
-        mAgcBds = info.jammerData[GNSS_LOC_SIGNAL_TYPE_BEIDOU_B1_I].agc;
-        mAgcGal = info.jammerData[GNSS_LOC_SIGNAL_TYPE_GALILEO_E1_C].agc;
+    if (info.jammerInd.size() > 0) {
+        mJammerGps = info.jammerInd[GNSS_LOC_SIGNAL_TYPE_GPS_L1CA];
+        mJammerGlo = info.jammerInd[GNSS_LOC_SIGNAL_TYPE_GLONASS_G1];
+        mJammerBds = info.jammerInd[GNSS_LOC_SIGNAL_TYPE_BEIDOU_B1_I];
+        mJammerGal = info.jammerInd[GNSS_LOC_SIGNAL_TYPE_GALILEO_E1_C];
     }
     mLeapSeconds = info.leapSecondInfo.leapSec;
     mLeapSecUnc = info.leapSecondInfo.leapSecUnc;
     mTimeUncNs = info.clkTimeUnc * 1000000LL;
     mJammedSignalsMask = info.jammedSignalsMask;
-    mJammerData = std::move(info.jammerData);
+    mJammerInd = std::move(info.jammerInd);
 }
 
 // parser
@@ -259,10 +251,6 @@ public:
     inline uint32_t   getJammerGlo()  { return mM1.mJammerGlo;        }
     inline uint32_t   getJammerBds()  { return mM1.mJammerBds;        }
     inline uint32_t   getJammerGal()  { return mM1.mJammerGal;        }
-    inline uint32_t   getAgcGps()     { return mM1.mAgcGps;           }
-    inline uint32_t   getAgcGlo()     { return mM1.mAgcGlo;           }
-    inline uint32_t   getAgcBds()     { return mM1.mAgcBds;           }
-    inline uint32_t   getAgcGal()     { return mM1.mAgcGal;           }
     inline uint32_t   getRecErrorRecovery() { return mM1.mRecErrorRecovery; }
     inline int32_t    getLeapSeconds(){ return mM1.mLeapSeconds; }
     inline int32_t    getLeapSecUnc() { return mM1.mLeapSecUnc; }
@@ -301,11 +289,6 @@ public:
         mM1.mJammerBds = atoi(mField[eJammerBds].c_str());
         mM1.mJammerGal = atoi(mField[eJammerGal].c_str());
         mM1.mRecErrorRecovery = atoi(mField[eRecErrorRecovery].c_str());
-        // convert agc db scale to 0.01 db
-        mM1.mAgcGps = (uint32_t)(atof(mField[eAgcGps].c_str()) * 100);
-        mM1.mAgcGlo = (uint32_t)(atof(mField[eAgcGlo].c_str()) * 100);
-        mM1.mAgcBds = (uint32_t)(atof(mField[eAgcBds].c_str()) * 100);
-        mM1.mAgcGal = (uint32_t)(atof(mField[eAgcGal].c_str()) * 100);
         if (mField.size() > eLeapSecUnc) {
             mM1.mLeapSeconds = atoi(mField[eLeapSeconds].c_str());
             mM1.mLeapSecUnc = atoi(mField[eLeapSecUnc].c_str());
@@ -1010,10 +993,6 @@ SystemStatusRfAndParams::SystemStatusRfAndParams(const SystemStatusPQWM1& nmea) 
     mJammerGlo(nmea.mJammerGlo),
     mJammerBds(nmea.mJammerBds),
     mJammerGal(nmea.mJammerGal),
-    mAgcGps(nmea.mAgcGps),
-    mAgcGlo(nmea.mAgcGlo),
-    mAgcBds(nmea.mAgcBds),
-    mAgcGal(nmea.mAgcGal),
     mGloBpAmpI(nmea.mGloBpAmpI),
     mGloBpAmpQ(nmea.mGloBpAmpQ),
     mBdsBpAmpI(nmea.mBdsBpAmpI),
@@ -1021,7 +1000,7 @@ SystemStatusRfAndParams::SystemStatusRfAndParams(const SystemStatusPQWM1& nmea) 
     mGalBpAmpI(nmea.mGalBpAmpI),
     mGalBpAmpQ(nmea.mGalBpAmpQ),
     mJammedSignalsMask(nmea.mJammedSignalsMask),
-    mJammerData(std::move(nmea.mJammerData)) {}
+    mJammerInd(std::move(nmea.mJammerInd)) {}
 
 bool SystemStatusRfAndParams::equals(const SystemStatusItemBase& peer) {
     if ((mPgaGain != ((const SystemStatusRfAndParams&)peer).mPgaGain) ||
@@ -1033,10 +1012,6 @@ bool SystemStatusRfAndParams::equals(const SystemStatusItemBase& peer) {
         (mJammerGlo != ((const SystemStatusRfAndParams&)peer).mJammerGlo) ||
         (mJammerBds != ((const SystemStatusRfAndParams&)peer).mJammerBds) ||
         (mJammerGal != ((const SystemStatusRfAndParams&)peer).mJammerGal) ||
-        (mAgcGps != ((const SystemStatusRfAndParams&)peer).mAgcGps) ||
-        (mAgcGlo != ((const SystemStatusRfAndParams&)peer).mAgcGlo) ||
-        (mAgcBds != ((const SystemStatusRfAndParams&)peer).mAgcBds) ||
-        (mAgcGal != ((const SystemStatusRfAndParams&)peer).mAgcGal) ||
         (mGloBpAmpI != ((const SystemStatusRfAndParams&)peer).mGloBpAmpI) ||
         (mGloBpAmpQ != ((const SystemStatusRfAndParams&)peer).mGloBpAmpQ) ||
         (mBdsBpAmpI != ((const SystemStatusRfAndParams&)peer).mBdsBpAmpI) ||
@@ -1063,11 +1038,7 @@ void SystemStatusRfAndParams::dump()
              mJammerGps,
              mJammerGlo,
              mJammerBds,
-             mJammerGal,
-             mAgcGps,
-             mAgcGlo,
-             mAgcBds,
-             mAgcGal);
+             mJammerGal);
     return;
 }
 
@@ -1527,8 +1498,6 @@ SystemStatus::SystemStatus(const MsgTask* msgTask) :
     mCache.mShutdownState.clear();
     mCache.mTac.clear();
     mCache.mMccMnc.clear();
-    mCache.mBtDeviceScanDetail.clear();
-    mCache.mBtLeDeviceScanDetail.clear();
 
     EXIT_LOG_WITH_ERROR ("%d",result);
 }
@@ -1801,13 +1770,20 @@ bool SystemStatus::eventDataItemNotify(IDataItemCore* dataitem)
             ret = setIteminReport(mCache.mMccMnc,
                     SystemStatusMccMnc(*(static_cast<MccmncDataItem*>(dataitem))));
             break;
-        case BTLE_SCAN_DATA_ITEM_ID:
-            ret = setIteminReport(mCache.mBtDeviceScanDetail, SystemStatusBtDeviceScanDetail(
-                        *(static_cast<BtDeviceScanDetailsDataItem*>(dataitem))));
+        case TRACKING_STARTED_DATA_ITEM_ID:
+            ret = setIteminReport(mCache.mTrackingStarted,
+                    SystemStatusTrackingStarted(
+                        *(static_cast<TrackingStartedDataItem*>(dataitem))));
             break;
-        case BT_SCAN_DATA_ITEM_ID:
-            ret = setIteminReport(mCache.mBtLeDeviceScanDetail, SystemStatusBtleDeviceScanDetail(
-                        *(static_cast<BtLeDeviceScanDetailsDataItem*>(dataitem))));
+        case NTRIP_STARTED_DATA_ITEM_ID:
+            ret = setIteminReport(mCache.mNtripStarted,
+                    SystemStatusNtripStarted(
+                        *(static_cast<NtripStartedDataItem*>(dataitem))));
+            break;
+        case PRECISE_LOCATION_ENABLED_DATA_ITEM_ID:
+            ret = setIteminReport(mCache.mPreciseLocationEnabled,
+                    SystemStatusPreciseLocationEnabled(
+                        *(static_cast<PreciseLocationEnabledDataItem*>(dataitem))));
             break;
         default:
             break;
@@ -1871,8 +1847,6 @@ bool SystemStatus::getReport(SystemStatusReports& report, bool isLatestOnly,
         getIteminReport(report.mShutdownState, mCache.mShutdownState);
         getIteminReport(report.mTac, mCache.mTac);
         getIteminReport(report.mMccMnc, mCache.mMccMnc);
-        getIteminReport(report.mBtDeviceScanDetail, mCache.mBtDeviceScanDetail);
-        getIteminReport(report.mBtLeDeviceScanDetail, mCache.mBtLeDeviceScanDetail);
     }
     else {
         // copy entire reports and return them
@@ -1913,8 +1887,6 @@ bool SystemStatus::getReport(SystemStatusReports& report, bool isLatestOnly,
         report.mShutdownState.clear();
         report.mTac.clear();
         report.mMccMnc.clear();
-        report.mBtDeviceScanDetail.clear();
-        report.mBtLeDeviceScanDetail.clear();
 
         report = mCache;
     }
@@ -1997,7 +1969,21 @@ bool SystemStatus::updatePowerConnectState(bool charging)
 ******************************************************************************/
 bool SystemStatus::eventOptInStatus(bool userConsent)
 {
-    SystemStatusENH s(userConsent);
+    SystemStatusENH s(userConsent, ENHDataItem::FIELD_CONSENT);
+    mSysStatusObsvr.notify({&s.mDataItem});
+    return true;
+}
+
+/******************************************************************************
+@brief      API to update Region
+
+@param[In]  region
+
+@return     true when successfully done
+******************************************************************************/
+bool SystemStatus::eventRegionStatus(bool region)
+{
+    SystemStatusENH s(region, ENHDataItem::FIELD_REGION);
     mSysStatusObsvr.notify({&s.mDataItem});
     return true;
 }
@@ -2017,12 +2003,47 @@ bool SystemStatus::eventInEmergencyCall(bool isEmergency)
 }
 
 /******************************************************************************
-@brief      API to update engine tracking state
+@brief      API to update precise location state
+
+@param[In]  precise Location state
+
+@return     true when successfully done
 ******************************************************************************/
-void SystemStatus::setTracking(bool tracking) {
+bool SystemStatus::eventPreciseLocation(bool preciseLocation) {
+    SystemStatusPreciseLocationEnabled s(preciseLocation);
+    mSysStatusObsvr.notify({&s.mDataItem});
+    return true;
+}
+
+/******************************************************************************
+@brief      API to update Ntrip started state
+
+@param[In]  Ntrip started state
+
+@return     true when successfully done
+******************************************************************************/
+bool SystemStatus::eventNtripStarted(bool ntripStarted) {
+    SystemStatusNtripStarted s(ntripStarted);
+    mSysStatusObsvr.notify({&s.mDataItem});
+    return true;
+}
+
+/******************************************************************************
+@brief      API to update engine tracking state
+
+@param[In]  tracking state
+
+@return     true when successfully done
+******************************************************************************/
+bool SystemStatus::eventSetTracking(bool tracking, bool updateSysStatusTrkState) {
     pthread_mutex_lock(&mMutexSystemStatus);
-    mTracking = tracking;
+    if (updateSysStatusTrkState) {
+        mTracking = tracking;
+    }
+    SystemStatusTrackingStarted s(tracking);
+    mSysStatusObsvr.notify({&s.mDataItem});
     pthread_mutex_unlock(&mMutexSystemStatus);
+    return true;
 }
 } // namespace loc_core
 

@@ -27,6 +27,42 @@
  *
  */
 
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #ifndef LOC_LOG_H
 #define LOC_LOG_H
 
@@ -37,15 +73,9 @@
 #include "loc_target.h"
 #include "loc_misc_utils.h"
 
-#ifdef NO_UNORDERED_SET_OR_MAP
-#include <map>
-using std::map;
-#define unordered_map map
-#else
 #include <unordered_map>
-using std::unordered_map;
-#endif
 
+using std::unordered_map;
 using std::string;
 
 typedef unordered_map<int64_t, string> NameValTbl;
@@ -82,20 +112,8 @@ extern const string gUnknownStr;
                         to_string_hex((uint64_t)field) + " " + \
                                 loc_parenthesize(loc_get_bit_defs(field, tbl)))
 
-/* get from a table of strings with index */
-/* tbl - map of <int, string> entries
-   key - key to the matching entry
-   defalt - default pointer in case of incorrect parameters
- */
-inline static const string& loc_get_name_from_tbl(const NameValTbl& tbl, int64_t key,
-                                    const string& defalt = gEmptyStr) {
-    auto item = tbl.find(key);
-    if (item != tbl.end()) {
-        return item->second;
-    } else {
-        return defalt;
-    }
-}
+const string& loc_get_name_from_tbl(const NameValTbl& tbl, int64_t key,
+                                    const string& defalt = gEmptyStr);
 
 /* puts to string formatted "TAG: VAL" with option ending string, default to newline */
 inline string loc_put_tag_val(const string& tag, const string& val, const string& eol = "\n") {
@@ -123,7 +141,6 @@ inline const char* log_succ_fail_string(int is_succ) {
  */
 string loc_get_bit_defs(uint64_t mask, const NameValTbl& tbl);
 uint64_t loc_get_least_bit(uint64_t& mask, bool clearThebit = true);
-const char* loc_get_msg_q_status(int status);
 const char* loc_get_target_name(unsigned int target);
 char *loc_get_time(char *time_string, size_t buf_size);
 

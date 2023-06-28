@@ -387,7 +387,7 @@ Return<bool> Gnss::setCallback_1_1(const sp<V1_1::IGnssCallback>& callback) {
     mGnssCbIface_1_1 = callback;
     const GnssInterface* gnssInterface = getGnssInterface();
     if (nullptr != gnssInterface) {
-        OdcpiRequestCallback cb = [this](const OdcpiRequestInfo& odcpiRequest) {
+        odcpiRequestCallback cb = [this](const OdcpiRequestInfo& odcpiRequest) {
             odcpiRequestCb(odcpiRequest);
         };
         gnssInterface->odcpiInit(cb, OdcpiPrioritytype::ODCPI_HANDLER_PRIORITY_LOW);

@@ -32,7 +32,6 @@ getrlimit: 1
 
 pipe2: 1
 
-sched_getaffinity: 1
 timerfd_create: 1
 unlinkat: 1
 setpriority: 1

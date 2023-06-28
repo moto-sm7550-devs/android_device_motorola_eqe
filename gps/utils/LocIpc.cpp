@@ -27,15 +27,53 @@
  *
  */
 
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <loc_misc_utils.h>
 #include <log_util.h>
 #include <LocIpc.h>
 #include <algorithm>
+#include <unordered_map>
 
 using namespace std;
 
@@ -58,8 +96,20 @@ namespace loc_util {
         } \
     }
 
+std::unordered_map<std::string, std::pair<int32_t, std::string>> sSockToPayloadMap;
+
 const char Sock::MSG_ABORT[] = "LocIpc::Sock::ABORT";
-const char Sock::LOC_IPC_HEAD[] = "$MSGLEN$";
+bool Sock::sRandSeeded = false;
+
+Sock::Sock(int sid, const uint32_t maxTxSize) :
+        mMaxTxSize(maxTxSize - sizeof(LOC_IPC_HEAD)), mSid(sid) {
+    if (!sRandSeeded) {
+        srand48(time(NULL));
+        sRandSeeded = true;
+    }
+    snprintf(LOC_IPC_HEAD, sizeof(LOC_IPC_HEAD), "$MSG_CONCAT_HDR$%16.16lX$$%8.8X$", lrand48(), 0);
+}
+
 ssize_t Sock::send(const void *buf, uint32_t len, int flags, const struct sockaddr *destAddr,
                           socklen_t addrlen) const {
     ssize_t rtv = -1;
@@ -82,47 +132,60 @@ ssize_t Sock::sendto(const void *buf, size_t len, int flags, const struct sockad
     if (len <= mMaxTxSize) {
         rtv = ::sendto(mSid, buf, len, flags, destAddr, addrlen);
     } else {
-        std::string head(LOC_IPC_HEAD + to_string(len));
-        rtv = ::sendto(mSid, head.c_str(), head.length(), flags, destAddr, addrlen);
-        if (rtv > 0) {
-            for (size_t offset = 0; offset < len && rtv > 0; offset += rtv) {
-                rtv = ::sendto(mSid, (char*)buf + offset, min(len - offset, (size_t)mMaxTxSize),
-                               flags, destAddr, addrlen);
-            }
-            rtv = (rtv > 0) ? (head.length() + len) : -1;
+        rtv = 1;
+        char tempBuf[sizeof(LOC_IPC_HEAD) + mMaxTxSize];
+        memcpy(tempBuf, LOC_IPC_HEAD, sizeof(LOC_IPC_HEAD) - 9);
+        /** Writting 10 instead of 9 bytes into tempBuf to prevent overwritting of "$" by null
+        character at last index of LOC_IPC_HEAD. tempBuff is large enough to prevent any overflow */
+        snprintf(tempBuf + 33, sizeof(LOC_IPC_HEAD) - 32, "%8.8X$", len);
+        for (size_t offset = 0; offset < len && rtv > 0; offset += (rtv - sizeof(LOC_IPC_HEAD))) {
+            size_t thisLen = min(len - offset, (size_t)mMaxTxSize);
+            memcpy(tempBuf+sizeof(LOC_IPC_HEAD), (char*)buf + offset, thisLen);
+            rtv = ::sendto(mSid, tempBuf, thisLen + sizeof(LOC_IPC_HEAD), flags, destAddr, addrlen);
         }
+        rtv = (rtv > 0) ? (len) : -1;
     }
     return rtv;
 }
 ssize_t Sock::recvfrom(const LocIpcRecver& recver, const shared_ptr<ILocIpcListener>& dataCb,
                        int sid, int flags, struct sockaddr *srcAddr, socklen_t *addrlen) const  {
-    std::string msg(mMaxTxSize, 0);
+    std::string msg(mMaxTxSize + sizeof(LOC_IPC_HEAD), 0);
     ssize_t nBytes = ::recvfrom(sid, (void*)msg.data(), msg.size(), flags, srcAddr, addrlen);
     if (nBytes > 0) {
         if (strncmp(msg.data(), MSG_ABORT, sizeof(MSG_ABORT)) == 0) {
             LOC_LOGi("recvd abort msg.data %s", msg.data());
             nBytes = -100;
-        } else if (strncmp(msg.data(), LOC_IPC_HEAD, sizeof(LOC_IPC_HEAD) - 1)) {
+        } else if (nBytes <= sizeof(LOC_IPC_HEAD) || strncmp(msg.data(), LOC_IPC_HEAD, 16) ||
+            msg.data()[32] != '$' || msg.data()[41] != '$') {
             // short message
             msg.resize(nBytes);
             dataCb->onReceive(msg.data(), nBytes, &recver);
         } else {
             // long message
-            size_t msgLen = 0;
-            sscanf(msg.data() + sizeof(LOC_IPC_HEAD) - 1, "%zu", &msgLen);
-            msg.resize(msgLen);
-            for (size_t msgLenReceived = 0; (msgLenReceived < msgLen) && (nBytes > 0);
-                 msgLenReceived += nBytes) {
-                nBytes = ::recvfrom(sid, &(msg[msgLenReceived]), msg.size() - msgLenReceived,
-                                    flags, srcAddr, addrlen);
-            }
-            if (nBytes > 0) {
-                nBytes = msgLen;
-                dataCb->onReceive(msg.data(), nBytes, &recver);
+            std::string key(msg.data(), sizeof(LOC_IPC_HEAD));
+            auto iter = sSockToPayloadMap.find(key);
+            size_t payLoadSize = nBytes - sizeof(LOC_IPC_HEAD);
+            if (iter == sSockToPayloadMap.end()) {
+                size_t totalSize = 0;
+                sscanf(msg.data() + sizeof(LOC_IPC_HEAD) - 9, "%x", &totalSize);
+                sSockToPayloadMap[key] = std::make_pair(totalSize - payLoadSize,
+                                                        string(totalSize, 0));
+                memcpy((char*) sSockToPayloadMap[key].second.data(), (char *)msg.data()+
+                        sizeof(LOC_IPC_HEAD), payLoadSize);
+            } else {
+                memcpy((char*) iter->second.second.data() +
+                        (iter->second.second.size() - iter->second.first),
+                        msg.data()+sizeof(LOC_IPC_HEAD), payLoadSize);
+                iter->second.first -= payLoadSize;
+
+                if (0 == iter->second.first) {
+                    dataCb->onReceive(iter->second.second.data(),
+                            iter->second.second.size(), &recver);
+                    sSockToPayloadMap.erase(iter);
+                }
             }
         }
     }
-
     return nBytes;
 }
 ssize_t Sock::sendAbort(int flags, const struct sockaddr *destAddr, socklen_t addrlen) {
@@ -151,10 +214,10 @@ public:
                 timeout.tv_usec = 0;
                 setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
             }
-        }
-        mSock.reset(new Sock(fd));
-        if (mSock != nullptr && mSock->isValid()) {
-            snprintf(mAddr.sun_path, sizeof(mAddr.sun_path), "%s", name);
+            mSock.reset(new Sock(fd));
+            if (mSock != nullptr && mSock->isValid()) {
+                snprintf(mAddr.sun_path, sizeof(mAddr.sun_path), "%s", name);
+            }
         }
     }
 };

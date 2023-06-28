@@ -62,7 +62,6 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 #ifndef __LOC_CONTEXT_BASE__
 #define __LOC_CONTEXT_BASE__
 
@@ -73,12 +72,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <LocApiBase.h>
 #include <LBSProxyBase.h>
 #include <loc_cfg.h>
-#ifdef NO_UNORDERED_SET_OR_MAP
-    #include <map>
-    #define unordered_map map
-#else
-    #include <unordered_map>
-#endif
+#include <unordered_map>
 
 /* GPS.conf support */
 /* NOTE: the implementaiton of the parser casts number
@@ -165,6 +159,7 @@ class ContextBase {
     LocApiBase* createLocApi(LOC_API_ADAPTER_EVENT_MASK_T excludedMask);
     static const loc_param_s_type mGps_conf_table[];
     static const loc_param_s_type mSap_conf_table[];
+    static uint32_t mAntennaInfoVectorSize;
 protected:
     const LBSProxyBase* mLBSProxy;
     const MsgTask* mMsgTask;
@@ -356,7 +351,9 @@ public:
         return (ContextBase::sQwesFeatureMask);
     }
 
-
+    static inline bool isAntennaInfoAvailable() {
+        return mAntennaInfoVectorSize != 0;
+    }
 };
 
 struct LocApiResponse: LocMsg {

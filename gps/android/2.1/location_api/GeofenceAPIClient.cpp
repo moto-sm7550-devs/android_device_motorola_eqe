@@ -95,7 +95,7 @@ GeofenceAPIClient::GeofenceAPIClient(const sp<IGnssGeofenceCallback>& callback) 
 
     locationCallbacks.geofenceBreachCb = nullptr;
     locationCallbacks.geofenceBreachCb =
-            [this](GeofenceBreachNotification geofenceBreachNotification) {
+            [this](const GeofenceBreachNotification& geofenceBreachNotification) {
         onGeofenceBreachCb(geofenceBreachNotification);
     };
 
@@ -179,7 +179,8 @@ void GeofenceAPIClient::geofenceRemoveAll()
 }
 
 // callbacks
-void GeofenceAPIClient::onGeofenceBreachCb(GeofenceBreachNotification geofenceBreachNotification)
+void GeofenceAPIClient::onGeofenceBreachCb(
+        const GeofenceBreachNotification& geofenceBreachNotification)
 {
     LOC_LOGD("%s]: (%d)", __FUNCTION__, geofenceBreachNotification.count);
     mMutex.lock();

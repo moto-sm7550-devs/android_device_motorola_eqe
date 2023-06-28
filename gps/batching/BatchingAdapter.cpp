@@ -26,6 +26,43 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #define LOG_NDEBUG 0
 #define LOG_TAG "LocSvc_BatchingAdapter"
 
@@ -164,6 +201,44 @@ BatchingAdapter::updateClientsEventMask()
 }
 
 void
+BatchingAdapter::handleEngineLockStatusEvent(EngineLockState engineLockState) {
+
+    LOC_LOGd("Engine state : %d", engineLockState);
+
+    struct MsgEngineLockStateEvent : public LocMsg {
+        BatchingAdapter& mAdapter;
+        EngineLockState mEngineLockState;
+
+        inline MsgEngineLockStateEvent(BatchingAdapter& adapter, EngineLockState engineLockState) :
+            LocMsg(),
+            mAdapter(adapter),
+            mEngineLockState(engineLockState){}
+
+        virtual void proc() const {
+            mAdapter.handleEngineLockStatus(mEngineLockState);
+        }
+    };
+
+    sendMsg(new MsgEngineLockStateEvent(*this, engineLockState));
+}
+
+void
+BatchingAdapter::handleEngineLockStatus(EngineLockState engineLockState) {
+
+    if (ENGINE_LOCK_STATE_ENABLED == engineLockState) {
+        for (auto msg: mPendingMsgs) {
+            sendMsg(msg);
+        }
+        mPendingMsgs.clear();
+
+        if ((POWER_STATE_SUSPEND != mSystemPowerState) &&
+            POWER_STATE_SHUTDOWN != mSystemPowerState) {
+            restartSessions();
+        }
+    }
+}
+
+void
 BatchingAdapter::handleEngineUpEvent()
 {
     struct MsgSSREvent : public LocMsg {
@@ -179,14 +254,17 @@ BatchingAdapter::handleEngineUpEvent()
             mAdapter.broadcastCapabilities(mAdapter.getCapabilities());
             mApi.setBatchSize(mAdapter.getBatchSize());
             mApi.setTripBatchSize(mAdapter.getTripBatchSize());
-            if ((POWER_STATE_SUSPEND != mAdapter.mSystemPowerState) &&
-                 POWER_STATE_SHUTDOWN != mAdapter.mSystemPowerState) {
-                mAdapter.restartSessions();
+            if (ENGINE_LOCK_STATE_ENABLED == mApi.getEngineLockState()) {
+                for (auto msg: mAdapter.mPendingMsgs) {
+                    mAdapter.sendMsg(msg);
+                }
+                mAdapter.mPendingMsgs.clear();
+
+                if ((POWER_STATE_SUSPEND != mAdapter.mSystemPowerState) &&
+                    POWER_STATE_SHUTDOWN != mAdapter.mSystemPowerState) {
+                    mAdapter.restartSessions();
+                }
             }
-            for (auto msg: mAdapter.mPendingMsgs) {
-                mAdapter.sendMsg(msg);
-            }
-            mAdapter.mPendingMsgs.clear();
         }
     };
 
@@ -390,7 +468,8 @@ BatchingAdapter::startBatching(LocationAPI* client, uint32_t sessionId,
     mLocApi->startBatching(sessionId, batchingOptions, getBatchingAccuracy(), getBatchingTimeout(),
             new LocApiResponse(*getContext(),
             [this, client, sessionId, batchingOptions] (LocationError err) {
-        if (LOCATION_ERROR_SUCCESS != err) {
+        if (ENGINE_LOCK_STATE_ENABLED == mLocApi->getEngineLockState() &&
+            LOCATION_ERROR_SUCCESS != err) {
             eraseBatchingSession(client, sessionId);
         }
 
@@ -514,7 +593,8 @@ BatchingAdapter::stopBatching(LocationAPI* client, uint32_t sessionId, bool rest
                 new LocApiResponse(*getContext(),
                 [this, client, sessionId, flpOptions, restartNeeded, batchOptions, eraseSession]
                 (LocationError err) {
-            if (LOCATION_ERROR_SUCCESS != err) {
+            if (ENGINE_LOCK_STATE_ENABLED == mLocApi->getEngineLockState() &&
+                LOCATION_ERROR_SUCCESS != err) {
                 if (eraseSession)
                     saveBatchingSession(client, sessionId, batchOptions);
             } else {
@@ -772,7 +852,8 @@ BatchingAdapter::startTripBatchingMultiplex(LocationAPI* client, uint32_t sessio
         mLocApi->startOutdoorTripBatching(batchingOptions.minDistance,
                 batchingOptions.minInterval, getBatchingTimeout(), new LocApiResponse(*getContext(),
                 [this, client, sessionId, batchingOptions] (LocationError err) {
-            if (err == LOCATION_ERROR_SUCCESS) {
+            if (ENGINE_LOCK_STATE_DISABLED == mLocApi->getEngineLockState() ||
+                err == LOCATION_ERROR_SUCCESS) {
                 mOngoingTripDistance = batchingOptions.minDistance;
                 mOngoingTripTBFInterval = batchingOptions.minInterval;
                 LOC_LOGD("%s] New Trip started ...", __func__);

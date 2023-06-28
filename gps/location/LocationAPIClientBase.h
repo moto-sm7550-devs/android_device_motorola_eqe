@@ -25,7 +25,41 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
 
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 #ifndef LOCATION_API_CLINET_BASE_H
 #define LOCATION_API_CLINET_BASE_H
 
@@ -130,7 +164,7 @@ public:
     void locAPIDisable();
     uint32_t locAPIGnssUpdateConfig(GnssConfig config);
     uint32_t locAPIGnssGetConfig(GnssConfigFlagsMask config);
-    inline LocationControlAPI* getControlAPI() { return mLocationControlAPI; }
+    inline ILocationControlAPI* getControlAPI() { return mLocationControlAPI; }
 
     // callbacks
     void onCtrlResponseCb(LocationError error, uint32_t id);
@@ -191,7 +225,7 @@ public:
 
 private:
     pthread_mutex_t mMutex;
-    LocationControlAPI* mLocationControlAPI;
+    ILocationControlAPI* mLocationControlAPI;
     RequestQueue mRequestQueues[CTRL_REQUEST_MAX];
     bool mEnabled;
 };
@@ -231,6 +265,8 @@ public:
     void locAPIRemoveAllGeofences();
 
     void locAPIGnssNiResponse(uint32_t id, GnssNiResponse response);
+    void locAPIGetDebugReport(GnssDebugReport &report);
+    uint32_t locAPIGetAntennaInfo(AntennaInfoCallback* cb);
 
     // callbacks
     void onResponseCb(LocationError error, uint32_t id);
@@ -240,19 +276,19 @@ public:
 
     inline virtual void onCapabilitiesCb(LocationCapabilitiesMask /*capabilitiesMask*/) {}
     inline virtual void onGnssNmeaCb(GnssNmeaNotification /*gnssNmeaNotification*/) {}
-    inline virtual void onGnssDataCb(GnssDataNotification /*gnssDataNotification*/) {}
+    inline virtual void onGnssDataCb(const GnssDataNotification &/*gnssDataNotification*/) {}
     inline virtual void onGnssMeasurementsCb(
-            GnssMeasurementsNotification /*gnssMeasurementsNotification*/) {}
+            const GnssMeasurementsNotification &/*gnssMeasurementsNotification*/) {}
     inline virtual void onGnssNHzMeasurementsCb(
-            GnssMeasurementsNotification /*gnssMeasurementsNotification*/) {}
-    inline virtual void onTrackingCb(Location /*location*/) {}
-    inline virtual void onGnssSvCb(GnssSvNotification /*gnssSvNotification*/) {}
+            const GnssMeasurementsNotification &/*gnssMeasurementsNotification*/) {}
+    inline virtual void onTrackingCb(const Location &/*location*/) {}
+    inline virtual void onGnssSvCb(const GnssSvNotification& /*gnssSvNotification*/) {}
     inline virtual void onStartTrackingCb(LocationError /*error*/) {}
     inline virtual void onStopTrackingCb(LocationError /*error*/) {}
     inline virtual void onUpdateTrackingOptionsCb(LocationError /*error*/) {}
 
     inline virtual void onGnssLocationInfoCb(
-            GnssLocationInfoNotification /*gnssLocationInfoNotification*/) {}
+            const GnssLocationInfoNotification &/*gnssLocationInfoNotification*/) {}
 
     inline virtual void onBatchingCb(size_t /*count*/, Location* /*location*/,
             BatchingOptions /*batchingOptions*/) {}
@@ -266,7 +302,7 @@ public:
     inline virtual void onGetBatchedLocationsCb(LocationError /*error*/) {}
 
     inline virtual void onGeofenceBreachCb(
-            GeofenceBreachNotification /*geofenceBreachNotification*/) {}
+            const GeofenceBreachNotification& /*geofenceBreachNotification*/) {}
     inline virtual void onGeofenceStatusCb(
             GeofenceStatusNotification /*geofenceStatusNotification*/) {}
     inline virtual void onAddGeofencesCb(
@@ -280,7 +316,8 @@ public:
     inline virtual void onResumeGeofencesCb(
             size_t /*count*/, LocationError* /*errors*/, uint32_t* /*ids*/) {}
 
-    inline virtual void onGnssNiCb(uint32_t /*id*/, GnssNiNotification /*gnssNiNotification*/) {}
+    inline virtual void onGnssNiCb(uint32_t /*id*/,
+            const GnssNiNotification &/*gnssNiNotification*/) {}
     inline virtual void onGnssNiResponseCb(LocationError /*error*/) {}
 
     inline virtual void onLocationSystemInfoCb(LocationSystemInfo /*locationSystemInfo*/) {}
@@ -414,7 +451,7 @@ private:
     public:
         StartTrackingRequest(LocationAPIClientBase& API) : mAPI(API) {}
         inline void onResponse(LocationError error, uint32_t id) {
-            if (error != LOCATION_ERROR_SUCCESS) {
+            if ((error != LOCATION_ERROR_SUCCESS) && (error != LOCATION_ERROR_TZ_LOCKED)) {
                 mAPI.removeSession(id);
             }
             mAPI.onStartTrackingCb(error);
@@ -447,7 +484,7 @@ private:
     public:
         StartBatchingRequest(LocationAPIClientBase& API) : mAPI(API) {}
         inline void onResponse(LocationError error, uint32_t id) {
-            if (error != LOCATION_ERROR_SUCCESS) {
+            if ((error != LOCATION_ERROR_SUCCESS) && (error != LOCATION_ERROR_TZ_LOCKED)) {
                 mAPI.removeSession(id);
             }
             mAPI.onStartBatchingCb(error);
@@ -580,7 +617,7 @@ private:
     geofenceBreachCallback mGeofenceBreachCallback;
     batchingStatusCallback mBatchingStatusCallback;
 
-    LocationAPI* mLocationAPI;
+    ILocationAPI* mLocationAPI;
 
     RequestQueue mRequestQueues[REQUEST_MAX];
     BiDict<GeofenceBreachTypeMask> mGeofenceBiDict;

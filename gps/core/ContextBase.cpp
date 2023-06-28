@@ -26,7 +26,6 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-
 /*
 Changes from Qualcomm Innovation Center are provided under the following license:
 
@@ -78,7 +77,6 @@ namespace loc_core {
 
 #define SLL_LOC_API_LIB_NAME "libsynergy_loc_api.so"
 #define LOC_APIV2_0_LIB_NAME "libloc_api_v02.so"
-#define IS_SS5_HW_ENABLED  1
 
 loc_gps_cfg_s_type ContextBase::mGps_conf {};
 loc_sap_cfg_s_type ContextBase::mSap_conf {};
@@ -152,6 +150,8 @@ const loc_param_s_type ContextBase::mSap_conf_table[] =
   {"SENSOR_CONTROL_MODE",            &mSap_conf.SENSOR_CONTROL_MODE,            NULL, 'n'},
   {"SENSOR_ALGORITHM_CONFIG_MASK",   &mSap_conf.SENSOR_ALGORITHM_CONFIG_MASK,   NULL, 'n'}
 };
+
+uint32_t ContextBase::mAntennaInfoVectorSize = 0;
 
 void ContextBase::readConfig()
 {
@@ -239,6 +239,12 @@ void ContextBase::readConfig()
         UTIL_READ_CONF(LOC_PATH_GPS_CONF, mGps_conf_table);
         UTIL_READ_CONF(LOC_PATH_SAP_CONF, mSap_conf_table);
 
+        loc_param_s_type ant_info_vector_table[] =
+        {
+            { "ANTENNA_INFO_VECTOR_SIZE", &mAntennaInfoVectorSize, NULL, 'n' }
+        };
+        UTIL_READ_CONF(LOC_PATH_ANT_CORR, ant_info_vector_table);
+
         if (strncmp(mGps_conf.NMEA_REPORT_RATE, "1HZ", sizeof(mGps_conf.NMEA_REPORT_RATE)) == 0) {
             /* NMEA reporting is configured at 1Hz*/
             sNmeaReportRate = GNSS_NMEA_REPORT_RATE_1HZ;
@@ -246,8 +252,8 @@ void ContextBase::readConfig()
             sNmeaReportRate = GNSS_NMEA_REPORT_RATE_NHZ;
         }
         LOC_LOGI("%s] GNSS Deployment: %s", __FUNCTION__,
-                ((mGps_conf.GNSS_DEPLOYMENT == 1) ? "SS5" :
-                ((mGps_conf.GNSS_DEPLOYMENT == 2) ? "QFUSION" : "QGNSS")));
+                ((mGps_conf.GNSS_DEPLOYMENT == QCSR_SS5_ENABLED) ? "SS5" :
+                ((mGps_conf.GNSS_DEPLOYMENT == PDS_API_ENABLED) ? "QFUSION" : "QGNSS")));
 
         switch (getTargetGnssType(loc_get_target())) {
           case GNSS_GSS:
@@ -313,7 +319,7 @@ LocApiBase* ContextBase::createLocApi(LOC_API_ADAPTER_EVENT_MASK_T exMask)
         if (NULL == (locApi = mLBSProxy->getLocApi(exMask, this))) {
             void *handle = NULL;
 
-            if (IS_SS5_HW_ENABLED == mGps_conf.GNSS_DEPLOYMENT) {
+            if (QCSR_SS5_ENABLED == mGps_conf.GNSS_DEPLOYMENT) {
                 libname = SLL_LOC_API_LIB_NAME;
             }
 

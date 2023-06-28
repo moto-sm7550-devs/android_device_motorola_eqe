@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+ * Not a Contribution
+ *
  * Copyright (C) 2010 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -218,9 +221,9 @@ typedef uint16_t LocAGpsSetIDType;
 
 typedef uint16_t LocApnIpType;
 #define LOC_APN_IP_INVALID          0
-#define LOC_APN_IP_IPV4             1
-#define LOC_APN_IP_IPV6             2
-#define LOC_APN_IP_IPV4V6           3
+#define LOC_APN_IP_IPV4             4
+#define LOC_APN_IP_IPV6             6
+#define LOC_APN_IP_IPV4V6           10
 
 /**
  * String length constants

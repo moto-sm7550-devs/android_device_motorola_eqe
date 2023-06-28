@@ -27,6 +27,42 @@
  *
  */
 
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include "GnssAdapter.h"
 #include "location_interface.h"
 
@@ -75,11 +111,12 @@ static void enableNfwLocationAccess(std::vector<std::string>& enabledNfws);
 static void nfwInit(const NfwCbInfo& cbInfo);
 static void getPowerStateChanges(std::function<void(bool)> powerStateCb);
 
-static void odcpiInit(const OdcpiRequestCallback& callback, OdcpiPrioritytype priority);
+static void odcpiInit(const odcpiRequestCallback& callback, OdcpiPrioritytype priority);
 static void odcpiInject(const Location& location);
 
 static void blockCPI(double latitude, double longitude, float accuracy,
                      int blockDurationMsec, double latLonDiffThreshold);
+static void setEsStatusCallback(std::function<void(bool)> esStatusCb);
 static void updateBatteryStatus(bool charging);
 static void updateSystemPowerState(PowerStateType systemPowerState);
 static uint32_t setConstrainedTunc (bool enable, float tuncConstraint,
@@ -87,7 +124,6 @@ static uint32_t setConstrainedTunc (bool enable, float tuncConstraint,
 static uint32_t setPositionAssistedClockEstimator(bool enable);
 static uint32_t gnssUpdateSvConfig(const GnssSvTypeConfig& constellationEnablementConfig,
                                    const GnssSvIdConfig& blacklistSvConfig);
-static uint32_t gnssResetSvConfig();
 static uint32_t configLeverArm(const LeverArmConfigInfo& configInfo);
 static uint32_t configRobustLocation(bool enable, bool enableForE911);
 static uint32_t configMinGpsWeek(uint16_t minGpsWeek);
@@ -100,18 +136,23 @@ static void updateNTRIPGGAConsent(bool consentAccepted);
 static void enablePPENtripStream(const GnssNtripConnectionParams& params, bool enableRTKEngine);
 static void disablePPENtripStream();
 
-static bool measCorrInit(const measCorrSetCapabilitiesCb setCapabilitiesCb);
+static bool measCorrInit(const measCorrSetCapabilitiesCallback setCapabilitiesCb);
 static bool measCorrSetCorrections(const GnssMeasurementCorrections gnssMeasCorr);
 static void measCorrClose();
-static uint32_t antennaInfoInit(const antennaInfoCb antennaInfoCallback);
-static void antennaInfoClose();
+static uint32_t getAntennaInfo(AntennaInfoCallback* antennaInfoCallback);
 static uint32_t configEngineRunState(PositioningEngineMask engType, LocEngineRunState engState);
-static uint32_t configOutputNmeaTypes(GnssNmeaTypesMask enabledNmeaTypes);
+static uint32_t configOutputNmeaTypes(GnssNmeaTypesMask enabledNmeaTypes,
+                                      GnssGeodeticDatumType nmeaDatumType);
 static void powerIndicationInit(const powerIndicationCb powerIndicationCallback);
 static void powerIndicationRequest();
 static void setAddressRequestCb(const std::function<void(const Location&)> addressRequestCb);
 static void injectLocationAndAddr(const Location& location, const GnssCivicAddress& addr);
 static uint32_t setOptInStatus(bool userConsent);
+static uint32_t configEngineIntegrityRisk(PositioningEngineMask engType, uint32_t integrityRisk);
+static uint32_t configXtraParams(bool enable, const XtraConfigParams& configParams);
+static uint32_t getXtraStatus();
+static uint32_t registerXtraStatusUpdate(bool registerUpdate);
+static void configPrecisePositioning(uint32_t featureId, bool enable, std::string appHash);
 
 static const GnssInterface gGnssInterface = {
     sizeof(GnssInterface),
@@ -145,6 +186,7 @@ static const GnssInterface gGnssInterface = {
     odcpiInit,
     odcpiInject,
     blockCPI,
+    setEsStatusCallback,
     getGnssEnergyConsumed,
     enableNfwLocationAccess,
     nfwInit,
@@ -159,8 +201,7 @@ static const GnssInterface gGnssInterface = {
     measCorrInit,
     measCorrSetCorrections,
     measCorrClose,
-    antennaInfoInit,
-    antennaInfoClose,
+    getAntennaInfo,
     configRobustLocation,
     configMinGpsWeek,
     configDeadReckoningEngineParams,
@@ -177,6 +218,11 @@ static const GnssInterface gGnssInterface = {
     setAddressRequestCb,
     injectLocationAndAddr,
     setOptInStatus,
+    configEngineIntegrityRisk,
+    configXtraParams,
+    getXtraStatus,
+    registerXtraStatusUpdate,
+    configPrecisePositioning,
 };
 
 #ifndef DEBUG_X86
@@ -314,7 +360,7 @@ static uint32_t* gnssGetConfig(GnssConfigFlagsMask mask)
 static void gnssUpdateSvTypeConfig(GnssSvTypeConfig& config)
 {
     if (NULL != gGnssAdapter) {
-        gGnssAdapter->gnssUpdateSvTypeConfigCommand(config);
+        gGnssAdapter->gnssUpdateSvTypeConfigCommand(config, SV_TYPE_CONFIG_FROM_API);
     }
 }
 
@@ -405,7 +451,7 @@ static void updateConnectionStatus(bool connected, int8_t type,
     }
 }
 
-static void odcpiInit(const OdcpiRequestCallback& callback, OdcpiPrioritytype priority)
+static void odcpiInit(const odcpiRequestCallback& callback, OdcpiPrioritytype priority)
 {
     if (NULL != gGnssAdapter) {
         gGnssAdapter->initOdcpiCommand(callback, priority);
@@ -424,6 +470,13 @@ static void blockCPI(double latitude, double longitude, float accuracy,
     if (NULL != gGnssAdapter) {
         gGnssAdapter->blockCPICommand(latitude, longitude, accuracy,
                                       blockDurationMsec, latLonDiffThreshold);
+    }
+}
+
+static void setEsStatusCallback(std::function<void(bool)> esStatusCb)
+{
+    if (NULL != gGnssAdapter) {
+        gGnssAdapter->setEsStatusCallbackCommand(esStatusCb);
     }
 }
 
@@ -461,7 +514,7 @@ static void injectLocationExt(const GnssLocationInfoNotification &locationInfo)
 
 static void updateBatteryStatus(bool charging) {
     if (NULL != gGnssAdapter) {
-        gGnssAdapter->getSystemStatus()->updatePowerConnectState(charging);
+        gGnssAdapter->updatePowerConnectStateCommand(charging);
     }
 }
 
@@ -512,7 +565,7 @@ static uint32_t configLeverArm(const LeverArmConfigInfo& configInfo){
     }
 }
 
-static bool measCorrInit(const measCorrSetCapabilitiesCb setCapabilitiesCb) {
+static bool measCorrInit(const measCorrSetCapabilitiesCallback setCapabilitiesCb) {
     if (NULL != gGnssAdapter) {
         return gGnssAdapter->openMeasCorrCommand(setCapabilitiesCb);
     } else {
@@ -534,17 +587,11 @@ static void measCorrClose() {
     }
 }
 
-static uint32_t antennaInfoInit(const antennaInfoCb antennaInfoCallback) {
+static uint32_t getAntennaInfo(AntennaInfoCallback* antennaInfoCallback) {
     if (NULL != gGnssAdapter) {
-        return gGnssAdapter->antennaInfoInitCommand(antennaInfoCallback);
+        return gGnssAdapter->getAntennaeInfoCommand(antennaInfoCallback);
     } else {
-        return ANTENNA_INFO_ERROR_GENERIC;
-    }
-}
-
-static void antennaInfoClose() {
-    if (NULL != gGnssAdapter) {
-        return gGnssAdapter->antennaInfoCloseCommand();
+        return LOCATION_ERROR_GENERAL_FAILURE;
     }
 }
 
@@ -618,9 +665,11 @@ static uint32_t configEngineRunState(PositioningEngineMask engType, LocEngineRun
     }
 }
 
-static uint32_t configOutputNmeaTypes (GnssNmeaTypesMask enabledNmeaTypes) {
+static uint32_t configOutputNmeaTypes (GnssNmeaTypesMask enabledNmeaTypes,
+                                       GnssGeodeticDatumType nmeaDatumType) {
     if (NULL != gGnssAdapter) {
-        return gGnssAdapter->configOutputNmeaTypesCommand(enabledNmeaTypes);
+        return gGnssAdapter->configOutputNmeaTypesCommand(enabledNmeaTypes,
+                                                          nmeaDatumType);
     } else {
         return 0;
     }
@@ -667,5 +716,44 @@ static uint32_t setOptInStatus(bool userConsent) {
         return sessionId;
     } else {
         return 0;
+    }
+}
+
+static uint32_t configEngineIntegrityRisk(PositioningEngineMask engType,
+                                          uint32_t integrityRisk) {
+    if (NULL != gGnssAdapter) {
+        return gGnssAdapter->configEngineIntegrityRiskCommand(engType, integrityRisk);
+    } else {
+        return 0;
+    }
+}
+
+static uint32_t configXtraParams(bool enable, const XtraConfigParams& xtraParams) {
+    if (NULL != gGnssAdapter) {
+        return gGnssAdapter->configXtraParamsCommand(enable, xtraParams);
+    } else {
+        return 0;
+    }
+}
+
+static uint32_t getXtraStatus(){
+    if (NULL != gGnssAdapter) {
+        return gGnssAdapter->getXtraStatusCommand();
+    } else {
+        return 0;
+    }
+}
+
+static uint32_t registerXtraStatusUpdate(bool registerUpdate) {
+    if (NULL != gGnssAdapter) {
+        return gGnssAdapter->registerXtraStatusUpdateCommand(registerUpdate);
+    } else {
+        return 0;
+    }
+}
+
+static void configPrecisePositioning(uint32_t featureId, bool enable, std::string appHash) {
+    if (NULL != gGnssAdapter) {
+        gGnssAdapter->configPrecisePositioningCommand(featureId, enable, appHash);
     }
 }

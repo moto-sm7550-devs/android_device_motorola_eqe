@@ -65,11 +65,11 @@ void MeasurementCorrections::GnssMeasurementCorrectionsDeathRecipient::serviceDi
         return;
     }
     if (nullptr == spMeasurementCorrections->mGnss ||
-        nullptr == spMeasurementCorrections->mGnss->getGnssInterface()) {
+        nullptr == spMeasurementCorrections->mGnss->getLocationControlApi()) {
         LOC_LOGe("Null GNSS interface");
         return;
     }
-    spMeasurementCorrections->mGnss->getGnssInterface()->measCorrClose();
+    spMeasurementCorrections->mGnss->getLocationControlApi()->measCorrClose();
 }
 
 MeasurementCorrections::MeasurementCorrections(Gnss* gnss) : mGnss(gnss) {
@@ -127,7 +127,7 @@ Return<bool> MeasurementCorrections::setCorrections(
 
     V2_1::implementation::convertMeasurementCorrections(corrections, gnssMeasurementCorrections);
 
-    return mGnss->getGnssInterface()->measCorrSetCorrections(gnssMeasurementCorrections);
+    return mGnss->getLocationControlApi()->measCorrSetCorrections(gnssMeasurementCorrections);
 }
 
 Return<bool> MeasurementCorrections::setCorrections_1_1(
@@ -179,13 +179,13 @@ Return<bool> MeasurementCorrections::setCorrections_1_1(
         gnssMeasurementCorrections.satCorrections.push_back(gnssSingleSatCorrection);
     }
 
-    return mGnss->getGnssInterface()->measCorrSetCorrections(gnssMeasurementCorrections);
+    return mGnss->getLocationControlApi()->measCorrSetCorrections(gnssMeasurementCorrections);
 }
 
 Return<bool> MeasurementCorrections::setCallback(
         const sp<V1_0::IMeasurementCorrectionsCallback>& callback) {
 
-    if (nullptr == mGnss || nullptr == mGnss->getGnssInterface()) {
+    if (nullptr == mGnss || nullptr == mGnss->getLocationControlApi()) {
         LOC_LOGe("Null GNSS interface");
         return false;
     }
@@ -193,7 +193,16 @@ Return<bool> MeasurementCorrections::setCallback(
     mMeasurementCorrectionsCbIface = callback;
     lock.unlock();
 
-    return mGnss->getGnssInterface()->measCorrInit(measCorrSetCapabilitiesCb);
+    LocationControlCallbacks locCtrlCbs;
+    memset(&locCtrlCbs, 0, sizeof(locCtrlCbs));
+    locCtrlCbs.size = sizeof(LocationControlCallbacks);
+
+    locCtrlCbs.measCorrSetCapabilitiesCb =
+            [this] (GnssMeasurementCorrectionsCapabilitiesMask capabilities) {
+            measCorrSetCapabilitiesCb(capabilities);
+    };
+    mGnss->getLocationControlApi()->updateCallbacks(locCtrlCbs);
+    return true;
 }
 
 }  // namespace implementation

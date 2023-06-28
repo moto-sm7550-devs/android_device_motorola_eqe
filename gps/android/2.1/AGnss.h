@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2017-2021, The Linux Foundation. All rights reserved.
  * Not a Contribution
  */
 /*
@@ -60,10 +60,7 @@ struct AGnss : public V2_0::IAGnss {
     Return<bool> setServer(V2_0::IAGnssCallback::AGnssType type,
                          const hidl_string& hostname, int32_t port) override;
 
-    void statusCb(AGpsExtType type, LocAGpsStatusValue status);
-
-    /* Data call setup callback passed down to GNSS HAL implementation */
-    static void agnssStatusIpV4Cb(AGnssExtStatusIpV4 status);
+    void statusCb(AGpsExtType type, AGpsStatusValue status);
 
  private:
     Gnss* mGnss = nullptr;

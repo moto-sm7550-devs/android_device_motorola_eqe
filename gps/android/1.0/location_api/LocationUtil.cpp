@@ -26,6 +26,41 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
 #include <gps_extended_c.h>
 #include <LocationUtil.h>
@@ -40,7 +75,7 @@ using ::android::hardware::gnss::V1_0::GnssLocation;
 using ::android::hardware::gnss::V1_0::GnssConstellationType;
 using ::android::hardware::gnss::V1_0::GnssLocationFlags;
 
-void convertGnssLocation(Location& in, GnssLocation& out)
+void convertGnssLocation(const Location& in, GnssLocation& out)
 {
     memset(&out, 0, sizeof(GnssLocation));
     if (in.flags & LOCATION_HAS_LAT_LONG_BIT) {
@@ -120,7 +155,7 @@ void convertGnssLocation(const GnssLocation& in, Location& out)
     out.timestamp = static_cast<uint64_t>(in.timestamp);
 }
 
-void convertGnssConstellationType(GnssSvType& in, GnssConstellationType& out)
+void convertGnssConstellationType(const GnssSvType& in, GnssConstellationType& out)
 {
     switch(in) {
         case GNSS_SV_TYPE_GPS:
@@ -148,7 +183,7 @@ void convertGnssConstellationType(GnssSvType& in, GnssConstellationType& out)
     }
 }
 
-void convertGnssSvid(GnssSv& in, int16_t& out)
+void convertGnssSvid(const GnssSv& in, int16_t& out)
 {
     switch(in.type){
         case GNSS_SV_TYPE_GPS:
@@ -182,7 +217,7 @@ void convertGnssSvid(GnssSv& in, int16_t& out)
     }
 }
 
-void convertGnssSvid(GnssMeasurementsData& in, int16_t& out)
+void convertGnssSvid(const GnssMeasurementsData& in, int16_t& out)
 {
     switch (in.svType) {
         case GNSS_SV_TYPE_GPS:
@@ -216,7 +251,7 @@ void convertGnssSvid(GnssMeasurementsData& in, int16_t& out)
     }
 }
 
-void convertGnssEphemerisType(GnssEphemerisType& in, GnssDebug::SatelliteEphemerisType& out)
+void convertGnssEphemerisType(const GnssEphemerisType& in, GnssDebug::SatelliteEphemerisType& out)
 {
     switch(in) {
         case GNSS_EPH_TYPE_EPHEMERIS:
@@ -232,7 +267,8 @@ void convertGnssEphemerisType(GnssEphemerisType& in, GnssDebug::SatelliteEphemer
     }
 }
 
-void convertGnssEphemerisSource(GnssEphemerisSource& in, GnssDebug::SatelliteEphemerisSource& out)
+void convertGnssEphemerisSource(const GnssEphemerisSource& in,
+        GnssDebug::SatelliteEphemerisSource& out)
 {
     switch(in) {
         case GNSS_EPH_SOURCE_DEMODULATED:
@@ -252,7 +288,8 @@ void convertGnssEphemerisSource(GnssEphemerisSource& in, GnssDebug::SatelliteEph
     }
 }
 
-void convertGnssEphemerisHealth(GnssEphemerisHealth& in, GnssDebug::SatelliteEphemerisHealth& out)
+void convertGnssEphemerisHealth(const GnssEphemerisHealth& in,
+        GnssDebug::SatelliteEphemerisHealth& out)
 {
     switch(in) {
         case GNSS_EPH_HEALTH_GOOD:

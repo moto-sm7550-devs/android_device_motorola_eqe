@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2017, 2020 The Linux Foundation. All rights reserved.
+/* Copyright (c) 2013-2017, 2020-2021 The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -152,19 +152,24 @@ struct BackhaulContext {
     uint16_t prefSub;
     std::string prefApn;
     uint16_t prefIpType;
+    inline bool operator ==(const BackhaulContext& i1) const {
+        // we do not support multiple request from same client
+        return i1.clientName == clientName;
+    }
+
+    // Custom hash function for BackhaulContext set.
+    struct hash {
+        inline size_t operator()(BackhaulContext const& i) const {
+            // Index with client name base hash, as we support just one BackhaulRequest
+            // with the same client name.
+            return (std::hash<std::string>()(i.clientName));
+        }
+    };
 };
 
 /* Engine Debug data Information */
 
 #define GNSS_MAX_SV_INFO_LIST_SIZE 176
-
-typedef struct {
-    int32_t jammerInd;
-    // Jammer Indication
-    int32_t agc;
-    // Automatic gain control
-} GnssJammerData;
-
 
 typedef struct {
     uint16_t gnssSvId;
@@ -244,7 +249,7 @@ typedef struct {
     Gnss_LeapSecondInfoStructType leapSecondInfo;
     /**<   Leap second information. */
 
-    std::vector<GnssJammerData> jammerData;
+    std::vector<int32_t> jammerInd;
     /**<   Jammer indicator of each signal. */
 
     uint64_t jammedSignalsMask;
@@ -257,23 +262,30 @@ typedef struct {
     /**<   Epi validity >*/
 
     float epiLat;
-    /**<   EPI Latitude. - Units: Radians */
+    /**<   EPI Latitude. - Units: Radians
+        valid if 0th bit set in epiValidity*/
 
     float epiLon;
-    /**<   EPI Longitude. - Units: Radians */
+    /**<   EPI Longitude. - Units: Radians
+        valid if 0th bit set in epiValidity*/
 
     float epiAlt;
-    /**<   EPI Altitude. - Units: Meters */
+    /**<   EPI Altitude. - Units: Meters
+        valid if 1st bit set in epiValidity*/
 
     float epiHepe;
     /**<   EPI Horizontal Estimated Position Error.
-      - Units: Meters */
+      - Units: Meters
+        valid if 0th bit set in epiValidity*/
+
     float epiAltUnc;
     /**<   EPI Altitude Uncertainty.
-      - Units: Meters */
+      - Units: Meters
+        valid if 1st bit set in epiValidity*/
 
     uint8_t epiSrc;
-    /**<   EPI Source*/
+    /**<   EPI Source
+        valid if 2nd bit set in epiValidity*/
 
     GnssTimeInfo bestPosTime;
     /**<   UTC Time associated with Best Position. */

@@ -26,6 +26,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 /*
 Changes from Qualcomm Innovation Center are provided under the following license:
 
@@ -61,6 +62,7 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 #ifndef GEOFENCE_ADAPTER_H
 #define GEOFENCE_ADAPTER_H
 
@@ -160,8 +162,6 @@ public:
     LocationError getHwIdFromClient(LocationAPI* client, uint32_t clientId, uint32_t& hwId);
     LocationError getGeofenceKeyFromHwId(uint32_t hwId, GeofenceKey& key);
     void dump();
-
-    /* ==== REPORTS ======================================================================== */
     /* ======== EVENTS ====(Called from QMI Thread)========================================= */
     void geofenceBreachEvent(size_t count, uint32_t* hwIds, Location& location,
                              GeofenceBreachType breachType, uint64_t timestamp);

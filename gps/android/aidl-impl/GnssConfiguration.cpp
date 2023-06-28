@@ -17,10 +17,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
+Changes from Qualcomm Innovation Center are provided under the following license:
+
+Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 
 #define LOG_TAG "GnssConfigurationAidl"
 
 #include "Gnss.h"
+#include "GnssConfiguration.h"
 #include <log_util.h>
 
 namespace android {
@@ -32,10 +69,10 @@ namespace implementation {
 GnssConfiguration::GnssConfiguration(Gnss* gnss) : mGnss(gnss) {
 }
 
-ndk::ScopedAStatus GnssConfiguration::setSuplVersion(int version) {
+ScopedAStatus GnssConfiguration::setSuplVersion(int version) {
     if (mGnss == nullptr) {
-        LOC_LOGE("%s]: mGnss is nullptr", __FUNCTION__);
-        return ndk::ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
+        LOC_LOGe("]: mGnss is nullptr");
+        return ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
     }
 
     GnssConfig config;
@@ -56,17 +93,17 @@ ndk::ScopedAStatus GnssConfiguration::setSuplVersion(int version) {
             config.suplVersion = GNSS_CONFIG_SUPL_VERSION_1_0_0;
             break;
         default:
-            LOC_LOGE("%s]: invalid version: 0x%x.", __FUNCTION__, version);
-            return ndk::ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
+            LOC_LOGe("]: invalid version: 0x%x.", version);
+            return ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
     }
 
     return mGnss->updateConfiguration(config);
 }
 
-ndk::ScopedAStatus GnssConfiguration::setSuplMode(int mode) {
+ScopedAStatus GnssConfiguration::setSuplMode(int mode) {
     if (mGnss == nullptr) {
-        LOC_LOGE("%s]: mGnss is nullptr", __FUNCTION__);
-        return ndk::ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
+        LOC_LOGe("]: mGnss is nullptr");
+        return ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
     }
 
     GnssConfig config;
@@ -87,17 +124,17 @@ ndk::ScopedAStatus GnssConfiguration::setSuplMode(int mode) {
             config.suplModeMask = GNSS_CONFIG_SUPL_MODE_MSB_BIT | GNSS_CONFIG_SUPL_MODE_MSA_BIT;
             break;
         default:
-            LOC_LOGE("%s]: invalid mode: %d.", __FUNCTION__, mode);
-            return ndk::ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
+            LOC_LOGe("]: invalid mode: %d.", mode);
+            return ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
     }
 
     return mGnss->updateConfiguration(config);
 }
 
-ndk::ScopedAStatus GnssConfiguration::setLppProfile(int lppProfileMask) {
+ScopedAStatus GnssConfiguration::setLppProfile(int lppProfileMask) {
     if (mGnss == nullptr) {
-        LOC_LOGE("%s]: mGnss is nullptr", __FUNCTION__);
-        return ndk::ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
+        LOC_LOGe("]: mGnss is nullptr");
+        return ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
     }
 
     GnssConfig config = {};
@@ -121,10 +158,10 @@ ndk::ScopedAStatus GnssConfiguration::setLppProfile(int lppProfileMask) {
     return mGnss->updateConfiguration(config);
 }
 
-ndk::ScopedAStatus GnssConfiguration::setGlonassPositioningProtocol(int protocol) {
+ScopedAStatus GnssConfiguration::setGlonassPositioningProtocol(int protocol) {
     if (mGnss == nullptr) {
-        LOC_LOGE("%s]: mGnss is nullptr", __FUNCTION__);
-        return ndk::ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
+        LOC_LOGe("]: mGnss is nullptr");
+        return ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
     }
 
     GnssConfig config;
@@ -148,10 +185,10 @@ ndk::ScopedAStatus GnssConfiguration::setGlonassPositioningProtocol(int protocol
     return mGnss->updateConfiguration(config);
 }
 
-ndk::ScopedAStatus GnssConfiguration::setEmergencySuplPdn(bool enabled) {
+ScopedAStatus GnssConfiguration::setEmergencySuplPdn(bool enabled) {
     if (mGnss == nullptr) {
-        LOC_LOGE("%s]: mGnss is nullptr", __FUNCTION__);
-        return ndk::ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
+        LOC_LOGe("]: mGnss is nullptr");
+        return ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
     }
 
     GnssConfig config;
@@ -165,11 +202,11 @@ ndk::ScopedAStatus GnssConfiguration::setEmergencySuplPdn(bool enabled) {
     return mGnss->updateConfiguration(config);
 }
 
-ndk::ScopedAStatus GnssConfiguration::setEsExtensionSec(int emergencyExtensionSeconds) {
+ScopedAStatus GnssConfiguration::setEsExtensionSec(int emergencyExtensionSeconds) {
     ENTRY_LOG_CALLFLOW();
     if (mGnss == nullptr) {
         LOC_LOGe("mGnss is nullptr");
-        return ndk::ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
+        return ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
     }
 
     GnssConfig config;
@@ -181,11 +218,11 @@ ndk::ScopedAStatus GnssConfiguration::setEsExtensionSec(int emergencyExtensionSe
     return mGnss->updateConfiguration(config);
 }
 
-ndk::ScopedAStatus GnssConfiguration::setBlocklist(const vector<BlocklistedSource>& sourceList) {
+ScopedAStatus GnssConfiguration::setBlocklist(const vector<BlocklistedSource>& sourceList) {
     ENTRY_LOG_CALLFLOW();
     if (nullptr == mGnss) {
         LOC_LOGe("mGnss is null");
-        return ndk::ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
+        return ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
     }
 
     // blValid is true if sourceList is empty, i.e. clearing the BL;
@@ -209,7 +246,7 @@ ndk::ScopedAStatus GnssConfiguration::setBlocklist(const vector<BlocklistedSourc
     // Update configuration only if blValid is true
     // i.e. only if atleast one source is valid for sourceListing
     if (!blValid) {
-        return ndk::ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
+        return ScopedAStatus::fromExceptionCode(STATUS_INVALID_OPERATION);
     }
     return mGnss->updateConfiguration(config);
 }
@@ -255,7 +292,7 @@ bool GnssConfiguration::setBlocklistedSource(GnssSvIdSource& copyToSource,
         break;
     default:
         copyToSource.constellation = GNSS_SV_TYPE_UNKNOWN;
-        LOC_LOGe("Invalid constellation %hhu", copyFromSource.constellation);
+        LOC_LOGe("Invalid constellation %d", copyFromSource.constellation);
         retVal = false;
         break;
     }

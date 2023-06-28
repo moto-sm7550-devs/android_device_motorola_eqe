@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2017-2021, The Linux Foundation. All rights reserved.
  * Not a Contribution
  */
 /*
@@ -57,7 +57,7 @@ Return<bool> AGnssRil::updateNetworkState(bool connected, NetworkType type, bool
     std::string apn("");
 
     // for XTRA
-    if (nullptr != mGnss && ( nullptr != mGnss->getGnssInterface() )) {
+    if (nullptr != mGnss && ( nullptr != mGnss->getLocationControlApi() )) {
         int8_t typeout = loc_core::TYPE_UNKNOWN;
         switch(type)
         {
@@ -103,14 +103,14 @@ Return<bool> AGnssRil::updateNetworkState(bool connected, NetworkType type, bool
                 }
                 break;
         }
-        mGnss->getGnssInterface()->updateConnectionStatus(connected, typeout, false, 0, apn);
+        mGnss->getLocationControlApi()->updateConnectionStatus(connected, typeout, false, 0, apn);
     }
     return true;
 }
 Return<bool> AGnssRil::updateNetworkState_2_0(const V2_0::IAGnssRil::NetworkAttributes& attributes) {
     ENTRY_LOG_CALLFLOW();
     std::string apn = attributes.apn;
-    if (nullptr != mGnss && (nullptr != mGnss->getGnssInterface())) {
+    if (nullptr != mGnss && (nullptr != mGnss->getLocationControlApi())) {
         int8_t typeout = loc_core::TYPE_UNKNOWN;
         bool roaming = false;
         if (attributes.capabilities & IAGnssRil::NetworkCapability::NOT_METERED) {
@@ -122,7 +122,7 @@ Return<bool> AGnssRil::updateNetworkState_2_0(const V2_0::IAGnssRil::NetworkAttr
             roaming = false;
         }
         LOC_LOGd("apn string received is: %s", apn.c_str());
-        mGnss->getGnssInterface()->updateConnectionStatus(attributes.isConnected,
+        mGnss->getLocationControlApi()->updateConnectionStatus(attributes.isConnected,
                 typeout, roaming, (NetworkHandle) attributes.networkHandle, apn);
     }
     return true;

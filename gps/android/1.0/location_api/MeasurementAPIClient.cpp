@@ -26,7 +26,6 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-
 /*
 Changes from Qualcomm Innovation Center are provided under the following license:
 
@@ -62,6 +61,7 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 #define LOG_NDEBUG 0
 #define LOG_TAG "LocSvc_MeasurementAPIClient"
 
@@ -80,11 +80,12 @@ namespace implementation {
 using ::android::hardware::gnss::V1_0::IGnssMeasurement;
 using ::android::hardware::gnss::V1_0::IGnssMeasurementCallback;
 
-static void convertGnssData(GnssMeasurementsNotification& in,
+static void convertGnssData(const GnssMeasurementsNotification& in,
         V1_0::IGnssMeasurementCallback::GnssData& out);
-static void convertGnssMeasurement(GnssMeasurementsData& in,
+static void convertGnssMeasurement(const GnssMeasurementsData& in,
         V1_0::IGnssMeasurementCallback::GnssMeasurement& out);
-static void convertGnssClock(GnssMeasurementsClock& in, IGnssMeasurementCallback::GnssClock& out);
+static void convertGnssClock(
+        const GnssMeasurementsClock& in, IGnssMeasurementCallback::GnssClock& out);
 
 MeasurementAPIClient::MeasurementAPIClient() :
     mGnssMeasurementCbIface(nullptr),
@@ -130,7 +131,7 @@ MeasurementAPIClient::startTracking()
     locationCallbacks.gnssMeasurementsCb = nullptr;
     if (mGnssMeasurementCbIface != nullptr) {
         locationCallbacks.gnssMeasurementsCb =
-            [this](GnssMeasurementsNotification gnssMeasurementsNotification) {
+            [this](const GnssMeasurementsNotification &gnssMeasurementsNotification) {
                 onGnssMeasurementsCb(gnssMeasurementsNotification);
             };
     }
@@ -164,7 +165,7 @@ void MeasurementAPIClient::measurementClose() {
 
 // callbacks
 void MeasurementAPIClient::onGnssMeasurementsCb(
-        GnssMeasurementsNotification gnssMeasurementsNotification)
+        const GnssMeasurementsNotification &gnssMeasurementsNotification)
 {
     LOC_LOGD("%s]: (count: %zu active: %d)",
             __FUNCTION__, gnssMeasurementsNotification.count, mTracking);
@@ -188,7 +189,7 @@ void MeasurementAPIClient::onGnssMeasurementsCb(
     }
 }
 
-static void convertGnssMeasurement(GnssMeasurementsData& in,
+static void convertGnssMeasurement(const GnssMeasurementsData& in,
         V1_0::IGnssMeasurementCallback::GnssMeasurement& out)
 {
     memset(&out, 0, sizeof(IGnssMeasurementCallback::GnssMeasurement));
@@ -267,7 +268,8 @@ static void convertGnssMeasurement(GnssMeasurementsData& in,
     out.agcLevelDb = in.agcLevelDb;
 }
 
-static void convertGnssClock(GnssMeasurementsClock& in, IGnssMeasurementCallback::GnssClock& out)
+static void convertGnssClock(const GnssMeasurementsClock& in,
+        IGnssMeasurementCallback::GnssClock& out)
 {
     memset(&out, 0, sizeof(IGnssMeasurementCallback::GnssClock));
     if (in.flags & GNSS_MEASUREMENTS_CLOCK_FLAGS_LEAP_SECOND_BIT)
@@ -295,7 +297,7 @@ static void convertGnssClock(GnssMeasurementsClock& in, IGnssMeasurementCallback
     out.hwClockDiscontinuityCount = in.hwClockDiscontinuityCount;
 }
 
-static void convertGnssData(GnssMeasurementsNotification& in,
+static void convertGnssData(const GnssMeasurementsNotification& in,
         V1_0::IGnssMeasurementCallback::GnssData& out)
 {
     out.measurementCount = in.count;

@@ -181,13 +181,13 @@ PRODUCT_PACKAGES += \
 
 # GPS
 PRODUCT_PACKAGES += \
-    android.hardware.gnss@2.1-impl-qti \
     android.hardware.gnss-aidl-impl-qti \
     android.hardware.gnss-aidl-service-qti \
     gnss@2.0-base.policy \
+    gnss@2.0-edgnss-daemon.policy \
+    gnss@2.0-qsap-location.policy \
     gnss@2.0-xtra-daemon.policy \
     gnss@2.0-xtwifi-client.policy \
-    gnss@2.0-xtwifi-inet-agent.policy \
     libloc_pla_headers \
     liblocation_api_headers \
     libgps.utils_headers \
