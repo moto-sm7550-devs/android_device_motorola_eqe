@@ -7,7 +7,7 @@ genrule {
   tools: [
     "aprotoc",
   ],
-  cmd: "mkdir -p $(genDir) && $(location aprotoc) --cpp_out=$(genDir) --proto_path=external/protobuf/src/google/protobuf --proto_path=vendor/qcom/opensource/location/location_api_msg_proto $(in)",
+  cmd: "mkdir -p $(genDir) && $(location aprotoc) --cpp_out=$(genDir) --proto_path=external/protobuf/src/google/protobuf --proto_path=device/motorola/sm8550-common/location/location_api_msg_proto $(in)",
   out: [
     "LocationApiMsg.pb.cc",
     "LocationApiDataTypes.pb.cc"
@@ -23,7 +23,7 @@ genrule {
   tools: [
     "aprotoc",
   ],
-  cmd: "mkdir -p $(genDir) && $(location aprotoc) --cpp_out=$(genDir) --proto_path=external/protobuf/src/google/protobuf --proto_path=vendor/qcom/opensource/location/location_api_msg_proto $(in)",
+  cmd: "mkdir -p $(genDir) && $(location aprotoc) --cpp_out=$(genDir) --proto_path=external/protobuf/src/google/protobuf --proto_path=device/motorola/sm8550-common/location/location_api_msg_proto $(in)",
   out: [
     "LocationApiMsg.pb.h",
     "LocationApiDataTypes.pb.h"
