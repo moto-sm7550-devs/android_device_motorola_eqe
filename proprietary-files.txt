@@ -352,6 +352,7 @@ vendor/lib64/libcne.so
 vendor/lib64/libcneapiclient.so
 vendor/lib64/libcneoplookup.so
 vendor/lib64/libcneqmiutils.so
+vendor/lib64/libmasc.so
 vendor/lib64/libshsc.so
 vendor/lib64/libwms.so
 vendor/lib64/libwqe.so
@@ -447,6 +448,9 @@ vendor/etc/display/DPU8__.xml
 vendor/etc/display/DPU9__.xml
 vendor/etc/display/advanced_sf_offsets.xml
 vendor/etc/display/thermallevel_to_fps.xml
+vendor/lib64/libclstc_algorithm_adapter.so
+vendor/lib64/libclstc_gcp_adapter.so
+vendor/lib64/libclstc_tm.so
 vendor/lib64/libdisplayqos.so
 vendor/lib64/libdisplayskuutils.so
 vendor/lib64/libintervmipc.so
@@ -580,6 +584,7 @@ vendor/lib64/liblbs_core.so
 vendor/lib64/libloc_api_v02.so
 vendor/lib64/libloc_api_wds.so
 vendor/lib64/libloc_eng_hub.so
+vendor/lib64/libloc_qwes_iface.so
 vendor/lib64/libloc_socket.so
 vendor/lib64/libloc_util.so
 vendor/lib64/liblocationservice.so
@@ -735,10 +740,9 @@ vendor/lib/c2.dolby.decoder.secure.so
 vendor/lib/c2.dolby.decoder.so
 vendor/lib/c2.dolby.egl.so
 vendor/lib/c2.dolby.store.so
-vendor/lib/libcodec2_soft_ac4dec.so
+vendor/lib/libdolbyottcameracontrol.so
+vendor/lib/libdolbyvision.so
 vendor/lib/libcodec2_soft_common.so
-vendor/lib/libcodec2_soft_ddpdec.so
-vendor/lib/libcodec2_store_dolby.so
 vendor/lib64/c2.dolby.client.so
 vendor/lib64/c2.dolby.decoder.secure.so
 vendor/lib64/c2.dolby.decoder.so
@@ -856,6 +860,7 @@ vendor/etc/pwr/VideoPowerOptFeature.xml
 vendor/etc/powerhint.xml
 -vendor/etc/vintf/manifest/vendor.qti.hardware.perf.xml
 -vendor/etc/vintf/manifest/vendor.qti.hardware.power.powermodule.xml
+vendor/lib/libaodoptfeature.so
 vendor/lib/libperfconfig.so
 vendor/lib/libperfgluelayer.so
 vendor/lib/libperfioctl.so
@@ -869,6 +874,7 @@ vendor/lib/libvideooptfeature.so
 vendor/lib/vendor.qti.hardware.perf@2.3.so
 vendor/lib/vendor.qti.memory.pasrmanager@1.0.so
 vendor/lib/vendor.qti.memory.pasrmanager@1.1.so
+vendor/lib64/libaodoptfeature.so
 vendor/lib64/liblearningmodule.so
 vendor/lib64/libmeters.so
 vendor/lib64/libpasrutils.so
@@ -1063,6 +1069,7 @@ vendor/lib64/libDcfHalBleProto.so
 vendor/lib64/libDcfHalFramework.so
 vendor/lib64/libDcfHalLogger.so
 vendor/lib64/libDcfHalQtiMutex.so
+vendor/lib64/libqape_oem_ext.so
 vendor/lib64/libqsap_sdk.so
 vendor/lib64/libSensorsInterface.so
 vendor/lib64/libvui_dmgr.so
@@ -1473,6 +1480,7 @@ vendor/lib/libfastcvdsp_stub.so
 vendor/lib/libscveCommon.so
 vendor/lib/libscveCommon_stub.so
 vendor/lib/libscveObjectSegmentation.so
+vendor/lib/libscveObjectSegmentation_stub.so
 vendor/lib/libscveObjectTracker.so
 vendor/lib/libscveObjectTracker_stub.so
 vendor/lib64/libeva.so
@@ -1481,6 +1489,7 @@ vendor/lib64/libfastcvdsp_stub.so
 vendor/lib64/libscveCommon.so
 vendor/lib64/libscveCommon_stub.so
 vendor/lib64/libscveObjectSegmentation.so
+vendor/lib64/libscveObjectSegmentation_stub.so
 vendor/lib64/libscveObjectTracker.so
 vendor/lib64/libscveObjectTracker_stub.so
 
@@ -1657,6 +1666,7 @@ vendor/etc/seccomp_policy/wfdvndservice.policy
 vendor/etc/seccomp_policy/wifidisplayhalservice.policy
 vendor/etc/ArmHDCP_QTI_Android.cfg
 vendor/etc/wfdconfig.xml
+vendor/lib64/hw/vendor.qti.hardware.wifidisplaysession@1.0-impl.so
 vendor/lib64/libDxHdcp.so
 vendor/lib64/libFileMux_proprietary.so
 vendor/lib64/libmm-hdcpmgr.so
