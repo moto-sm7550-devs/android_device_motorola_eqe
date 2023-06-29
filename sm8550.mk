@@ -128,7 +128,7 @@ PRODUCT_PACKAGES += \
 
 # Camera
 PRODUCT_PACKAGES += \
-    android.hardware.camera.device@3.4.vendor \
+    android.hardware.camera.device@3.6.vendor \
     android.hardware.camera.provider@2.4.vendor \
     libcamera2ndk_vendor \
     libdng_sdk.vendor \
@@ -195,6 +195,9 @@ PRODUCT_PACKAGES += \
     liblocation_api_headers \
     libgps.utils_headers \
     liblocation_api \
+    liblocation_api_msg \
+    liblocation_client_api \
+    liblocation_integration_api \
     libgps.utils \
     libbatching \
     libgeofencing \
