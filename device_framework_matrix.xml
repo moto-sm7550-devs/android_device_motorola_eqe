@@ -200,6 +200,14 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <hal format="aidl" optional="true">
+        <name>motorola.hardware.sensors</name>
+        <version>1</version>
+        <interface>
+            <name>ISensorExt</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
     <hal format="hidl" optional="true">
         <name>vendor.display.color</name>
         <version>1.0-7</version>
@@ -265,6 +273,14 @@
         <version>2.0-7</version>
         <interface>
             <name>IFactory</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="aidl" optional="true">
+        <name>vendor.qti.data.txpwrservice</name>
+        <version>2</version>
+        <interface>
+            <name>ITxPwrService</name>
             <instance>default</instance>
         </interface>
     </hal>
@@ -740,6 +756,14 @@
     <hal format="hidl" optional="true">
         <name>vendor.qti.hardware.radio.internal.deviceinfo</name>
         <version>1.0</version>
+        <interface>
+            <name>IDeviceInfo</name>
+            <instance>deviceinfo</instance>
+        </interface>
+    </hal>
+    <hal format="aidl" optional="true">
+        <name>vendor.qti.hardware.radio.internal.deviceinfo</name>
+        <version>1</version>
         <interface>
             <name>IDeviceInfo</name>
             <instance>deviceinfo</instance>

@@ -136,6 +136,7 @@ vendor/lib/libaudio_log_utils.so
 vendor/lib/libext_tflite_c.so
 vendor/lib/libdapparamstorage.so
 vendor/lib/libfmpal.so
+vendor/lib/libhfp_pal.so
 vendor/lib/liblx-ar_util.so
 -vendor/lib/liblx-osal.so
 vendor/lib/libmcs.so
@@ -161,6 +162,7 @@ vendor/lib64/libaualgo_sst_component.so
 vendor/lib64/libaudio_log_utils.so
 vendor/lib64/libdapparamstorage.so
 vendor/lib64/libext_tflite_c.so
+vendor/lib64/libhfp_pal.so
 vendor/lib64/libfmpal.so
 vendor/lib64/liblx-ar_util.so
 -vendor/lib64/liblx-osal.so
@@ -430,6 +432,11 @@ vendor/lib64/libsnapdragoncolor-qdcm.so
 -vendor/lib/libvmmem.so
 -vendor/lib64/libvmmem.so
 
+# Display - memtrack
+vendor/bin/hw/vendor.qti.hardware.memtrack-service
+vendor/etc/init/memtrack_qti.rc
+-vendor/etc/vintf/manifest/memtrack_qti.xml
+
 # Display - SDM
 vendor/etc/display/DPU660.xml
 vendor/etc/display/DPU670.xml
@@ -525,6 +532,7 @@ vendor/lib64/libQSEEComAPI.so
 vendor/lib64/libcpion.so
 vendor/lib64/libdrmfs.so
 vendor/lib64/libdrmtime.so
+vendor/lib64/libgpt.so
 vendor/lib64/libops.so
 vendor/lib64/libqisl.so
 vendor/lib64/librpmb.so
@@ -636,6 +644,12 @@ vendor/gpu/kbc/unified_ksqs.bin
 vendor/lib/hw/vulkan.adreno.so
 vendor/lib64/hw/vulkan.adreno.so
 
+# Identity
+vendor/bin/hw/android.hardware.identity-service-qti
+vendor/etc/init/android.hardware.identity-service-qti.rc
+vendor/etc/vintf/manifest/manifest_identity_credential.xml
+vendor/lib64/libqtiidentitycredential.so
+
 # IO prefetcher
 vendor/bin/hw/vendor.qti.hardware.iop@2.0-service
 vendor/etc/init/vendor.qti.hardware.iop@2.0-service.rc
@@ -674,6 +688,8 @@ vendor/lib64/libqtikeymint.so
 vendor/lib/hw/sound_trigger.primary.kalama.so
 vendor/lib/libcapiv2svacnnvendor.so
 vendor/lib/libcapiv2svarnnvendor.so
+vendor/lib/libcapiv2udk7vendor.so
+vendor/lib/libcapiv2uvvendor.so
 vendor/lib/libeai_fixed_32.so
 vendor/lib/liblistensoundmodel2vendor.so
 vendor/lib/vendor.qti.hardware.ListenSoundModel@1.0-impl.so
@@ -681,6 +697,7 @@ vendor/lib/vendor.qti.hardware.ListenSoundModel@1.0.so
 vendor/lib64/hw/sound_trigger.primary.kalama.so
 vendor/lib64/libcapiv2svacnnvendor.so
 vendor/lib64/libcapiv2svarnnvendor.so
+vendor/lib64/libcapiv2udk7vendor.so
 vendor/lib64/libcapiv2uvvendor.so
 vendor/lib64/libeai_fixed.so
 vendor/lib64/libeai_float.so
@@ -713,11 +730,27 @@ vendor/etc/seccomp_policy/codec2.vendor.ext-arm64.policy
 -vendor/etc/vintf/manifest/c2_manifest_vendor_audio.xml
 -vendor/etc/vintf/manifest/vendor.dolby.media.c2.v1.0@1.0-service.xml
 -vendor/etc/vintf/manifest/vendor.dolby.vision.media.c2@1.0-service.xml
+vendor/lib/c2.dolby.client.so
+vendor/lib/c2.dolby.decoder.secure.so
+vendor/lib/c2.dolby.decoder.so
+vendor/lib/c2.dolby.egl.so
+vendor/lib/c2.dolby.store.so
+vendor/lib/libcodec2_soft_ac4dec.so
+vendor/lib/libcodec2_soft_common.so
+vendor/lib/libcodec2_soft_ddpdec.so
+vendor/lib/libcodec2_store_dolby.so
+vendor/lib64/c2.dolby.client.so
+vendor/lib64/c2.dolby.decoder.secure.so
+vendor/lib64/c2.dolby.decoder.so
+vendor/lib64/c2.dolby.egl.so
+vendor/lib64/c2.dolby.store.so
 vendor/lib64/libcodec2_soft_ac4dec.so
 vendor/lib64/libcodec2_soft_common.so
 vendor/lib64/libcodec2_soft_ddpdec.so
 vendor/lib64/libcodec2_store_dolby.so
 vendor/lib64/libdeccfg.so
+vendor/lib64/libdolbyottcameracontrol.so
+vendor/lib64/libdolbyvision.so
 vendor/lib64/libdsd2pcm.so
 vendor/lib64/libEvrcSwCodec.so
 vendor/lib64/libQcelp13SwCodec.so
@@ -847,6 +880,7 @@ vendor/lib64/libqti-perfd-client.so
 vendor/lib64/libqti-perfd.so
 vendor/lib64/libqti-util.so
 vendor/lib64/libqti-utils.so
+vendor/lib64/libprefapps.so
 vendor/lib64/libskewknob.so
 vendor/lib64/libstandbyfeature.so
 vendor/lib64/libvideooptfeature.so
@@ -935,6 +969,8 @@ vendor/lib64/vendor.qti.hardware.qccvndhal@1.0.so
 vendor/bin/qesdk-manager
 vendor/etc/init/qesdk-manager.rc
 vendor/etc/seccomp_policy/qesdk.policy
+vendor/lib/libqesdk2_0.so
+vendor/lib/libqesdk_manager.so
 vendor/lib64/liblocation_qesdk.so
 vendor/lib64/libqesdk2_0.so
 vendor/lib64/libqesdk_manager.so
@@ -1000,6 +1036,38 @@ vendor/lib64/libqmimotext.so
 vendor/lib64/libqmiservices.so
 vendor/lib64/libsubsystem_control.so
 
+# QMS
+vendor/bin/qms
+vendor/etc/init/qms.rc
+vendor/etc/seccomp_policy/qms.policy
+vendor/etc/vintf/manifest/qms-saidl.xml
+vendor/lib64/lib-qhcpservice.so
+vendor/lib64/libqcc_sdk.so
+vendor/lib64/libqms_client.so
+
+# QSAP
+vendor/bin/qsap_dcfd
+vendor/bin/qsap_location
+vendor/bin/qsap_qapeservice
+vendor/bin/qsap_sensors
+vendor/bin/qsap_voiceui
+vendor/etc/init/dcfd.rc
+vendor/etc/init/vendor.qsap.location.rc
+vendor/etc/init/vendor.qsap.qapeservice.rc
+vendor/etc/init/vendor.qsap.sensors.rc
+vendor/etc/seccomp_policy/qsap_qapeservice.policy
+vendor/etc/seccomp_policy/qsap_dcfd.policy
+vendor/etc/seccomp_policy/qsap_sensors.policy
+vendor/etc/seccomp_policy/qsap_voiceui.policy
+vendor/lib64/libDcfHalBleProto.so
+vendor/lib64/libDcfHalFramework.so
+vendor/lib64/libDcfHalLogger.so
+vendor/lib64/libDcfHalQtiMutex.so
+vendor/lib64/libqsap_sdk.so
+vendor/lib64/libSensorsInterface.so
+vendor/lib64/libvui_dmgr.so
+vendor/lib64/libvui_dmgr_client.so
+
 # QSPM
 system_ext/bin/qspmsvc
 system_ext/etc/init/qspmsvc.rc
@@ -1048,6 +1116,11 @@ vendor/lib64/libStereoRectifyWrapper.so
 vendor/lib64/libsensor_calibration.so
 vendor/lib64/libtracker_6dof_impl.so
 vendor/lib64/vendor.qti.hardware.qxr-V1-ndk.so
+
+# QWESD
+vendor/bin/qwesd
+vendor/etc/init/qwesd.rc
+vendor/etc/seccomp_policy/qwesd@2.0.policy
 
 # RIL - UIM
 -product/app/uimgbaservice/uimgbaservice.apk
@@ -1139,6 +1212,10 @@ vendor/etc/qcril_database/upgrade/ecc/37_version_qcrildb.sql
 vendor/etc/qcril_database/upgrade/ecc/38_version_qcrildb.sql
 vendor/etc/qcril_database/upgrade/ecc/39_version_qcrildb.sql
 vendor/etc/qcril_database/upgrade/ecc/3_version_qcrildb.sql
+vendor/etc/qcril_database/upgrade/ecc/40_version_qcrildb.sql
+vendor/etc/qcril_database/upgrade/ecc/41_version_qcrildb.sql
+vendor/etc/qcril_database/upgrade/ecc/42_version_qcrildb.sql
+vendor/etc/qcril_database/upgrade/ecc/43_version_qcrildb.sql
 vendor/etc/qcril_database/upgrade/ecc/4_version_qcrildb.sql
 vendor/etc/qcril_database/upgrade/ecc/5_version_qcrildb.sql
 vendor/etc/qcril_database/upgrade/ecc/6_version_qcrildb.sql
@@ -1152,7 +1229,15 @@ vendor/etc/seccomp_policy/atfwd@2.0.policy
 vendor/etc/seccomp_policy/qcrilnr@2.0.policy
 vendor/etc/ssg/ta_config.json
 vendor/etc/ssg/tz_whitelist.json
+-vendor/etc/vintf/manifest/android.hardware.radio.config.xml
+-vendor/etc/vintf/manifest/android.hardware.radio.data.xml
+-vendor/etc/vintf/manifest/android.hardware.radio.messaging.xml
+-vendor/etc/vintf/manifest/android.hardware.radio.modem.xml
+-vendor/etc/vintf/manifest/android.hardware.radio.network.xml
+-vendor/etc/vintf/manifest/android.hardware.radio.sim.xml
+-vendor/etc/vintf/manifest/android.hardware.radio.voice.xml
 -vendor/etc/vintf/manifest/dataconnection-saidl.xml
+-vendor/etc/vintf/manifest/deviceinfo-saidl.xml
 -vendor/etc/vintf/manifest/qcrilhook-saidl.xml
 -vendor/etc/vintf/manifest/qtiradio-saidl.xml
 -vendor/etc/vintf/manifest/vendor.qti.hardware.radio.am.xml
@@ -1231,6 +1316,7 @@ vendor/lib64/vendor.qti.hardware.data.ka-V1-ndk.so
 vendor/lib64/vendor.qti.hardware.radio.am@1.0.so
 vendor/lib64/vendor.qti.hardware.radio.am-V1-ndk.so
 vendor/lib64/vendor.qti.hardware.radio.atcmdfwd@1.0.so
+vendor/lib64/vendor.qti.hardware.radio.atcmdfwd-V1-ndk.so
 vendor/lib64/vendor.qti.hardware.radio.internal.deviceinfo@1.0.so
 vendor/lib64/vendor.qti.hardware.radio.internal.deviceinfo-V1-ndk.so
 vendor/lib64/vendor.qti.hardware.radio.lpa@1.0.so
@@ -1359,7 +1445,9 @@ vendor/lib64/libsensorslog.so
 vendor/lib64/libsns_api.so
 vendor/lib64/libsns_device_mode_stub.so
 vendor/lib64/libsns_direct_channel_stub.so
+vendor/lib64/libsns_dynamic_loader_stub.so
 vendor/lib64/libsns_registry_skel.so
+vendor/lib64/libsns_remote_proc_state_stub.so
 vendor/lib64/libsnsapi.so
 vendor/lib64/libsnsdiaglog.so
 vendor/lib64/libsnsutils.so
@@ -1367,6 +1455,16 @@ vendor/lib64/libssc.so
 vendor/lib64/libssc_default_listener.so
 vendor/lib64/motorola.hardware.sensors-V1-ndk_platform.so
 vendor/lib64/vendor.qti.hardware.sensorscalibrate@1.0.so
+
+# Sensors - Moto
+vendor/bin/hw/motorola.hardware.sensorext-service
+vendor/etc/init/motorola.hardware.sensorext.service.rc
+vendor/etc/vintf/manifest/motorola.hardware.sensorext.service.xml
+vendor/lib64/libflatbuffers-cpp_vendor.so
+vendor/lib64/libruy_vendor.so
+vendor/lib64/libtextclassifier_hash_vendor.so
+vendor/lib64/libtflite_vendor.so
+vendor/lib64/motorola.hardware.sensors-V1-ndk_platform.so
 
 # Snapdragon Computer Vision Engine
 vendor/lib/libeva.so
@@ -1431,10 +1529,12 @@ vendor/lib64/libtime_genoff.so
 # Trusted Execution Environment connector
 vendor/bin/hw/vendor.qti.hardware.qteeconnector@1.0-service
 vendor/etc/init/vendor.qti.hardware.qteeconnector@1.0-service.rc
+vendor/lib/libGPMTEEC_vendor.so
 vendor/lib/libGPQTEEC_vendor.so
 vendor/lib/libGPTEE_vendor.so
 vendor/lib/libQTEEConnector_vendor.so
 vendor/lib/vendor.qti.hardware.qteeconnector@1.0.so
+vendor/lib64/libGPMTEEC_vendor.so
 vendor/lib64/libGPQTEEC_vendor.so
 vendor/lib64/libGPTEE_vendor.so
 vendor/lib64/libQTEEConnector_vendor.so
