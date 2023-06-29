@@ -1234,8 +1234,6 @@ vendor/etc/qcril_database/upgrade/other/3_version_update_wps_config_qcrilnr.sql
 vendor/etc/qcril_database/upgrade/other/6_version_change_property_table_qcrilnr.sql
 vendor/etc/seccomp_policy/atfwd@2.0.policy
 vendor/etc/seccomp_policy/qcrilnr@2.0.policy
-vendor/etc/ssg/ta_config.json
-vendor/etc/ssg/tz_whitelist.json
 -vendor/etc/vintf/manifest/android.hardware.radio.config.xml
 -vendor/etc/vintf/manifest/android.hardware.radio.data.xml
 -vendor/etc/vintf/manifest/android.hardware.radio.messaging.xml
@@ -1516,6 +1514,12 @@ vendor/lib/vendor.qti.spu@2.0.so
 vendor/lib64/vendor.qti.spu@1.0.so
 vendor/lib64/vendor.qti.spu@1.1.so
 vendor/lib64/vendor.qti.spu@2.0.so
+
+# SSGTZ
+vendor/bin/ssgtzd
+vendor/etc/init/ssgtzd.rc
+vendor/etc/ssg/ta_config.json
+vendor/etc/ssg/tz_whitelist.json
 
 # SXR
 vendor/bin/hw/sxrservice
