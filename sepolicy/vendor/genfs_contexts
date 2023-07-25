@@ -14,6 +14,7 @@ genfscon sysfs /devices/platform/soc/88e0000.qcom,msm-eud/extcon/extcon2/cable.2
 
 # Health
 genfscon sysfs /devices/platform/soc/soc:mmi,charger/power_supply/mmi_battery      u:object_r:vendor_sysfs_battery_supply:s0
+genfscon sysfs /devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:qcom,ucsi/power_supply/ucsi-source-psy-soc:qcom,pmic_glink:qcom,ucsi1/type u:object_r:vendor_sysfs_pmic_glink:s0
 
 # Input Devices
 genfscon sysfs /devices/virtual/input                                           u:object_r:vendor_sysfs_input:s0
@@ -49,6 +50,7 @@ genfscon sysfs /devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0/card0-DSI-1
 genfscon sysfs /class/touchscreen                                               u:object_r:vendor_sysfs_touchpanel:s0
 genfscon sysfs /devices/virtual/touchscreen                                     u:object_r:vendor_sysfs_touchpanel:s0
 genfscon sysfs /devices/platform/soc/a94000.i2c/i2c-2/2-0049/touchscreen        u:object_r:vendor_sysfs_touchpanel:s0
+genfscon sysfs /devices/platform/soc/ac0000.qcom,qupv3_1_geni_se/a90000.spi/spi_master/spi0/spi0.0/touchscreen  u:object_r:vendor_sysfs_touchpanel:s0
 
 # Vibrator
 genfscon sysfs /devices/platform/soc/984000.i2c/i2c-0/0-005a/leds/vibrator      u:object_r:sysfs_vibrator:s0

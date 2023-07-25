@@ -36,6 +36,9 @@
 /sys/devices/virtual/input/input[0-9]+/offset           u:object_r:vendor_sysfs_laser:s0
 /sys/devices/virtual/input/input[0-9]+/xtalk            u:object_r:vendor_sysfs_laser:s0
 
+# Capsense
+/sys/devices/virtual/capsense(/.*)?                                                   u:object_r:vendor_sysfs_capsense:s0
+
 # Charger
 /data/vendor/chargeonly(/.*)?                           u:object_r:chargeonly_data_file:s0
 /(mnt/vendor/persist|persist)/chargeonly(/.*)?          u:object_r:persist_chargeonly_file:s0
@@ -46,15 +49,14 @@
 
 # Dolby DMS
 /(vendor|system/vendor)/bin/hw/vendor\.dolby\.hardware\.dms@2\.0-service       u:object_r:hal_dms_default_exec:s0
+/(vendor|system/vendor)/bin/hw/dolbycodec2                                     u:object_r:mediacodec_exec:s0
 
 # Fingerprint
-/(mnt/vendor/persist|persist)/egis(/.*)?                u:object_r:vendor_persist_egis_file:s0
-/(vendor|system/vendor)/bin/hw/android\.hardware\.biometrics\.fingerprint@2\.3-service\.eqs           u:object_r:hal_fingerprint_default_exec:s0
-/(vendor|system/vendor)/bin/hw/android\.hardware\.biometrics\.fingerprint@2\.1-service-ets              u:object_r:hal_fingerprint_default_exec:s0
+/(mnt/vendor/persist|persist)/goodix(/.*)?              u:object_r:vendor_persist_fingerprint_file:s0
+/(vendor|system/vendor)/bin/hw/android\.hardware\.biometrics\.fingerprint@2\.3-service\.rtwo              u:object_r:hal_fingerprint_default_exec:s0
+/(vendor|system/vendor)/bin/hw/android\.hardware\.biometrics\.fingerprint@2\.1-goodixservice              u:object_r:hal_fingerprint_default_exec:s0
 /data/vendor/.fps(/.*)?                                 u:object_r:fingerprint_vendor_data_file:s0
-/data/vendor/egis(/.*)?                                 u:object_r:fingerprint_vendor_data_file:s0
-/data/vendor/fpc(/.*)?                                  u:object_r:fingerprint_vendor_data_file:s0
-/dev/esfp0                                              u:object_r:egis_device:s0
+/dev/goodix_fp                                          u:object_r:fingerprint_device:s0
 
 # IFAA
 /(vendor|system/vendor)/bin/hw/vendor\.zui\.hardware\.ifaa@1\.0-service                 u:object_r:hal_ifaa_default_exec:s0
@@ -73,18 +75,28 @@
 /(vendor|system/vendor)/bin/hw/android\.hardware\.nfc@1\.2-service\.st        u:object_r:hal_nfc_default_exec:s0
 
 # Powershare
-/(vendor|system/vendor)/bin/hw/vendor\.lineage\.powershare@1\.0-service\.eqs        u:object_r:hal_lineage_powershare_default_exec:s0
+/(vendor|system/vendor)/bin/hw/vendor\.lineage\.powershare@1\.0-service\.rtwo       u:object_r:hal_lineage_powershare_default_exec:s0
 
 # Radio
+/(vendor|system/vendor)/bin/mbm_spy                     u:object_r:vendor_mbm_spy_exec:s0
 /data/vendor/misc/cutback(/.*)?                         u:object_r:cutback_data_file:s0
 /dev/socket/cutback                                     u:object_r:cutback_socket:s0
+
+# Same process hal files
+/vendor/lib(64)?/c2.dolby.decoder.so                                u:object_r:same_process_hal_file:s0
+/vendor/lib(64)?/libdolbyottcameracontrol.so                        u:object_r:same_process_hal_file:s0
+/vendor/lib(64)?/panel_als_comp_filter_rtwo.so                      u:object_r:same_process_hal_file:s0
 
 # Secure Element
 /(vendor|system/vendor)/bin/hw/android\.hardware\.secure_element@1\.2-service-gto        u:object_r:hal_secure_element_default_exec:s0
 /dev/st54spi                                                                             u:object_r:secure_element_device:s0
 
+# Sensors
+/vendor/bin/hw/motorola.hardware.sensorext-service                                    u:object_r:hal_sensors_default_exec:s0
+/(vendor|system/vendor)/bin/mot_vsync_psd                                             u:object_r:vendor_mot_vsync_exec:s0
+
 # Touch
-/(vendor|system/vendor)/bin/hw/vendor\.lineage\.touch@1\.0-service\.eqs               u:object_r:hal_lineage_touch_default_exec:s0
+/(vendor|system/vendor)/bin/hw/vendor\.lineage\.touch@1\.0-service\.rtwo              u:object_r:hal_lineage_touch_default_exec:s0
 /sys/devices/platform/soc/990000\.i2c/i2c-0/0-005d/touchscreen/primary(/.*)?          u:object_r:vendor_sysfs_touchpanel:s0
 
 # Thermal
@@ -92,6 +104,8 @@
 /sys/devices/platform/soc/[a-f0-9]+.qcom,spmi/spmi-[0-3]+/0-[0-4]+/[a-f0-9]+.qcom,spmi:qcom,pm8350b@[0-9]+:qcom,amoled-ecm@[a-f0-9]+/hwmon/hwmon[0-9]+/name                u:object_r:sysfs_thermal:s0
 
 # Vendor init scripts
+/(vendor|system/vendor)/bin/init\.mmi\.boot\.sh                 u:object_r:vendor_init_hw_exec:s0
+/(vendor|system/vendor)/bin/init\.mmi\.cap\.sh                  u:object_r:vendor_init_hw_exec:s0
 /(vendor|system/vendor)/bin/init\.mmi\.laser\.sh                u:object_r:vendor_mmi_laser_exec:s0
 /(vendor|system/vendor)/bin/init\.mmi\.touch\.sh                u:object_r:vendor_init_touch_exec:s0
 /(vendor|system/vendor)/bin/init\.oem\.hw\.sh                   u:object_r:vendor_init_hw_exec:s0
@@ -111,3 +125,6 @@
 /sys/devices/virtual/fastrpc/adsprpc-smd/wakeup[0-9]+(/.*)?                               u:object_r:sysfs_wakeup:s0
 /sys/devices/virtual/fastrpc/adsprpc-smd-secure/wakeup[0-9]+(/.*)?                        u:object_r:sysfs_wakeup:s0
 /sys/devices/platform/soc/c440000.qcom,spmi/spmi-0/spmi0-00/c440000.qcom,spmi:qcom,pmk8350@0:rtc@6100/rtc/rtc0/wakeup[0-9]+(/.*)?   u:object_r:sysfs_wakeup:s0
+
+# Widevine
+/vendor/bin/copy_qc_cert\.sh                                                              u:object_r:vendor_qclicense_copy_exec:s0

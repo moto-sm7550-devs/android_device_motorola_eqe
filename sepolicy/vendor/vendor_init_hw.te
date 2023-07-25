@@ -2,7 +2,8 @@ type vendor_init_hw, domain;
 type vendor_init_hw_exec, exec_type, vendor_file_type, file_type;
 init_daemon_domain(vendor_init_hw)
 
-allow vendor_init_hw self:capability sys_module;
+allow vendor_init_hw self:capability { chown sys_module };
+
 allow vendor_init_hw vendor_file:system module_load;
 
 allow vendor_init_hw vendor_proc_hw:dir r_dir_perms;
@@ -18,3 +19,10 @@ set_prop(vendor_init_hw, vendor_radio_prop)
 allow vendor_init_hw vendor_file:file execute_no_trans;
 
 allow vendor_init_hw kmsg_device:chr_file rw_file_perms;
+
+allow vendor_init_hw mnt_vendor_file:dir r_dir_perms;
+allow vendor_init_hw mnt_vendor_file:file r_file_perms;
+allow vendor_init_hw proc_cmdline:file r_file_perms;
+allow vendor_init_hw proc_moto_boot:file r_file_perms;
+allow vendor_init_hw vendor_sysfs_capsense:file create_file_perms;
+allow vendor_init_hw vendor_sysfs_capsense:dir r_dir_perms;

@@ -1,0 +1,1 @@
+allow vendor_qsap_location vendor_location_data_file:dir search;

@@ -1,0 +1,5 @@
+type vendor_mbm_spy, domain;
+type vendor_mbm_spy_exec, exec_type, vendor_file_type, file_type;
+init_daemon_domain(vendor_mbm_spy)
+
+allow vendor_mbm_spy block_device:dir r_dir_perms;

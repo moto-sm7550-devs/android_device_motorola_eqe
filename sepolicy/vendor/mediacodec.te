@@ -1,0 +1,2 @@
+allow mediacodec hal_dms_default:binder transfer;
+allow mediacodec vendor_vm_cp_bitstream_device:chr_file { open read };

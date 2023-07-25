@@ -8,5 +8,7 @@ r_dir_file(vendor_init_touch , vendor_sysfs_touchpanel)
 set_prop(vendor_init_touch, vendor_mot_touch_prop)
 set_prop(vendor_init_touch, vendor_mot_hw_prop)
 
-
+allow vendor_init_touch kmsg_device:chr_file rw_file_perms;
+allow vendor_init_touch self:capability chown;
+allow vendor_init_touch vendor_sysfs_touchpanel:file setattr;
 allow vendor_init_touch vendor_sysfs_data:file r_file_perms;
