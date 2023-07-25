@@ -114,7 +114,6 @@ $(WIFI_FIRMWARE_SYMLINKS): $(LOCAL_INSTALLED_MODULE)
 	@mkdir -p $@/kiwi
 	@mkdir -p $@/kiwi_v2
 	@mkdir -p $@/qca6490
-	$(hide) ln -sf /vendor/etc/wifi/WCNSS_qcom_cfg.ini $@/WCNSS_qcom_cfg.ini
 	$(hide) ln -sf /mnt/vendor/persist/kiwi/wlan_mac.bin $@/kiwi/wlan_mac.bin
 	$(hide) ln -sf /vendor/etc/wifi/kiwi/WCNSS_qcom_cfg.ini $@/kiwi/WCNSS_qcom_cfg.ini
 	$(hide) ln -sf /mnt/vendor/persist/kiwi_v2/wlan_mac.bin $@/kiwi_v2/wlan_mac.bin
