@@ -4,29 +4,6 @@ import /vendor/etc/init/hw/init.mmi.chipset.rc
 # Target-specific file
 import /vendor/etc/init/hw/init.mmi.overlay.rc
 
-# Moto debugging
-import /vendor/etc/init/hw/init.mmi.debug.rc
-
-# Moto diag_mdlog configuration
-import /vendor/etc/init/hw/init.mmi.diag_mdlog.rc
-
-import /vendor/etc/init/hw/init.oem.rc
-import /vendor/etc/init/hw/init.mmi.common.rc
-import /vendor/etc/init/hw/init.mmi.nonab.rc
-
-#Moto wlan configuration
-import /vendor/etc/init/hw/init.mmi.wlan.rc
-
-# Moto verified boot extension
-import /vendor/etc/init/hw/init.mmi.hab.rc
-
-# Test commands
-import /vendor/etc/init/hw/init.mmi.tcmd.rc
-
-# Carrier specific script
-import /vendor/etc/init/carrier/init.${ro.boot.carrier}.rc
-import /vendor/etc/init/carrier/init.default.rc
-
 on early-boot
     write /sys/module/subsystem_restart/parameters/disable_restart_work 0x0
 
