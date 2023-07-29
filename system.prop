@@ -49,6 +49,7 @@ persist.vendor.data.mode=concurrent
 # Radio
 persist.vendor.radio.atfwd.start=true
 ro.telephony.default_network=33,33
+telephony.lteOnCdmaDevice=1
 
 # RTT
 config.disable_rtt=true
