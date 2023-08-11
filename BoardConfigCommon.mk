@@ -74,7 +74,6 @@ TARGET_KERNEL_CONFIG := \
     vendor/kalama_GKI.config \
     vendor/ext_config/moto-kalama.config \
     vendor/ext_config/moto-kalama-gki.config
-KERNEL_LTO := none
 
 # Kernel modules
 TARGET_KERNEL_EXT_MODULE_ROOT := kernel/motorola/sm8550-modules
