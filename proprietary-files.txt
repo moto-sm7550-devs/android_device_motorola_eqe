@@ -933,13 +933,14 @@ vendor/lib64/libadropbox.so
 vendor/lib64/libperipheral_client.so
 vendor/lib64/libspcom.so
 
-# Power-off alarm
-system_ext/framework/vendor.qti.hardware.alarm-V1.0-java.jar
-vendor/bin/hw/vendor.qti.hardware.alarm@1.0-service
-vendor/bin/power_off_alarm
-vendor/etc/init/vendor.qti.hardware.alarm@1.0-service.rc
-vendor/lib64/hw/vendor.qti.hardware.alarm@1.0-impl.so
-vendor/lib64/vendor.qti.hardware.alarm@1.0.so
+# Power-off alarm - from salami - 13.1.0.580 A.23
+product/app/PowerOffAlarm/PowerOffAlarm.apk|0537320987acc5cb4b41f43064a8dcf6ec122896
+system_ext/framework/vendor.qti.hardware.alarm-V1.0-java.jar|f3c1fcc4d74e1ef63c5a87177850b85fc20e2a92
+vendor/bin/hw/vendor.qti.hardware.alarm@1.0-service|b1814f8fc4980043c145921417eee9390a1c63fb
+vendor/bin/power_off_alarm|e6d1bb0afddd3db93d620afe87f6150612bfa789
+vendor/etc/init/vendor.qti.hardware.alarm@1.0-service.rc|a03a9a1c818595b19272ea6ffb466e23a7fc3b05
+vendor/lib64/hw/vendor.qti.hardware.alarm@1.0-impl.so|a543cb6f023db50c9bbc10ec468ceef7f1fa2c3b
+vendor/lib64/vendor.qti.hardware.alarm@1.0.so|c3707ec648e98dc3b9cfa0e1a5c599abaecb36ce
 
 # QCC - System
 system_ext/bin/qccsyshal@1.2-service
@@ -1700,14 +1701,3 @@ vendor/lib64/libwfduibcsrcinterface_vendor.so
 vendor/lib64/libwfdutils_proprietary.so
 vendor/lib64/vendor.qti.hardware.wifidisplaysession@1.0.so
 vendor/lib64/vendor.qti.hardware.wifidisplaysessionl@1.0-halimpl.so
-
-# Zui alarm
-vendor/bin/hw/vendor.zuialarm.hardware.alarm@1.0-service
-vendor/bin/zui_power_off_alarm
-vendor/etc/init/init.zuipoweroffalarm.rc
-vendor/etc/init/vendor.zuialarm.hardware.alarm@1.0-service.rc
-vendor/etc/vintf/manifest/vendor.zuialarm.hardware.alarm@1.0-service.xml
-vendor/lib/hw/vendor.zuialarm.hardware.alarm@1.0-impl.so
-vendor/lib/vendor.zuialarm.hardware.alarm@1.0.so
-vendor/lib64/hw/vendor.zuialarm.hardware.alarm@1.0-impl.so
-vendor/lib64/vendor.zuialarm.hardware.alarm@1.0.so
