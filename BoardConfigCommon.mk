@@ -93,6 +93,7 @@ AB_OTA_PARTITIONS += \
     dtbo \
     init_boot \
     product \
+    recovery \
     system \
     system_dlkm \
     system_ext \
