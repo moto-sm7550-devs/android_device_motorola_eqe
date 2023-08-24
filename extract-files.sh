@@ -78,6 +78,18 @@ function blob_fixup() {
     esac
 }
 
+function prepare_firmware() {
+    if [ "${SRC}" != "adb" ]; then
+        local STAR="${ANDROID_ROOT}"/lineage/scripts/motorola/star.sh
+        for IMAGE in bootloader radio; do
+            if [ -f "${SRC}/${IMAGE}.img" ]; then
+                echo "Extracting Motorola star image ${SRC}/${IMAGE}.img"
+                sh "${STAR}" "${SRC}/${IMAGE}.img" "${SRC}"
+            fi
+        done
+    fi
+}
+
 if [ -z "${ONLY_TARGET}" ]; then
     # Initialize the helper for common device
     setup_vendor "${DEVICE_COMMON}" "${VENDOR_COMMON:-$VENDOR}" "${ANDROID_ROOT}" true "${CLEAN_VENDOR}"
@@ -92,6 +104,10 @@ if [ -z "${ONLY_COMMON}" ] && [ -s "${MY_DIR}/../../${VENDOR}/${DEVICE}/propriet
 
     extract "${MY_DIR}/../../${VENDOR}/${DEVICE}/proprietary-files.txt" "${SRC}" "${KANG}" --section "${SECTION}"
     extract "${MY_DIR}/../../${VENDOR}/${DEVICE}/proprietary-files-carriersettings.txt" "${SRC}" "${KANG}" --section "${SECTION}"
+
+    if [ -z "${SECTION}" ] && [ -f "${MY_DIR}/../../${VENDOR}/${DEVICE}/proprietary-firmware.txt" ]; then
+        extract_firmware "${MY_DIR}/../../${VENDOR}/${DEVICE}/proprietary-firmware.txt" "${SRC}"
+    fi
 
     extract_carriersettings
 fi
