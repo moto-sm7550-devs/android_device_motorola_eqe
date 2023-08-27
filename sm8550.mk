@@ -96,13 +96,20 @@ PRODUCT_PACKAGES += \
     android.hardware.audio.service \
     android.hardware.bluetooth.audio-impl \
     android.hardware.soundtrigger@2.3-impl \
+    agmcap \
+    agmcompressplay \
+    agmplay \
     audioadsprpcd \
     audio.bluetooth.default \
     audio.primary.kalama \
     audio.r_submix.default \
     audio.usb.default \
+    libagm_compress_plugin \
+    libagm_mixer_plugin \
+    libagm_pcm_plugin \
     libaudiochargerlistener \
     libbatterylistener \
+    libpalclient \
     libqcompostprocbundle \
     libqcomvisualizer \
     libqcomvoiceprocessing \
