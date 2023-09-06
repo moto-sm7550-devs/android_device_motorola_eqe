@@ -96,9 +96,6 @@ PRODUCT_PACKAGES += \
     android.hardware.audio.service \
     android.hardware.bluetooth.audio-impl \
     android.hardware.soundtrigger@2.3-impl \
-    agmcap \
-    agmcompressplay \
-    agmplay \
     audioadsprpcd \
     audio.bluetooth.default \
     audio.primary.kalama \
