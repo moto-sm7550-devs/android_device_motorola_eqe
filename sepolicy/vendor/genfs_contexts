@@ -8,15 +8,9 @@ genfscon sysfs /devices/platform/soc/soc:qcom,dsi-display-primary/fod_hbm       
 genfscon sysfs /devices/platform/soc/990000.i2c/i2c-0/0-005d/touchscreen/primary/gesture       u:object_r:vendor_sysfs_dt2w:s0
 
 # Graphics
-genfscon sysfs /devices/platform/soc/88e0000.qcom,msm-eud/extcon/extcon0/cable.0/name          u:object_r:vendor_sysfs_graphics:s0
-genfscon sysfs /devices/platform/soc/88e0000.qcom,msm-eud/extcon/extcon0/cable.1/name          u:object_r:vendor_sysfs_graphics:s0
-genfscon sysfs /devices/platform/soc/88e0000.qcom,msm-eud/extcon/extcon0/cable.2/name          u:object_r:vendor_sysfs_graphics:s0
 genfscon sysfs /devices/platform/soc/88e0000.qcom,msm-eud/extcon/extcon2/cable.0/name          u:object_r:vendor_sysfs_graphics:s0
 genfscon sysfs /devices/platform/soc/88e0000.qcom,msm-eud/extcon/extcon2/cable.1/name          u:object_r:vendor_sysfs_graphics:s0
 genfscon sysfs /devices/platform/soc/88e0000.qcom,msm-eud/extcon/extcon2/cable.2/name          u:object_r:vendor_sysfs_graphics:s0
-genfscon sysfs /devices/platform/soc/soc:qcom,msm-ext-disp/extcon/extcon0/state                u:object_r:vendor_sysfs_graphics:s0
-genfscon sysfs /devices/platform/soc/soc:qcom,msm-ext-disp/extcon/extcon1/state                u:object_r:vendor_sysfs_graphics:s0
-genfscon sysfs /devices/platform/soc/soc:qcom,msm-ext-disp/extcon/extcon2/state                u:object_r:vendor_sysfs_graphics:s0
 
 # Health
 genfscon sysfs /devices/platform/soc/soc:mmi,charger/power_supply/mmi_battery      u:object_r:vendor_sysfs_battery_supply:s0
