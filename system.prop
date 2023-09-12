@@ -5,6 +5,12 @@ audio.offload.gapless.enabled=false
 audio.offload.min.duration.secs=60
 audio.offload.video=true
 media.aac_51_output_enabled=true
+use.voice.path.for.pcm.voip=true
+
+# Bluetooth
+persist.vendor.service.bt.adv_audio_mask=1
+persist.vendor.btstack.aac_frm_ctl.enabled=true
+persist.vendor.btstack.qhs_enable=true
 
 # Charger
 ro.charger.enable_suspend=1
@@ -29,10 +35,10 @@ persist.data.wda.enable=true
 #persist.dbg.volte_avail_ovr=1
 #persist.dbg.vt_avail_ovr=1
 #persist.dbg.wfc_avail_ovr=1
+net.lte.ims.data.enabled=true,true
 ro.qcom.ims.use_moto_vt_ext=true
 
 # Media
-media.settings.xml=/vendor/etc/media_profiles_vendor.xml
 media.stagefright.audio.deep=false
 media.stagefright.enable-aac=true
 media.stagefright.enable-fma2dp=true
@@ -46,7 +52,15 @@ ro.media.recorder-max-base-layer-fps=60
 # Netmgrd
 persist.vendor.data.mode=concurrent
 
+# NFC
+ro.nfc.port=I2C
+
+# Perf
+persist.device_config.runtime_native_boot.iorap_perfetto_enable=true
+
 # Radio
+persist.vendor.data.qmipriod_load=1
+persist.vendor.data.shsusr_load=1
 persist.vendor.radio.atfwd.start=true
 ro.telephony.default_network=33,33
 telephony.lteOnCdmaDevice=1

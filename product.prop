@@ -4,7 +4,8 @@ audio.sys.mute.latency.factor=2
 audio.sys.noisy.broadcast.delay=500
 audio.sys.offload.pstimeout.secs=3
 audio.sys.routing.latency=0
+ro.audio.monitorWindowRotation=true
+ro.audio.relative_volume=true
 
 # Media
 media.stagefright.audio.deep=false
-

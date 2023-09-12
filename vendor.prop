@@ -20,12 +20,9 @@ persist.vendor.audio.spf_restart=false
 persist.vendor.audio.spv3.enable=true
 persist.vendor.audio.voicecall.speaker.stereo=true
 persist.vendor.audio_fx.current=dolby
-persist.vendor.service.bt.adv_audio_mask=1
 ro.af.client_heap_size_kbyte=7168
 ro.audio.flinger_standbytime_ms=2000
 ro.audio.monitorRotation=true
-ro.audio.monitorWindowRotation=true
-ro.audio.relative_volume=true
 ro.vendor.audio.crystal_talk.supported=true
 ro.vendor.audio.crystal_talk_record.2mic.supported=false
 ro.vendor.audio.crystal_talk_record.max_rate=16000
@@ -70,7 +67,6 @@ vendor.audio_hal.in_period_size=144
 vendor.audio_hal.period_multiplier=3
 vendor.audio_hal.period_size=192
 vendor.voice.path.for.pcm.voip=true
-use.voice.path.for.pcm.voip=true
 
 # Audio feature
 vendor.audio.feature.a2dp_offload.enable=true
@@ -152,8 +148,6 @@ persist.bluetooth.a2dp_offload.cap=sbc-aac-aptx-aptxhd-ldac
 persist.bluetooth.a2dp_offload.disabled=false
 persist.vendor.bt.aac_frm_ctl.enabled=true
 persist.vendor.bt.aac_vbr_frm_ctl.enabled=true
-persist.vendor.btstack.aac_frm_ctl.enabled=true
-persist.vendor.btstack.qhs_enable=true
 persist.vendor.qcom.bluetooth.a2dp_mcast_test.enabled=false
 persist.vendor.qcom.bluetooth.a2dp_offload_cap=sbc-aptx-aptxtws-aptxhd-aac-ldac-aptxadaptiver2
 persist.vendor.qcom.bluetooth.aac_frm_ctl.enabled=true
@@ -263,7 +257,6 @@ vendor.gralloc.use_dma_buf_heaps=1
 vendor.hw.sf.IdleLazyResetThresholdT=1000
 
 # IMS
-net.lte.ims.data.enabled=true,true
 persist.vendor.lte.pco_supported=true
 persist.vendor.rcs.singlereg.feature=1
 vendor.ims.modem.multisub.cap=2
@@ -279,14 +272,9 @@ debug.c2.use_dmabufheaps=1
 debug.stagefright.c2inputsurface=-1
 debug.stagefright.ccodec=4
 debug.stagefright.omx_default_rank=0
-media.settings.xml=/vendor/etc/media_profiles_kalama.xml
-
-# NFC
-ro.nfc.port=I2C
 
 # Perf
 ro.vendor.extension_library=libqti-perfd-client.so
-persist.device_config.runtime_native_boot.iorap_perfetto_enable=true
 persist.sys.perf_fwk_enabled=true
 ro.vendor.perf-hal.ver=2.3
 ro.vendor.perf.scroll_opt=1
@@ -303,8 +291,6 @@ persist.vendor.qcomsysd.enabled=1
 
 # Radio
 persist.vendor.data.mode=concurrent
-persist.vendor.data.qmipriod_load=1
-persist.vendor.data.shsusr_load=1
 persist.vendor.radio.adb_log_on=0
 persist.vendor.radio.aosp_usr_pref_sel=true
 persist.vendor.radio.apm_sim_not_pwdn=1
@@ -344,9 +330,6 @@ sys.vendor.shutdown.waittime=500
 ro.hardware.soc.manufacturer=qcom
 ro.soc.manufacturer=QTI
 ro.soc.model=SM8550
-
-# SSR
-persist.vendor.ssr.restart_level=ALL_ENABLE
 
 # Surfaceflinger
 ro.sf.lcd_density=400
