@@ -8,6 +8,10 @@
     "target_path": "kernel/motorola/sm8550-modules"
   },
   {
+    "repository": "android_kernel_motorola_sm8550-devicetrees",
+    "target_path": "kernel/motorola/sm8550-devicetrees"
+  },
+  {
     "repository": "android_hardware_motorola",
     "target_path": "hardware/motorola"
   },
