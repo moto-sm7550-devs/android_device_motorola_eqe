@@ -122,15 +122,6 @@ SOONG_CONFIG_android_hardware_audio_run_64bit := true
 BOARD_HAVE_BLUETOOTH_QCOM := true
 TARGET_FWK_SUPPORTS_FULL_VALUEADDS := true
 
-# Display
-TARGET_USES_COLOR_METADATA := true
-TARGET_USES_DISPLAY_RENDER_INTENTS := true
-TARGET_USES_GRALLOC4 := true
-TARGET_USES_HWC2 := true
-SOONG_CONFIG_qtidisplay += \
-    gralloc_handle_has_reserved_size
-SOONG_CONFIG_qtidisplay_gralloc_handle_has_reserved_size := true
-
 # DRM
 TARGET_ENABLE_MEDIADRM_64 := true
 
