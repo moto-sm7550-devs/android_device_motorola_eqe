@@ -344,6 +344,9 @@ ro.surface_flinger.use_content_detection_for_refresh_rate=true
 ro.surface_flinger.use_smart_90_for_video=true
 ro.surface_flinger.wcg_composition_dataspace=143261696
 
+# Sensors
+persist.vendor.sensors.debug.hal=0
+
 # USB
 sys.usb.mtp.batchcancel=1
 sys.usb.mtp.device_type=3
