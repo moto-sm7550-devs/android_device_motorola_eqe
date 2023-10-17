@@ -21,7 +21,6 @@ on moto-charger
     write /sys/devices/platform/soc/soc:mmi,charger/state_sync 1
     wait /sys/class/udc/${sys.usb.controller} 20
     start vendor.charge_only_mode
-    start vendor.batt_health
     start vendor.thermal-com
     start system_suspend
 

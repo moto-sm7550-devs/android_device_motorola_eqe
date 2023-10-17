@@ -374,15 +374,6 @@ service vendor.apanic_annotate /vendor/bin/apanic_save.sh build
     oneshot
     disabled
 
-service vendor.batt_health /vendor/bin/batt_health
-    class late_start
-    user vendor_pwric
-    group vendor_pwric cache net_admin log
-    disabled
-
-on property:sys.boot_completed=1
-    start vendor.batt_health
-
 on property:sys.boot_completed=1 && property:ro.vendor.zram.product_swapon=""
     write /proc/sys/vm/page-cluster 0
     swapon_all /vendor/etc/fstab.qcom
@@ -445,12 +436,6 @@ service vendor.mmi-boot-sh /vendor/bin/init.mmi.boot.sh
     class core
     user root
     oneshot
-
-service vendor.mmi-shutdown-sh /vendor/bin/init.mmi.shutdown.sh
-    class core
-    user root
-    oneshot
-    disabled
 
 # translate to qcom property name in order to keep the consistent with
 # our legacy property
@@ -570,9 +555,6 @@ on property:vendor.wifi.station=true
 
 on property:vendor.wifi.station=false
     write /sys/module/wlan/parameters/sar_sta disabled
-
-on shutdown
-    exec_start vendor.mmi-shutdown-sh
 
 # IKSWQ-149109: Force shutter tone on Japan softbank carrier
 on property:ro.carrier=softbank
