@@ -942,14 +942,14 @@ vendor/lib64/libadropbox.so
 vendor/lib64/libperipheral_client.so
 vendor/lib64/libspcom.so
 
-# Power-off alarm - from salami - 13.1.0.580 A.23
-product/app/PowerOffAlarm/PowerOffAlarm.apk|0537320987acc5cb4b41f43064a8dcf6ec122896
-system_ext/framework/vendor.qti.hardware.alarm-V1.0-java.jar|f3c1fcc4d74e1ef63c5a87177850b85fc20e2a92
-vendor/bin/hw/vendor.qti.hardware.alarm@1.0-service|b1814f8fc4980043c145921417eee9390a1c63fb
-vendor/bin/power_off_alarm|e6d1bb0afddd3db93d620afe87f6150612bfa789
+# Power-off alarm - from pong - TKQ1.221220.001-2309061933
+product/app/PowerOffAlarm/PowerOffAlarm.apk|5ae835ca1d1720cfb2aa1c66f0c2c523efabf6d9
+system_ext/framework/vendor.qti.hardware.alarm-V1.0-java.jar|b9afec1739e5c14a69013c708a0a094d705ee899
+vendor/bin/hw/vendor.qti.hardware.alarm@1.0-service|45c973fe28d2c64fd8954dc9ea02622c40967d8a
+vendor/bin/power_off_alarm|534a9633e7144b99bbd80114d2b222108369afd8
 vendor/etc/init/vendor.qti.hardware.alarm@1.0-service.rc|a03a9a1c818595b19272ea6ffb466e23a7fc3b05
-vendor/lib64/hw/vendor.qti.hardware.alarm@1.0-impl.so|a543cb6f023db50c9bbc10ec468ceef7f1fa2c3b
-vendor/lib64/vendor.qti.hardware.alarm@1.0.so|c3707ec648e98dc3b9cfa0e1a5c599abaecb36ce
+vendor/lib64/hw/vendor.qti.hardware.alarm@1.0-impl.so|bccf8a1c7f72d6ac6237da9e6358dfd431ce0118
+vendor/lib64/vendor.qti.hardware.alarm@1.0.so|e53ebd67415a6e8ec23a8476a5cbb035cc84664b
 
 # QCC - System
 system_ext/bin/qccsyshal@1.2-service
