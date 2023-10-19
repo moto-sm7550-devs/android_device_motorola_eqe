@@ -69,6 +69,9 @@ function blob_fixup() {
         vendor/etc/vintf/manifest/vendor.dolby.vision.media.c2@1.0-service.xml)
             sed -ni '/default1/!p' "${2}"
             ;;
+        vendor/bin/hw/android.hardware.security.keymint-service-qti)
+            grep -q "android.hardware.security.rkp-V3-ndk.so" "${2}" || ${PATCHELF} --add-needed "android.hardware.security.rkp-V3-ndk.so" "${2}"
+            ;;
     esac
 }
 
