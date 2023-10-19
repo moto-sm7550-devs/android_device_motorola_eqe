@@ -66,9 +66,11 @@ PRODUCT_PACKAGES += \
 
 # Audio
 PRODUCT_PACKAGES += \
+    android.media.audio.common.types-V1-cpp.vendor \
     android.hardware.audio@7.1-impl \
     android.hardware.audio.effect@7.0-impl \
     android.hardware.audio.service \
+    android.hardware.bluetooth.audio-V2-ndk.vendor \
     android.hardware.bluetooth.audio-impl \
     android.hardware.soundtrigger@2.3-impl \
     audioadsprpcd \
@@ -123,6 +125,9 @@ PRODUCT_PACKAGES_DEBUG += \
 PRODUCT_PACKAGES += \
     android.hardware.camera.common@1.0.vendor \
     android.hardware.camera.device@3.6.vendor \
+    android.hardware.camera.device-V1-ndk.vendor \
+    android.hardware.camera.metadata-V1-ndk.vendor \
+    android.hardware.camera.provider-V1-ndk.vendor \
     android.hardware.camera.provider@2.4.vendor \
     libcamera2ndk_vendor \
     libdng_sdk.vendor \
@@ -189,6 +194,7 @@ PRODUCT_PACKAGES += \
 
 # GPS
 PRODUCT_PACKAGES += \
+    android.hardware.gnss-V2-ndk.vendor \
     gnss@2.0-base.policy \
     gnss@2.0-edgnss-daemon.policy \
     gnss@2.0-qsap-location.policy \
@@ -248,7 +254,9 @@ PRODUCT_COPY_FILES += \
 
 # Keymaster
 PRODUCT_PACKAGES += \
+    android.hardware.identity-V4-ndk.vendor \
     android.hardware.keymaster@4.1.vendor \
+    android.hardware.security.keymint-V2-ndk.vendor \
     libkeymaster_messages.vendor
 
 # Keymint
@@ -385,6 +393,10 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     android.hardware.power-service-qti
 
+# Protobuf
+PRODUCT_PACKAGES += \
+    libprotobuf-cpp-lite-3.9.1-vendorcompat
+
 # QMI
 PRODUCT_PACKAGES += \
     libjson \
@@ -411,12 +423,21 @@ PRODUCT_PACKAGES += \
     android.hardware.radio@1.6.vendor \
     android.hardware.radio.config@1.3.vendor \
     android.hardware.radio.deprecated@1.0.vendor \
+    android.hardware.radio-V1-ndk.vendor \
+    android.hardware.radio.config-V1-ndk.vendor \
+    android.hardware.radio.data-V1-ndk.vendor \
+    android.hardware.radio.messaging-V1-ndk.vendor \
+    android.hardware.radio.modem-V1-ndk.vendor \
+    android.hardware.radio.network-V1-ndk.vendor \
+    android.hardware.radio.sim-V1-ndk.vendor \
+    android.hardware.radio.voice-V1-ndk.vendor \
     android.system.net.netd@1.1.vendor \
     libprotobuf-cpp-full \
     librmnetctl
 
 # Sensors
 PRODUCT_PACKAGES += \
+    android.frameworks.sensorservice@1.0.vendor \
     android.hardware.sensors-service.multihal \
     libsensorndkbridge \
     sensors.dynamic_sensor_hal
@@ -496,6 +517,7 @@ PRODUCT_ENFORCE_ARTIFACT_PATH_REQUIREMENTS := strict
 # WiFi
 PRODUCT_PACKAGES += \
     android.hardware.wifi-service \
+    android.hardware.wifi.supplicant-V1-ndk.vendor \
     hostapd \
     libqsap_sdk \
     libwpa_client \
