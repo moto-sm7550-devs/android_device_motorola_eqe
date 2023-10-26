@@ -82,6 +82,9 @@ TARGET_KERNEL_EXT_MODULE_ROOT := kernel/motorola/sm8550-modules
 BOARD_USES_QCOM_HARDWARE := true
 TARGET_BOARD_PLATFORM := kalama
 
+BOARD_ROOT_EXTRA_SYMLINKS := \
+    /vendor/fsg:/fsg
+
 # A/B
 AB_OTA_UPDATER := true
 
