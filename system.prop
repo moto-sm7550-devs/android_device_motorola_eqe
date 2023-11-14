@@ -12,9 +12,6 @@ persist.vendor.service.bt.adv_audio_mask=1
 persist.vendor.btstack.aac_frm_ctl.enabled=true
 persist.vendor.btstack.qhs_enable=true
 
-# Charger
-ro.charger.enable_suspend=1
-
 # Display
 debug.sf.enable_hwc_vds=1
 
