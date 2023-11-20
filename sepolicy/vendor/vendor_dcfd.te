@@ -1,3 +1,1 @@
-get_prop(vendor_dcfd, vendor_sensors_debug_prop)
-
-allow hal_audio_default debugfs:dir r_dir_perms;
+get_prop(vendor_dcfd, vendor_sensors_prop)

@@ -2,8 +2,9 @@ type vendor_mot_vsync, domain;
 type vendor_mot_vsync_exec, exec_type, vendor_file_type, file_type;
 init_daemon_domain(vendor_mot_vsync)
 
+get_prop(vendor_mot_vsync, vendor_sensors_prop)
+
 allow vendor_mot_vsync self:netlink_kobject_uevent_socket { bind create getopt read setopt };
 allow vendor_mot_vsync self:qipcrtr_socket { create getattr read setopt write };
-allow vendor_mot_vsync vendor_sensors_debug_prop:file { getattr map open read };
 allow vendor_mot_vsync vendor_sysfs_graphics:dir r_dir_perms;
 allow vendor_mot_vsync vendor_sysfs_graphics:file r_file_perms;
