@@ -146,9 +146,12 @@ PRODUCT_PACKAGES += \
     init.qti.display_boot.sh \
     libdisplayconfig.qti \
     libdisplayconfig.system.qti \
+    libhistogram \
     libqdMetaData \
     libqdMetaData.system \
+    libqdutils \
     libsdmcore \
+    libsdmdal \
     libsdmutils \
     vendor.display.config@1.0 \
     vendor.display.config@1.11.vendor \
