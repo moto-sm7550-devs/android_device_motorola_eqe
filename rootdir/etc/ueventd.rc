@@ -107,6 +107,8 @@ subsystem mem_buf_vm
 /dev/synx_device          0660   root       camera
 /dev/hab                  0666   system     system
 /dev/iio:device*          0664   system     system
+/dev/qmc_dma              0660   radio      radio
+/dev/qmc_cma              0660   radio      radio
 
 #permissions for UFS RPMB BSG device node
 /dev/0:0:0:49476          0600   system     system
@@ -122,6 +124,8 @@ subsystem mem_buf_vm
 /dev/smd3                 0660   bluetooth  bluetooth
 /dev/btpower              0660   bluetooth  system
 /dev/btfmslim             0660   bluetooth  system
+/dev/bt_cp_ctrl           0660   bluetooth  system
+/dev/btfmcodec_dev        0660   bluetooth  system
 
 #permissions for pta
 /dev/pta                  0660   system     system
@@ -184,6 +188,7 @@ subsystem mem_buf_vm
 /dev/cvp*                 0660   system     camera
 /dev/media*               0660   system     camera
 /dev/v4l-subdev*          0660   system     camera
+/dev/hdmi_bdg_irq_handler 0660   system     camera
 /dev/qseecom              0660   system     drmrpc
 /dev/qce                  0660   system     drmrpc
 /dev/smcinvoke            0660   system     drmrpc
@@ -249,6 +254,7 @@ subsystem mem_buf_vm
 /sys/devices/platform/soc/1c00000.qcom,pcie/pci0000:00/0000:00:00.0/0000:01:00.0/net/wlan*/queues/rx-* rps_cpus      0660   system     system
 /dev/spidev0.0            0660   system     audio
 /dev/i2c-7                0660   system     audio
+/dev/msm_lsm_cdev         0660   system     audio
 /dev/msm_camera/*         0660   system     camera
 /dev/gemini/              0660   system     camera
 /dev/mercury0             0660   system     camera
@@ -357,6 +363,8 @@ subsystem mem_buf_vm
 /sys/devices/virtual/input/input*                   enable_ps_sensor 0660  system   input
 /sys/devices/virtual/input/input*                   set_delay_ms     0660  system   input
 /sys/devices/virtual/input/input*                   do_flush         0660  system   input
+/sys/devices/virtual/input/input*                   timing_budget    0660  system   input
+/dev/laser                                                           0660  system   camera
 
 # vm_bms
 /dev/vm_bms               0660   system     system
@@ -385,6 +393,9 @@ subsystem mem_buf_vm
 # eSE permissions
 /dev/st54spi_gpio         0660   system     system
 
+# UWB permissions
+/dev/uci                  0660    uwb         uwb
+
 # UIO devices
 /dev/uio0                 0660   system     system
 /dev/uio1                 0660   system     system
@@ -407,6 +418,16 @@ subsystem mem_buf_vm
 /sys/class/fts/touch_aoi aoi_set 0660 root system
 /sys/class/fts/touch_aoi power_set 0660 root system
 
+/sys/class/fingerprint/fpc1020 nav        0440     system    system
+/sys/class/fingerprint/fpc1020 irq        0440     system    system
+/sys/class/fingerprint/fpc1020 irq_cnt    0440     system    system
+/sys/class/fingerprint/fpc1020 dev_enable 0220     system    system
+/sys/class/fingerprint/fpc1020 vendor     0444     system    system
+
+/sys/devices/platform/soc/soc\:fpc_fpc1020 irq          0440     system    system
+/sys/devices/platform/soc/soc\:fpc_fpc1020 irq_cnt      0440     system    system
+/sys/devices/platform/soc/soc\:fpc_fpc1020 dev_enable   0220     system    system
+
 #ImproveTouch device
 /dev/hbtp_input           0660   system     system
 /dev/hbtp_vm              0660   system     system
@@ -425,6 +446,9 @@ subsystem mem_buf_vm
 /dev/block/platform/soc/7c4000.sdhci/by-name/frp        0600   system     system
 /dev/block/platform/soc/4744000.sdhci/by-name/frp       0600   system     system
 /dev/block/platform/soc/4804000.ufshc/by-name/frp       0600   system     system
+/dev/block/platform/soc/7c4000.sdhci/by-name/rawdump    0660   root       system
+/dev/block/platform/soc/1d84000.ufshc/by-name/rawdump   0660   root       system
+/dev/block/platform/soc/4804000.ufshc/by-name/rawdump   0600   root       system
 
 # This is temporary while using SD card for initial bring-up
 /dev/block/platform/soc/8804000.sdhci/by-name/frp       0600   system     system
@@ -574,3 +598,7 @@ subsystem mem_buf_vm
 
 # devcoredump data attributes
 /sys/class/devcoredump/devcd*                           data                            0600    system  system
+
+# hdmi cec hal
+/dev/cec*                                            0660    system  system
+/sys/devices/platform/soc/984000.i2c/i2c-0/0-002b    get_hpd_stat    0660   system   system

@@ -192,3 +192,15 @@ set_boot_bootseq_history()
 }
 
 set_boot_bootseq_history
+
+rkp_complete_file="/mnt/vendor/persist/rkp_complete"
+rkp_csr_state="not uploaded"
+if [ -f "$rkp_complete_file" ]; then
+	setprop ro.vendor.mot.hw.rkp_csr_uploaded 1
+	rkp_csr_state="already uploaded"
+else
+	setprop ro.vendor.mot.hw.rkp_csr_uploaded 0
+fi
+notice "RKP CSR file on device is: $rkp_csr_state"
+unset $rkp_complete_file
+unset $rkp_csr_state

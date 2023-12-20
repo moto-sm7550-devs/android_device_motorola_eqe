@@ -169,11 +169,13 @@ if [ -f /sys/devices/soc0/soc_id ]; then
 fi
 
 case "$platformid" in
-	"519"|"536"|"600"|"601")
-		/vendor/bin/sh /vendor/bin/init.kernel.post_boot-kalama.sh
+	"519"|"536"|"600"|"601"|"603"|"604")
+		#Pass as an argument the max number of clusters supported on the SOC
+		/vendor/bin/sh /vendor/bin/init.kernel.post_boot-kalama.sh 3
 		;;
 	*)
 		echo "***WARNING***: Invalid SoC ID\n\t No postboot settings applied!!\n"
+		source init.kernel.post_boot-kalama.sh fallback_setting
 		;;
 esac
 

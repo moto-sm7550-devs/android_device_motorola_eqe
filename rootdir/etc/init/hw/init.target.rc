@@ -84,6 +84,7 @@ on fs
     chown root system /mnt/vendor/persist
     chmod 0771 /mnt/vendor/persist
     restorecon_recursive /mnt/vendor/persist
+    mkdir /mnt/vendor/persist/secnvm 0770 system system
     mkdir /mnt/vendor/persist/data 0700 system system
 
 on property:ro.boot.product.vendor.sku=kalama
@@ -159,10 +160,10 @@ service vendor.per_proxy /vendor/bin/pm-proxy
     group system
     disabled
 
-#service vendor.mdm_helper /vendor/bin/mdm_helper
-#    class core
-#    group system wakelock
-#    disabled
+service vendor.mdm_helper /vendor/bin/mdm_helper
+    class core
+    group system wakelock
+    disabled
 
 service vendor.mdm_launcher /vendor/bin/sh /vendor/bin/init.mdm.sh
     class core

@@ -52,6 +52,7 @@ on early-init
     setprop ro.vendor.boot.powerup_reason ${ro.boot.powerup_reason}
     setprop ro.vendor.boot.bl_state ${ro.boot.bl_state}
     setprop ro.vendor.boot.serialno ${ro.boot.serialno}
+    setprop ro.vendor.boot.nal_id ${ro.boot.nal_id}
     setprop ro.vendor.zygote ${ro.zygote}
 
     # Make sure ro.boot.product.hardware.sku is set before hwservicemanager startup.
@@ -103,6 +104,7 @@ on post-fs
     mkdir /mnt/vendor/persist/public/att_dm 0775 radio vendor_tcmd
     mkdir /mnt/vendor/persist/public/hiddenmenu 0775 radio vendor_tcmd
     mkdir /mnt/vendor/persist/public/hiddenmenu/data 0775 system vendor_tcmd
+    mkdir /mnt/vendor/persist/uwb 0775 vendor_tcmd vendor_tcmd
     mkdir /persist/public/locale 0700 system system
     mkdir /persist/public/omadm 0700 radio radio
     mkdir /persist/public/svcs 0770 system system
@@ -558,4 +560,8 @@ on property:vendor.wifi.station=false
 
 # IKSWQ-149109: Force shutter tone on Japan softbank carrier
 on property:ro.carrier=softbank
+    setprop audio.camerasound.force true
+
+# IKSWT-90913: Force shutter tone on Japan ymobile carrier
+on property:ro.carrier=ymobile
     setprop audio.camerasound.force true

@@ -403,6 +403,24 @@
             <Limit name="performance-point-3840x2160" value="120" />
             <Limit name="performance-point-7680x4320" value="30" />
         </MediaCodec>
+        <MediaCodec name="c2.qti.hevc.encoder.hdr" type="video/hevc">
+            <Limit name="size" min="128x128" max="4096x2176" />
+            <Limit name="alignment" value="2x2" />
+            <Limit name="block-size" value="16x16" />
+            <Limit name="blocks-per-second" min="64" max="1958400" />
+            <Limit name="block-count" range="36-34816" />
+            <Limit name="bitrate" range="1-160000000" />
+            <Limit name="frame-rate" range="1-60" />
+            <Limit name="complexity" range="0-100"  default="100" />
+            <Limit name="concurrent-instances" max="16" />
+            <Feature name="bitrate-modes" value="VBR,CBR" />
+            <Feature name="intra-refresh" />
+            <Feature name="hdr-editing" />
+            <Feature name="encoding-statistics" />
+            <Feature name="video-minimum-quality" />
+            <Limit name="performance-point-3840x2160" value="60" />
+            <Limit name="performance-point-1920x1080" value="240" />
+        </MediaCodec>
         <MediaCodec name="c2.qti.hevc.encoder.cq" type="video/hevc">
             <Alias name="OMX.qcom.video.encoder.hevc.cq"/>
             <Limit name="size" min="128x128" max="512x512" />

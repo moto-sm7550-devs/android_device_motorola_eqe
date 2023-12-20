@@ -187,7 +187,8 @@ vendor.display.disable_sdr_dimming=1
 vendor.display.disable_sdr_histogram=1
 vendor.display.disable_stc_dimming=1
 vendor.display.enable_async_powermode=1
-vendor.display.enable_async_vds_creation=1
+vendor.display.enable_async_vds_creation=0
+vendor.display.enable_display_extensions=1
 vendor.display.enable_dpps_dynamic_fps=1
 vendor.display.enable_early_wakeup=1
 vendor.display.enable_hdr10_gpu_target=1
@@ -195,6 +196,8 @@ vendor.display.enable_optimize_refresh=0
 vendor.display.enable_rc_support=1
 vendor.display.enable_rounded_corner=0
 vendor.display.hdmi_cfg_idx=0:0:60:60
+vendor.display.only_report_first_mode=0
+vendor.display.pluggable_vsync_prioritized=0
 vendor.display.use_smooth_motion=1
 vendor.display.vds_allow_hwc=1
 
@@ -214,8 +217,12 @@ persist.vendor.qfp=true
 # FRP
 ro.frp.pst=/dev/block/bootdevice/by-name/frp
 
+# Gatekeeper
+vendor.gatekeeper.is_security_level_spu=0
+
 # Graphics
 debug.egl.hw=0
+debug.sf.auto_latch_unsignaled=0
 debug.sf.disable_backpressure=1
 debug.sf.disable_client_composition_cache=1
 debug.sf.early.app.duration=13666666
@@ -239,6 +246,7 @@ ro.surface_flinger.has_wide_color_display=true
 ro.surface_flinger.max_frame_buffer_acquired_buffers=3
 ro.surface_flinger.max_virtual_display_dimension=4096
 ro.surface_flinger.protected_contents=true
+ro.surface_flinger.supports_background_blur=1
 ro.surface_flinger.use_color_management=true
 ro.surface_flinger.use_content_detection_for_refresh_rate=true
 ro.surface_flinger.wcg_composition_dataspace=143261696
@@ -305,10 +313,12 @@ ro.vendor.use_data_netmgrd=true
 # Sensors
 persist.vendor.sensors.enable.mag_filter=true
 persist.vendor.sensors.mot_tap=true
+ro.vendor.sensors.enlarge_tries_count=true
 ro.vendor.sensors.front_light_compensate=true
 ro.vendor.sensors.glance_approach=false
 ro.vendor.sensors.led_interfere_rear_light=true
 ro.vendor.sensors.sns_offbody=false
+vendor.dynamic_sensor.setup.timeout.ms=2000
 
 # Shutdown
 sys.vendor.shutdown.waittime=500
