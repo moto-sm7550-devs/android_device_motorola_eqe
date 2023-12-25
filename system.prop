@@ -12,9 +12,6 @@ persist.vendor.service.bt.adv_audio_mask=1
 persist.vendor.btstack.aac_frm_ctl.enabled=true
 persist.vendor.btstack.qhs_enable=true
 
-# Display
-debug.sf.enable_hwc_vds=1
-
 # CNE
 persist.vendor.cne.feature=1
 
