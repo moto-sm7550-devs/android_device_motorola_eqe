@@ -463,11 +463,6 @@ vendor/lib64/libsnapdragoncolor-manager.so
 vendor/lib64/libsnapdragoncolor-qdcm.so
 vendor/lib64/vendor.qti.hardware.qdutils_disp@1.0.so
 
-# Display - memtrack
-vendor/bin/hw/vendor.qti.hardware.memtrack-service
-vendor/etc/init/memtrack_qti.rc
--vendor/etc/vintf/manifest/memtrack_qti.xml
-
 # Display - SDM
 vendor/etc/clstc_config_library.xml
 vendor/etc/display/DPU660.xml

@@ -306,6 +306,10 @@ PRODUCT_PACKAGES += \
     libpalclient \
     android.hardware.media.c2@1.2.vendor
 
+# Memtrack
+PRODUCT_PACKAGES += \
+    vendor.qti.hardware.memtrack-service
+
 # MotoActions
 PRODUCT_PACKAGES += \
     MotoActions \
