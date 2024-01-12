@@ -1,3 +1,5 @@
 hal_client_domain(hal_audio_default, hal_health);
 allow hal_audio_default fwk_sensor_hwservice:hwservice_manager find;
 allow hal_audio_default debugfs:dir r_dir_perms;
+
+get_prop(hal_audio_default, boot_status_prop)
