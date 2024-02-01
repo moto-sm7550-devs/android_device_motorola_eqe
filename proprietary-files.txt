@@ -1,4 +1,4 @@
-# All unpinned blobs below are extracted from rtwo_retcn-user 14 U1TR43.8-19-2 9bfa3-adc28 release-keys.
+# All unpinned blobs below are extracted from rtwo_g-user 14 U1TR34.8-30-13 c6cfc-4ed033 release-keys - RETAIL variant.
 
 # ADSP
 vendor/bin/adsprpcd
@@ -1546,11 +1546,6 @@ vendor/app/TimeService/TimeService.apk
 vendor/bin/time_daemon
 vendor/etc/init/init.time_daemon.rc
 vendor/lib64/libtime_genoff.so
-
-# Trusted Execution Environment connector - from motorola/rtwo_g/msi:13/T1TRS33.43-48-41-3/ac9a4-9767e:user/release-keys
-vendor/bin/hw/vendor.qti.hardware.qteeconnector@1.0-service|392795822f3465823d87e64b4e19ee9d16bc4611
-vendor/etc/init/vendor.qti.hardware.qteeconnector@1.0-service.rc|b966530ffcfaac04dee15c254d1815a8e0af4f4c
-vendor/lib64/libGPQTEEC_vendor.so|4cc9fad7d8e7dc3d6fcecbaf1c0a39a14741d791
 
 # Trusted Execution Environment connector
 vendor/lib64/libGPMTEEC_vendor.so
