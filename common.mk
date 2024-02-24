@@ -240,6 +240,11 @@ $(foreach f,$(wildcard $(LOCAL_PATH)/rootdir/etc/init/*.rc),\
 $(foreach f,$(wildcard $(LOCAL_PATH)/rootdir/bin/*.sh),\
         $(eval PRODUCT_COPY_FILES += $(f):$(TARGET_COPY_OUT_VENDOR)/bin/$(notdir $f)))
 
+$(foreach f,$(wildcard $(LOCAL_PATH)/rootdir/*.rc),\
+        $(eval PRODUCT_COPY_FILES += $(f):$(TARGET_COPY_OUT_ROOT)/$(notdir $f)))
+$(foreach f,$(wildcard $(LOCAL_PATH)/rootdir/system/bin/*.sh),\
+        $(eval PRODUCT_COPY_FILES += $(f):$(TARGET_COPY_OUT_SYSTEM)/bin/$(notdir $f)))
+
 # IPACM
 PRODUCT_PACKAGES += \
     ipacm \
