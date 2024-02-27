@@ -1393,6 +1393,9 @@ vendor/lib64/hw/vendor.qti.hardware.servicetracker@1.2-impl.so
 vendor/bin/rmt_storage
 vendor/etc/init/vendor.qti.rmt_storage.rc
 
+# RIL - from benz CPH2613_15.0.0.400(EX01)
+vendor/lib64/libqcrilNrSmsModule.so|c2cb6f28e0ef00cdeb5fd6e165cc70b65511fb97
+
 # RIL
 system_ext/app/QtiTelephonyService/QtiTelephonyService.apk
 system_ext/etc/permissions/qcrilhook.xml
@@ -1495,7 +1498,6 @@ vendor/lib64/libqcrilNrLogger.so
 vendor/lib64/libqcrilNrPbmModule.so
 vendor/lib64/libqcrilNrQtiBus.so
 vendor/lib64/libqcrilNrQtiMutex.so
-vendor/lib64/libqcrilNrSmsModule.so
 vendor/lib64/libqcrilNrSocketModule.so
 vendor/lib64/libqcrilNrVoiceModule.so
 vendor/lib64/libqcrildataaidl.so
