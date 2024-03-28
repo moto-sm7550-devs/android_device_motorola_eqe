@@ -36,14 +36,6 @@ $(FSG_MOUNT_POINT): $(LOCAL_INSTALLED_MODULE)
 
 ALL_DEFAULT_INSTALLED_MODULES += $(FIRMWARE_MOUNT_POINT) $(BT_FIRMWARE_MOUNT_POINT) $(DSP_MOUNT_POINT) $(FSG_MOUNT_POINT)
 
-CNE_APP_SYMLINKS := $(TARGET_OUT_VENDOR)/app/CneApp/lib/arm64
-$(CNE_APP_SYMLINKS): $(LOCAL_INSTALLED_MODULE)
-	@echo "Creating CneApp symlinks: $@"
-	@mkdir -p $@
-	$(hide) ln -sf /vendor/lib64/libvndfwk_detect_jni.qti_vendor.so $@/libvndfwk_detect_jni.qti_vendor.so
-
-ALL_DEFAULT_INSTALLED_MODULES += $(CNE_APP_SYMLINKS)
-
 EXPAT_SYMLINKS := $(TARGET_OUT_VENDOR_EXECUTABLES)/expat
 $(EXPAT_SYMLINKS): $(LOCAL_INSTALLED_MODULE)
 	@echo "Expat bin link: $@"
