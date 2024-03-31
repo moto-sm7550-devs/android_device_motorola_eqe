@@ -305,7 +305,8 @@ PRODUCT_PACKAGES += \
     libcodec2_hidl@1.2.vendor \
     libcodec2_vndk.vendor \
     libpalclient \
-    android.hardware.media.c2@1.2.vendor
+    android.hardware.media.c2@1.2.vendor \
+    dolbycodec_shim
 
 # Memtrack
 PRODUCT_PACKAGES += \
