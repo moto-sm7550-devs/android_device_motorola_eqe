@@ -552,7 +552,6 @@ PRODUCT_VENDOR_MOVE_ENABLED := true
 
 # WiFi Display
 PRODUCT_PACKAGES += \
-    libavservices_minijail \
     libnl \
     libwfdaac_vendor
 
