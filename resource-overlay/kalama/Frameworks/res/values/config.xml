@@ -52,8 +52,8 @@
         <item>"/vendor/lib64/libgsl.so"</item>
    </string-array>
 
-    <!-- Should the pinner service pin the Home application? -->
-    <bool name="config_pinnerHomeApp">true</bool>
+    <!-- Bytes that the PinnerService will pin for Home app -->
+    <integer name="config_pinnerHomePinBytes">6291456</integer>
 
     <!-- Flag indicating whether we should enable smart battery. -->
     <bool name="config_smart_battery_available">true</bool>
