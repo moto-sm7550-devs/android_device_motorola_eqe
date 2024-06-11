@@ -1,4 +1,4 @@
-# All unpinned blobs below are extracted from rtwo_g-user 14 U1TRS34.8-30-13-1 7c77a-12bae6 release-keys - RETAIL variant.
+# All unpinned blobs below are extracted from rtwo_g-user 14 U1TR34.8-30-13-2-2 5b4b0d-dde58 release-keys - RETAIL variant.
 
 # ADSP
 vendor/bin/adsprpcd
