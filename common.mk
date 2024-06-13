@@ -127,8 +127,12 @@ PRODUCT_PACKAGES += \
     android.hardware.camera.provider-V1-ndk.vendor \
     android.hardware.camera.provider@2.4.vendor \
     libcamera2ndk_vendor \
+    libcamera_metadata.vendor \
     libdng_sdk.vendor \
+    libexif.vendor \
     libgui_vendor \
+    libutilscallstack.vendor \
+    libyuv.vendor \
     vendor.qti.hardware.camera.aon@1.3.vendor \
     vendor.qti.hardware.camera.postproc@1.0.vendor
 
@@ -408,10 +412,13 @@ PRODUCT_PACKAGES += \
 
 # QMI
 PRODUCT_PACKAGES += \
+    libcurl.vendor \
     libjson \
+    libjsoncpp.vendor \
     libqti_vndfwk_detect \
     libqti_vndfwk_detect.vendor \
     libvndfwk_detect_jni.qti \
+    libsqlite.vendor \
     libvndfwk_detect_jni.qti.vendor \
     libvndfwk_detect_jni.qti_vendor
 
@@ -442,7 +449,9 @@ PRODUCT_PACKAGES += \
     android.hardware.radio.voice-V1-ndk.vendor \
     android.system.net.netd@1.1.vendor \
     libprotobuf-cpp-full \
-    librmnetctl
+    librmnetctl \
+    libsysutils.vendor \
+    libusbhost.vendor
 
 # Sensors
 PRODUCT_PACKAGES += \
@@ -558,6 +567,7 @@ PRODUCT_VENDOR_MOVE_ENABLED := true
 PRODUCT_PACKAGES += \
     android.media.audio.common.types-V2-cpp \
     libnl \
+    libpng.vendor \
     libwfdaac_vendor
 
 PRODUCT_BOOT_JARS += \
