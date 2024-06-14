@@ -201,6 +201,9 @@ persist.vendor.dpm.vndr.tcm=2
 # DRM
 drm.service.enabled=true
 
+# Enable DeviceAsWebcam support
+ro.usb.uvc.enabled=true
+
 # Fingerprint
 persist.vendor.qfp=true
 ro.hardware.fingerprint=goodix
