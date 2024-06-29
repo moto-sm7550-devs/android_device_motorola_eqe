@@ -953,7 +953,7 @@ vendor/lib64/libhta_hexagon_runtime_qnn.so
 vendor/lib64/libqnnengine.so
 
 # OEM
-vendor/bin/motobox
+vendor/bin/motobox;SYMLINK=vendor/bin/expat
 
 # OMX
 vendor/lib/libAlacSwDec.so
