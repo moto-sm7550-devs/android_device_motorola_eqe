@@ -40,6 +40,7 @@ WIFI_FIRMWARE_SYMLINKS := $(TARGET_OUT_VENDOR)/firmware/wlan/qca_cld
 $(WIFI_FIRMWARE_SYMLINKS): $(LOCAL_INSTALLED_MODULE)
 	@echo "Creating wifi firmware symlinks: $@"
 	@mkdir -p $@/kiwi_v2
+	$(hide) ln -sf /data/vendor/firmware/wlanmdsp.mbn $@/wlanmdsp.otaupdate
 	$(hide) ln -sf /mnt/vendor/persist/kiwi_v2/wlan_mac.bin $@/kiwi_v2/wlan_mac.bin
 	$(hide) ln -sf /vendor/etc/wifi/kiwi_v2/WCNSS_qcom_cfg.ini $@/kiwi_v2/WCNSS_qcom_cfg.ini
 
