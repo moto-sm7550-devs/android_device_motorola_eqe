@@ -39,15 +39,9 @@ ALL_DEFAULT_INSTALLED_MODULES += $(FIRMWARE_MOUNT_POINT) $(BT_FIRMWARE_MOUNT_POI
 WIFI_FIRMWARE_SYMLINKS := $(TARGET_OUT_VENDOR)/firmware/wlan/qca_cld
 $(WIFI_FIRMWARE_SYMLINKS): $(LOCAL_INSTALLED_MODULE)
 	@echo "Creating wifi firmware symlinks: $@"
-	@mkdir -p $@/kiwi
 	@mkdir -p $@/kiwi_v2
-	@mkdir -p $@/qca6490
-	$(hide) ln -sf /mnt/vendor/persist/kiwi/wlan_mac.bin $@/kiwi/wlan_mac.bin
-	$(hide) ln -sf /vendor/etc/wifi/kiwi/WCNSS_qcom_cfg.ini $@/kiwi/WCNSS_qcom_cfg.ini
 	$(hide) ln -sf /mnt/vendor/persist/kiwi_v2/wlan_mac.bin $@/kiwi_v2/wlan_mac.bin
 	$(hide) ln -sf /vendor/etc/wifi/kiwi_v2/WCNSS_qcom_cfg.ini $@/kiwi_v2/WCNSS_qcom_cfg.ini
-	$(hide) ln -sf /mnt/vendor/persist/qca6490/wlan_mac.bin $@/qca6490/wlan_mac.bin
-	$(hide) ln -sf /vendor/etc/wifi/qca6490/WCNSS_qcom_cfg.ini $@/qca6490/WCNSS_qcom_cfg.ini
 
 ALL_DEFAULT_INSTALLED_MODULES += $(WIFI_FIRMWARE_SYMLINKS)
 
