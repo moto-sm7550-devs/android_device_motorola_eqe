@@ -142,6 +142,10 @@ PRODUCT_PACKAGES += \
 # Charger
 WITH_LINEAGE_CHARGER := false
 
+# ConfigStore
+PRODUCT_PACKAGES += \
+    vendor.qti.hardware.capabilityconfigstore@1.0.vendor
+
 # Context Hub
 PRODUCT_PACKAGES += \
     android.hardware.contexthub-V1-ndk.vendor
