@@ -223,7 +223,8 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libOmxCore \
     libmm-omxcore \
-    libstagefrighthw
+    libstagefrighthw \
+    libstagefright_softomx_plugin.vendor
 
 # Permissions
 PRODUCT_COPY_FILES += \
