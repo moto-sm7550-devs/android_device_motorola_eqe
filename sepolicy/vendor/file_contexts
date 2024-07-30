@@ -54,6 +54,7 @@
 
 # Fingerprint
 /(mnt/vendor/persist|persist)/goodix(/.*)?              u:object_r:vendor_persist_fingerprint_file:s0
+/(mnt/vendor/persist|persist)/mdm(/.*)?                 u:object_r:persist_modem_file:s0
 /(vendor|system/vendor)/bin/hw/android\.hardware\.biometrics\.fingerprint@2\.3-service\.rtwo              u:object_r:hal_fingerprint_default_exec:s0
 /(vendor|system/vendor)/bin/hw/android\.hardware\.biometrics\.fingerprint@2\.1-goodixservice              u:object_r:hal_fingerprint_default_exec:s0
 /data/vendor/.fps(/.*)?                                 u:object_r:fingerprint_vendor_data_file:s0
