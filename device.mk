@@ -27,6 +27,7 @@ PRODUCT_PACKAGES += \
     FrameworksResEqe \
     LineageSystemUIEqe \
     ProductFrameworksResEqe \
+    RegulatoryInfoOverlayEqe \
     SettingsResEqe \
     SystemUIResEqe
 
