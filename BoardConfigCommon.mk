@@ -55,6 +55,15 @@ TARGET_KERNEL_CONFIG := \
 # Kernel modules
 TARGET_KERNEL_EXT_MODULE_ROOT := kernel/motorola/sm8550-modules
 
+BOARD_SYSTEM_KERNEL_MODULES_LOAD := $(strip $(shell cat $(COMMON_PATH)/modules.load.system_dlkm))
+BOARD_VENDOR_KERNEL_MODULES_LOAD := $(strip $(shell cat $(COMMON_PATH)/modules.load))
+BOARD_VENDOR_KERNEL_MODULES_BLOCKLIST_FILE := $(COMMON_PATH)/modules.blocklist
+BOARD_VENDOR_RAMDISK_KERNEL_MODULES_LOAD := $(strip $(shell cat $(COMMON_PATH)/modules.load.vendor_boot))
+BOARD_VENDOR_RAMDISK_KERNEL_MODULES_BLOCKLIST_FILE := $(COMMON_PATH)/modules.blocklist.vendor_boot
+BOARD_VENDOR_RAMDISK_RECOVERY_KERNEL_MODULES_LOAD := $(strip $(shell cat $(COMMON_PATH)/modules.load.recovery))
+BOOT_KERNEL_MODULES := $(strip $(shell cat $(COMMON_PATH)/modules.load.recovery $(COMMON_PATH)/modules.load.vendor_ramdisk))
+SYSTEM_KERNEL_MODULES := $(strip $(shell cat $(COMMON_PATH)/modules.load.system_dlkm))
+
 TARGET_KERNEL_EXT_MODULES := \
   qcom/opensource/mmrm-driver \
   qcom/opensource/mm-drivers/hw_fence \
