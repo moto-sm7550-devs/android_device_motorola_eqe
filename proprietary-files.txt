@@ -1345,6 +1345,8 @@ vendor/lib64/libruy_vendor.so
 vendor/lib64/libtextclassifier_hash_vendor.so
 vendor/lib64/libtflite_vendor.so
 vendor/lib64/motorola.hardware.sensors-V1-ndk_platform.so
+vendor/lib64/sensors.moto.so
+vendor/lib64/sensors.ssc.so
 
 # Soter
 vendor/bin/hw/vendor.qti.hardware.soter@1.0-service
