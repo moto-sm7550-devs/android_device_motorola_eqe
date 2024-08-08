@@ -7,6 +7,7 @@
 cc_library_shared {
     name: "sensors.eqe",
     defaults: ["hidl_defaults"],
+    init_rc: ["sensors.eqe.rc"],
     srcs: [
         "Sensor.cpp",
         "SensorsSubHal.cpp",
