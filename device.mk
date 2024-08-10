@@ -32,18 +32,18 @@ PRODUCT_SHIPPING_API_LEVEL := $(BOARD_SHIPPING_API_LEVEL)
 # Characteristics
 PRODUCT_CHARACTERISTICS := nosdcard
 
-# Inherit from motorola sm8550-common
-$(call inherit-product, device/motorola/sm8550-common/common.mk)
+# Inherit from motorola sm7550-common
+$(call inherit-product, device/motorola/sm7550-common/common.mk)
 
 # Overlay
 PRODUCT_PACKAGES += \
-    ApertureResRtwo \
-    FrameworksResRtwo \
-    LineageSystemUIRtwo \
-    ProductFrameworksResRtwo \
-    SettingsProviderResRtwo \
-    SettingsResRtwo \
-    SystemUIResRtwo
+    ApertureResEqe \
+    FrameworksResEqe \
+    LineageSystemUIEqe \
+    ProductFrameworksResEqe \
+    SettingsProviderResEqe \
+    SettingsResEqe \
+    SystemUIResEqe
 
 # Audio
 PRODUCT_COPY_FILES += \
@@ -68,7 +68,7 @@ $(call add-product-dex-preopt-module-config,MotoSignatureApp,disable)
 
 # Fingerprint
 PRODUCT_PACKAGES += \
-    android.hardware.biometrics.fingerprint@2.3-service.rtwo
+    android.hardware.biometrics.fingerprint@2.3-service.eqe
 
 # Init
 $(foreach f,$(wildcard $(LOCAL_PATH)/rootdir/etc/init/hw/*.rc),\
@@ -81,10 +81,6 @@ $(foreach f,$(wildcard $(LOCAL_PATH)/rootdir/bin/*.sh),\
 # Keylayout
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayout/goodix_ts.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/goodix_ts.kl
-
-# Media
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/media/media_profiles_kalama.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles_kalama.xml
 
 # NFC
 PRODUCT_PACKAGES += \
@@ -104,25 +100,21 @@ PRODUCT_COPY_FILES += \
 
 # PowerShare
 PRODUCT_PACKAGES += \
-    vendor.lineage.powershare@1.0-service.rtwo
+    vendor.lineage.powershare@1.0-service.eqe
 
 # Sensors
 PRODUCT_PACKAGES += \
-    sensors.rtwo
+    sensors.eqe
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/sensors/hals.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/hals.conf
 
-# Thermal
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/thermal-engine-rtwo-game-perf.conf:$(TARGET_COPY_OUT_VENDOR)/etc/thermal-engine-rtwo.conf
-
 # Touch
 PRODUCT_PACKAGES += \
-    vendor.lineage.touch@1.0-service.rtwo
+    vendor.lineage.touch@1.0-service.eqe
 
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += $(LOCAL_PATH)
 
 # Inherit from vendor blobs
-$(call inherit-product, vendor/motorola/rtwo/rtwo-vendor.mk)
+$(call inherit-product, vendor/motorola/eqe/eqe-vendor.mk)

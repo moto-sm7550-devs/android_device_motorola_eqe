@@ -1,6 +1,6 @@
 [
   {
-    "repository": "android_device_motorola_sm8550-common",
-    "target_path": "device/motorola/sm8550-common"
+    "repository": "android_device_motorola_sm7550-common",
+    "target_path": "device/motorola/sm7550-common"
   }
 ]

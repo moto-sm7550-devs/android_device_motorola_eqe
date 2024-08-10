@@ -14,8 +14,8 @@ fi
 
 set -e
 
-export DEVICE=rtwo
-export DEVICE_COMMON=sm8550-common
+export DEVICE=eqe
+export DEVICE_COMMON=sm7550-common
 export VENDOR=motorola
 
 "./../../${VENDOR}/${DEVICE_COMMON}/extract-files.sh" "$@"

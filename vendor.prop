@@ -1,8 +1,8 @@
 # Bluetooth
-bluetooth.device.default_name=motorola edge 40 pro
+bluetooth.device.default_name=motorola edge 50 pro
 
 # Camera
-persist.vendor.camera.physical.num=4
+persist.vendor.camera.physical.num=6
 ro.camera.enableCamera1MaxZsl=1
 
 # Fingerprint
