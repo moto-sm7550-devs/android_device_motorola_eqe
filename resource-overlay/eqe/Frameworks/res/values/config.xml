@@ -151,10 +151,10 @@
          @see https://www.w3.org/TR/SVG/paths.html#PathData
          -->
     <string translatable="false" name="config_mainBuiltInDisplayCutout">
-        M -35,0
-        L 35,0
-		L 35,112
-		L -35,112
+        M -56,0
+        L 56,0
+		L 56,106
+		L -56,106
 		Z
 	</string>
 
@@ -214,9 +214,9 @@
 
     <!-- The properties of a UDFPS sensor in pixels, in the order listed below: -->
     <array name="config_udfps_sensor_props" translatable="false" >
-        <item>540</item> <!-- sensorLocationX -->
-        <item>2141</item> <!-- sensorLocationY -->
-        <item>91</item> <!-- sensorRadius -->
+        <item>610</item> <!-- sensorLocationX -->
+        <item>2440</item> <!-- sensorLocationY -->
+        <item>102</item> <!-- sensorRadius -->
     </array>
 
     <!-- Screen brightness used to dim the screen when the user activity
@@ -279,7 +279,7 @@
     </array>
 
     <!-- MMS user agent string -->
-    <string name="config_mms_user_agent" translatable="false">motorolaedge40pro</string>
+    <string name="config_mms_user_agent" translatable="false">motorolaedge50pro</string>
     <!-- MMS user agent profile url -->
     <string name="config_mms_user_agent_profile_url" translatable="false">http://uaprof.motorola.com/phoneconfig/motov1/Profile/motov1.rdf</string>
 
