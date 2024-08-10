@@ -44,6 +44,15 @@ vendor/etc/aualgo/aualgo_ainr.conf
 vendor/etc/aualgo/aualgo_azp.conf
 vendor/etc/aualgo/aualgo_comp_azpp.conf
 
+# Audio - configs
+vendor/etc/audio_effects.xml
+vendor/etc/audio_ext_spkr.conf
+vendor/etc/audio_policy_volumes.xml
+vendor/etc/card-defs.xml
+vendor/etc/default_volume_tables.xml
+vendor/etc/microphone_characteristics.xml
+vendor/etc/usecaseKvManager.xml
+
 # Camera
 vendor/lib/camera/com.qti.ois.mot_dw9784_main.so
 vendor/lib/camera/com.qti.ois.mot_dw9784_tele.so
