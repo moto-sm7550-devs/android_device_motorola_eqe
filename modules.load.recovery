@@ -180,6 +180,7 @@ qseecom_proxy.ko
 qcom-i2c-pmic.ko
 sg.ko
 spi-msm-geni.ko
+mcp25xxfd.ko
 msm_sharedmem.ko
 phy-generic.ko
 phy-qcom-emu.ko
@@ -255,6 +256,8 @@ industrialio-buffer-cb.ko
 nvmem_qfprom.ko
 slimbus.ko
 slim-qcom-ngd-ctrl.ko
+hwmon.ko
+qti_amoled_ecm.ko
 stm_core.ko
 stm_p_basic.ko
 stm_p_ost.ko
