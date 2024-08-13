@@ -248,7 +248,6 @@ ro.surface_flinger.wcg_composition_dataspace=143261696
 # IMS
 persist.vendor.lte.pco_supported=true
 persist.vendor.rcs.singlereg.feature=1
-vendor.ims.modem.multisub.cap=2
 
 # Incremental FS
 ro.incremental.enable=yes
