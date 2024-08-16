@@ -13,7 +13,7 @@ include device/motorola/sm7550-common/BoardConfigCommon.mk
 TARGET_BOOTLOADER_BOARD_NAME := eqe
 
 # Display
-TARGET_SCREEN_DENSITY := 400
+TARGET_SCREEN_DENSITY := 450
 
 # HIDL
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += $(DEVICE_PATH)/device_framework_matrix_eqe.xml
