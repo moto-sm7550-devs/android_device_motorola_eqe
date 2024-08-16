@@ -467,7 +467,7 @@ vendor/bin/vendor.dpmd
 vendor/etc/dpm_vndr/vendor.dpm.conf
 vendor/etc/init/dpmQmiMgr.rc
 vendor/etc/init/vendor.dpmd.rc
-vendor/lib64/com.qualcomm.qti.dpm.api@1.0.so
+vendor/lib64/com.qualcomm.qti.dpm.api@1.0.so;MODULE_SUFFIX=-vendor
 vendor/lib64/libdpmqmihal.so
 vendor/lib64/vendor.libdpmctmgr.so
 vendor/lib64/vendor.libdpmfdmgr.so
