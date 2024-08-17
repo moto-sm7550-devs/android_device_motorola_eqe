@@ -56,32 +56,25 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/public.libraries.txt:$(TARGET_COPY_OUT_VENDOR)/etc/public.libraries.txt \
     $(LOCAL_PATH)/configs/public.libraries-qti.txt:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/public.libraries-qti.txt
 
-# Ant
-PRODUCT_PACKAGES += \
-    com.dsi.ant@1.0.vendor
-
 # Atrace
 PRODUCT_PACKAGES += \
     android.hardware.atrace@1.0-service
 
 # Audio
 PRODUCT_PACKAGES += \
-    android.media.audio.common.types-V1-cpp.vendor \
     android.hardware.audio@7.1-impl \
     android.hardware.audio.effect@7.0-impl \
     android.hardware.audio.service \
-    android.hardware.bluetooth.audio-V2-ndk.vendor \
     android.hardware.bluetooth.audio-impl \
     android.hardware.soundtrigger@2.3-impl \
-    audioadsprpcd \
     audio.bluetooth.default \
     audio.r_submix.default \
     audio.usb.default \
+    audioadsprpcd \
     libagm_compress_plugin \
     libagm_mixer_plugin \
     libagm_pcm_plugin \
     libaudiochargerlistener \
-    libaudioroute.vendor \
     libbatterylistener \
     libfmpal \
     libhapticgenerator \
@@ -103,95 +96,28 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.audio.pro.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.audio.pro.xml \
     frameworks/native/data/etc/android.software.midi.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.midi.xml
 
-# Authsecret
-PRODUCT_PACKAGES += \
-    android.hardware.authsecret@1.0.vendor
-
-# Bluetooth
-PRODUCT_PACKAGES += \
-    android.hardware.bluetooth@1.1.vendor \
-    vendor.qti.hardware.bluetooth.audio-V1-ndk.vendor \
-    vendor.qti.hardware.bluetooth_audio@2.1.vendor \
-    vendor.qti.hardware.btconfigstore@1.0.vendor \
-    vendor.qti.hardware.btconfigstore@2.0.vendor
-
 # Boot control
 PRODUCT_PACKAGES += \
     android.hardware.boot@1.2-impl-qti \
     android.hardware.boot@1.2-impl-qti.recovery \
-    android.hardware.boot@1.2-service \
-    bootctrl.kalama \
-    bootctrl.kalama.recovery
-
-PRODUCT_PACKAGES_DEBUG += \
-    bootctl
-
-# Camera
-PRODUCT_PACKAGES += \
-    android.hardware.camera.common@1.0.vendor \
-    android.hardware.camera.device@3.6.vendor \
-    android.hardware.camera.device-V1-ndk.vendor \
-    android.hardware.camera.metadata-V1-ndk.vendor \
-    android.hardware.camera.provider-V1-ndk.vendor \
-    android.hardware.camera.provider@2.4.vendor \
-    libcamera2ndk_vendor \
-    libcamera_metadata.vendor \
-    libdng_sdk.vendor \
-    libexif.vendor \
-    libgui_vendor \
-    libutilscallstack.vendor \
-    libyuv.vendor \
-    vendor.qti.hardware.camera.aon@1.3.vendor \
-    vendor.qti.hardware.camera.postproc@1.0.vendor
+    android.hardware.boot@1.2-service
 
 # Charger
 WITH_LINEAGE_CHARGER := false
-
-# ConfigStore
-PRODUCT_PACKAGES += \
-    vendor.qti.hardware.capabilityconfigstore@1.0.vendor
-
-# Context Hub
-PRODUCT_PACKAGES += \
-    android.hardware.contexthub-V1-ndk.vendor
 
 # Display
 PRODUCT_PACKAGES += \
     android.hardware.graphics.mapper@4.0-impl-qti-display \
     init.qti.display_boot.rc \
     init.qti.display_boot.sh \
-    libdisplayconfig.qti \
-    libdisplayconfig.system.qti \
-    libhistogram \
-    libqdMetaData \
-    libqdMetaData.system \
-    libqdutils \
-    libsdmcore \
-    libsdmdal \
-    libsdmutils \
-    vendor.display.config@1.0 \
-    vendor.display.config@1.11.vendor \
-    vendor.display.config@2.0 \
-    vendor.display.config@2.0.vendor \
-    vendor.qti.hardware.display.allocator-service \
-    vendor.qti.hardware.display.composer-service \
     vendor.qti.hardware.display.composer-service.rc \
     vendor.qti.hardware.display.composer-service.xml \
-    vendor.qti.hardware.display.config-V1-ndk.vendor \
-    vendor.qti.hardware.display.config-V2-ndk.vendor \
-    vendor.qti.hardware.display.config-V3-ndk.vendor \
-    vendor.qti.hardware.display.config-V4-ndk.vendor \
-    vendor.qti.hardware.display.config-V5-ndk.vendor \
-    vendor.qti.hardware.display.config-V6-ndk.vendor \
-    vendor.qti.hardware.display.demura-service \
-    vendor.qti.hardware.display.mapper@1.1.vendor \
-    vendor.qti.hardware.display.mapper@2.0.vendor \
-    vendor.qti.hardware.display.mapper@3.0.vendor \
-    vendor.qti.hardware.display.mapper@4.0.vendor
+    vendor.qti.hardware.display.allocator-service \
+    vendor.qti.hardware.display.composer-service \
+    vendor.qti.hardware.display.demura-service
 
 # DRM
 PRODUCT_PACKAGES += \
-    android.hardware.drm@1.3.vendor \
     android.hardware.drm-service.clearkey
 
 # Enforce generic ramdisk allow list
@@ -201,17 +127,8 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/generic_ramdisk.mk)
 PRODUCT_PACKAGES += \
     fastbootd
 
-# Fingerprint
-PRODUCT_PACKAGES += \
-    com.motorola.hardware.biometric.fingerprint@1.0.vendor
-
-# Gatekeeper
-PRODUCT_PACKAGES += \
-    android.hardware.gatekeeper@1.0.vendor
-
 # GPS
 PRODUCT_PACKAGES += \
-    android.hardware.gnss-V2-ndk.vendor \
     gnss@2.0-base.policy \
     gnss@2.0-edgnss-daemon.policy \
     gnss@2.0-qsap-location.policy \
@@ -231,15 +148,7 @@ PRODUCT_PACKAGES += \
 # Health
 PRODUCT_PACKAGES += \
     android.hardware.health-service.qti \
-    android.hardware.health-service.qti_recovery \
-    android.hardware.health@1.0.vendor \
-    android.hardware.health@2.1.vendor
-
-# HIDL
-PRODUCT_PACKAGES += \
-    android.hidl.base@1.0.vendor \
-    libhidltransport.vendor \
-    libhwbinder.vendor
+    android.hardware.health-service.qti_recovery
 
 # Init
 PRODUCT_COPY_FILES += \
@@ -272,19 +181,9 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/sec_config:$(TARGET_COPY_OUT_VENDOR)/etc/sec_config
 
-# Keymaster
-PRODUCT_PACKAGES += \
-    android.hardware.identity-V4-ndk.vendor \
-    android.hardware.keymaster@4.1.vendor \
-    android.hardware.security.keymint-V2-ndk.vendor \
-    libkeymaster_messages.vendor
-
 # Keymint
 PRODUCT_PACKAGES += \
-    android.hardware.hardware_keystore.xml \
-    android.hardware.security.keymint-V1-ndk.vendor \
-    android.hardware.security.secureclock-V1-ndk.vendor \
-    android.hardware.security.sharedsecret-V1-ndk.vendor
+    android.hardware.hardware_keystore.xml
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.keystore.app_attest_key.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.keystore.app_attest_key.xml \
@@ -313,12 +212,7 @@ PRODUCT_COPY_FILES += \
 
 PRODUCT_PACKAGES += \
     libavservices_minijail \
-    libavservices_minijail_vendor \
-    libavservices_minijail.vendor \
-    libcodec2_hidl@1.2.vendor \
-    libcodec2_vndk.vendor \
     libpalclient \
-    android.hardware.media.c2@1.2.vendor \
     dolbycodec_shim
 
 # Memtrack
@@ -330,22 +224,11 @@ PRODUCT_PACKAGES += \
     MotoActions \
     MotoCommonOverlay
 
-# Net
-PRODUCT_PACKAGES += \
-    netutils-wrapper-1.0
-
 # OMX
 PRODUCT_PACKAGES += \
-    libcodec2_hidl@1.2.vendor \
-    libcodec2_hidl_plugin \
-    libcodec2_vndk.vendor \
     libOmxCore \
     libmm-omxcore \
     libstagefrighthw
-
-# Perf
-PRODUCT_PACKAGES += \
-    vendor.qti.hardware.perf@2.3.vendor
 
 # Permissions
 PRODUCT_COPY_FILES += \
@@ -416,54 +299,17 @@ PRODUCT_PACKAGES += \
     libprotobuf-cpp-full-3.9.1-vendorcompat \
     libprotobuf-cpp-lite-3.9.1-vendorcompat
 
-# QMI
+# QTI fwk-detect
 PRODUCT_PACKAGES += \
-    libcurl.vendor \
-    libjson \
-    libjsoncpp.vendor \
-    libqti_vndfwk_detect \
-    libqti_vndfwk_detect.vendor \
-    libvndfwk_detect_jni.qti \
-    libsqlite.vendor \
-    libvndfwk_detect_jni.qti.vendor \
-    libvndfwk_detect_jni.qti_vendor
-
-# QTI service tracker
-PRODUCT_PACKAGES += \
-    vendor.qti.hardware.servicetracker@1.2.vendor
-
-# QXR
-PRODUCT_PACKAGES += \
-    android.hardware.common-V2-ndk.vendor
+    libvndfwk_detect_jni.qti_vendor # Needed by CNE app
 
 # RenderScript
 PRODUCT_PACKAGES += \
     android.hardware.renderscript@1.0-impl
 
-# RIL
-PRODUCT_PACKAGES += \
-    android.hardware.radio@1.6.vendor \
-    android.hardware.radio.config@1.3.vendor \
-    android.hardware.radio.deprecated@1.0.vendor \
-    android.hardware.radio-V1-ndk.vendor \
-    android.hardware.radio.config-V1-ndk.vendor \
-    android.hardware.radio.data-V1-ndk.vendor \
-    android.hardware.radio.messaging-V1-ndk.vendor \
-    android.hardware.radio.modem-V1-ndk.vendor \
-    android.hardware.radio.network-V1-ndk.vendor \
-    android.hardware.radio.sim-V1-ndk.vendor \
-    android.hardware.radio.voice-V1-ndk.vendor \
-    android.system.net.netd@1.1.vendor \
-    libprotobuf-cpp-full \
-    librmnetctl \
-    libsysutils.vendor \
-    libusbhost.vendor
-
 # Sensors
 PRODUCT_PACKAGES += \
-    android.frameworks.sensorservice@1.0.vendor \
     android.hardware.sensors-service.multihal \
-    libsensorndkbridge \
     sensors.dynamic_sensor_hal
 
 # Soong namespaces
@@ -482,12 +328,12 @@ PRODUCT_PACKAGES += \
     ims-ext-common \
     ims_ext_common.xml \
     qti-telephony-hidl-wrapper \
-    qti_telephony_hidl_wrapper.xml \
     qti-telephony-hidl-wrapper-prd \
+    qti_telephony_hidl_wrapper.xml \
     qti_telephony_hidl_wrapper_prd.xml \
     qti-telephony-utils \
-    qti_telephony_utils.xml \
     qti-telephony-utils-prd \
+    qti_telephony_utils.xml \
     qti_telephony_utils_prd.xml \
     telephony-ext
 
@@ -499,14 +345,7 @@ PRODUCT_COPY_FILES += \
 
 # Thermal
 PRODUCT_PACKAGES += \
-    android.hardware.thermal@2.0-service.qti-v2 \
-    android.hardware.thermal@2.0 \
-    android.hardware.thermal@2.0.vendor
-
-# Trusted UI
-PRODUCT_PACKAGES += \
-    android.hidl.memory.block@1.0.vendor \
-    vendor.qti.hardware.systemhelper@1.0.vendor
+    android.hardware.thermal@2.0-service.qti-v2
 
 # Update engine
 PRODUCT_PACKAGES += \
@@ -549,20 +388,12 @@ PRODUCT_COPY_FILES += \
 
 # WiFi
 PRODUCT_PACKAGES += \
-    android.hardware.wifi.hostapd-V1-ndk.vendor \
     android.hardware.wifi-service \
-    android.hardware.wifi.supplicant-V1-ndk.vendor \
     hostapd \
     libqsap_sdk \
     libwpa_client \
     libwifi-hal-ctrl \
     libwifi-hal-qcom \
-    vendor.qti.hardware.wifi.hostapd@1.0.vendor \
-    vendor.qti.hardware.wifi.hostapd@1.1.vendor \
-    vendor.qti.hardware.wifi.hostapd@1.2.vendor \
-    vendor.qti.hardware.wifi.supplicant@2.0.vendor \
-    vendor.qti.hardware.wifi.supplicant@2.1.vendor \
-    vendor.qti.hardware.wifi.supplicant@2.2.vendor \
     wpa_supplicant \
     wpa_supplicant.conf
 
@@ -580,11 +411,6 @@ PRODUCT_PACKAGES += \
     firmware_WCNSS_qcom_cfg.ini_symlink
 
 # WiFi Display
-PRODUCT_PACKAGES += \
-    libnl \
-    libpng.vendor \
-    libwfdaac_vendor
-
 PRODUCT_BOOT_JARS += \
     WfdCommon
 
