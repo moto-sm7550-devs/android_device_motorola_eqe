@@ -200,8 +200,7 @@ PRODUCT_COPY_FILES += \
 
 PRODUCT_PACKAGES += \
     libavservices_minijail \
-    libpalclient \
-    dolbycodec_shim
+    libpalclient
 
 # Memtrack
 PRODUCT_PACKAGES += \

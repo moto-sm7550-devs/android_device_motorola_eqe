@@ -1,1 +1,0 @@
-allow mediaserver hal_dms_default:binder call;
