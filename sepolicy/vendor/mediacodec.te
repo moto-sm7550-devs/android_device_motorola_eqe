@@ -1,6 +1,0 @@
-allow mediacodec hal_dms_hwservice:hwservice_manager find;
-binder_call(mediacodec, hal_dms_default)
-
-allow mediacodec hal_dms_default:binder { call transfer };
-allow mediacodec hal_dms_server:binder { call transfer };
-allow mediacodec vendor_vm_cp_bitstream_device:chr_file { open read };

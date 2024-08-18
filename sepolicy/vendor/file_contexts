@@ -48,10 +48,6 @@
 # Devicetree
 /sys/firmware/devicetree/base/chosen(/.*)?              u:object_r:sysfs_dt_chosen:s0
 
-# Dolby DMS
-/(vendor|system/vendor)/bin/hw/vendor\.dolby\.hardware\.dms@2\.0-service       u:object_r:hal_dms_default_exec:s0
-/(vendor|system/vendor)/bin/hw/dolbycodec2                                     u:object_r:mediacodec_exec:s0
-
 # Fingerprint
 /(mnt/vendor/persist|persist)/goodix(/.*)?              u:object_r:vendor_persist_fingerprint_file:s0
 /(mnt/vendor/persist|persist)/mdm(/.*)?                 u:object_r:persist_modem_file:s0
@@ -65,9 +61,6 @@
 
 # LiveDisplay
 /(vendor|system/vendor)/bin/hw/vendor\.lineage\.livedisplay@2\.1-service\.motorola_kalama    u:object_r:hal_lineage_livedisplay_qti_exec:s0
-
-# Media
-/(vendor|system/vendor)/bin/hw/vendor\.dolby\.media\.c2@1\.0-service            u:object_r:mediacodec_exec:s0
 
 # Motobox
 /(vendor|system/vendor)/bin/motobox                     u:object_r:vendor_motobox_exec:s0
@@ -85,8 +78,6 @@
 /dev/socket/cutback                                     u:object_r:cutback_socket:s0
 
 # Same process hal files
-/vendor/lib(64)?/c2.dolby.decoder.so                                u:object_r:same_process_hal_file:s0
-/vendor/lib(64)?/libdolbyottcameracontrol.so                        u:object_r:same_process_hal_file:s0
 /vendor/lib(64)?/panel_als_comp_filter_rtwo.so                      u:object_r:same_process_hal_file:s0
 
 # Secure Element
