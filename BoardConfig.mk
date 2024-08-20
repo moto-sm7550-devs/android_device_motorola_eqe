@@ -242,7 +242,8 @@ TARGET_RECOVERY_WIPE := $(DEVICE_PATH)/recovery/recovery.wipe
 ENABLE_VENDOR_RIL_SERVICE := true
 
 # Security
-VENDOR_SECURITY_PATCH := 2025-01-01
+BOOT_SECURITY_PATCH := 2025-01-01
+VENDOR_SECURITY_PATCH := $(BOOT_SECURITY_PATCH)
 
 # SELinux
 include device/qcom/sepolicy_vndr/SEPolicy.mk
