@@ -101,38 +101,10 @@ system_ext/lib64/com.qualcomm.qti.ant@1.0.so
 vendor/lib64/hw/com.dsi.ant@1.0-impl.so
 
 # Audio AGM
--vendor/lib/libagm.so
--vendor/lib/vendor.qti.hardware.AGMIPC@1.0-impl.so
 -vendor/lib64/libagm.so
 -vendor/lib64/vendor.qti.hardware.AGMIPC@1.0-impl.so
 
 # Audio libraries
-vendor/lib/hw/audio.primary.kalama.so
-vendor/lib/libPeripheralStateUtils.so
-vendor/lib/libadm.so
-vendor/lib/libar-gpr.so
--vendor/lib/libar-gsl.so
--vendor/lib/libar-pal.so
--vendor/lib/libats.so
-vendor/lib/libaualgo_ainr_component.so
-vendor/lib/libaualgo_ainr_wrapper.so
-vendor/lib/libaualgo_arp_component.so
-vendor/lib/libaualgo_arp_wrapper.so
-vendor/lib/libaualgo_azp_component.so
-vendor/lib/libaualgo_azp_wrapper.so
-vendor/lib/libaualgo_foundation.so
-vendor/lib/libaualgo_sst_component.so
-vendor/lib/libaudio_log_utils.so
-vendor/lib/libdapparamstorage.so
-vendor/lib/libext_tflite_c.so
-vendor/lib/libfmpal.so
-vendor/lib/libhfp_pal.so
-vendor/lib/liblx-ar_util.so
--vendor/lib/liblx-osal.so
-vendor/lib/libmcs.so
-vendor/lib/libqtigefar.so
-vendor/lib/libspatializerparamstorage.so
--vendor/lib/vendor.qti.hardware.pal@1.0-impl.so
 vendor/lib64/hw/audio.primary.kalama.so
 vendor/lib64/libPeripheralStateUtils.so
 vendor/lib64/libadm.so
@@ -170,38 +142,11 @@ vendor/etc/models/acd/speech.eai
 
 # Audio - radar
 -vendor/etc/vintf/manifest/manifest.xml
-vendor/lib/hw/audio_radar.primary.default.so
-vendor/lib/hw/motorola.hardware.audio.radar@1.0-impl.so
-vendor/lib/motorola.hardware.audio.radar@1.0.so
 vendor/lib64/hw/audio_radar.primary.default.so
 vendor/lib64/hw/motorola.hardware.audio.radar@1.0-impl.so
 vendor/lib64/motorola.hardware.audio.radar@1.0.so
 
 # Audio - soundfx
-vendor/lib/soundfx/libasphere.so
-vendor/lib/soundfx/libaudiopreprocessing.so
-vendor/lib/soundfx/libbc360.so
-vendor/lib/soundfx/libbundlewrapper.so
-vendor/lib/soundfx/libdlbvol.so
-vendor/lib/soundfx/libdownmix.so
-vendor/lib/soundfx/libdynproc.so
-vendor/lib/soundfx/libeffectproxy.so
-vendor/lib/soundfx/libhapticgenerator.so
-vendor/lib/soundfx/libldnhncr.so
-vendor/lib/soundfx/libmmieffectswrapper.so
-vendor/lib/soundfx/libmsstwrapper.so
-vendor/lib/soundfx/libqcompostprocbundle.so
-vendor/lib/soundfx/libqcomvisualizer.so
-vendor/lib/soundfx/libqcomvoiceprocessing.so
-vendor/lib/soundfx/libquasar.so
-vendor/lib/soundfx/libreverbwrapper.so
-vendor/lib/soundfx/libshoebox.so
-vendor/lib/soundfx/libspeakerbundle.so
-vendor/lib/soundfx/libswdap.so
-vendor/lib/soundfx/libswgamedap.so
-vendor/lib/soundfx/libswspatializer.so
-vendor/lib/soundfx/libvisualizer.so
-vendor/lib/soundfx/libvolumelistener.so
 vendor/lib64/soundfx/libasphere.so
 vendor/lib64/soundfx/libaudiopreprocessing.so
 vendor/lib64/soundfx/libbc360.so
@@ -812,15 +757,6 @@ vendor/lib64/libqtikeymint.so
 vendor/lib64/libspcom.so
 
 # Listen
-vendor/lib/hw/sound_trigger.primary.kalama.so
-vendor/lib/libcapiv2svacnnvendor.so
-vendor/lib/libcapiv2svarnnvendor.so
-vendor/lib/libcapiv2udk7vendor.so
-vendor/lib/libcapiv2uvvendor.so
-vendor/lib/libeai_fixed_32.so
-vendor/lib/liblistensoundmodel2vendor.so
-vendor/lib/vendor.qti.hardware.ListenSoundModel@1.0-impl.so
-vendor/lib/vendor.qti.hardware.ListenSoundModel@1.0.so
 vendor/lib64/hw/sound_trigger.primary.kalama.so
 vendor/lib64/libcapiv2svacnnvendor.so
 vendor/lib64/libcapiv2svarnnvendor.so
