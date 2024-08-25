@@ -105,8 +105,8 @@ system_ext/lib64/com.qualcomm.qti.ant@1.0.so
 vendor/lib64/hw/com.dsi.ant@1.0-impl.so
 
 # Audio AGM
--vendor/lib64/libagm.so
--vendor/lib64/vendor.qti.hardware.AGMIPC@1.0-impl.so
+vendor/lib64/libagm.so
+vendor/lib64/vendor.qti.hardware.AGMIPC@1.0-impl.so
 
 # Audio libraries
 vendor/lib64/hw/audio.primary.kalama.so
@@ -115,9 +115,9 @@ vendor/lib64/libadm.so
 vendor/lib64/libadsprpc.so
 vendor/lib64/libar-acdb.so
 vendor/lib64/libar-gpr.so
--vendor/lib64/libar-gsl.so
+vendor/lib64/libar-gsl.so
 vendor/lib64/libar-pal.so;DISABLE_CHECKELF
--vendor/lib64/libats.so
+vendor/lib64/libats.so
 vendor/lib64/libaualgo_ainr_component.so
 vendor/lib64/libaualgo_ainr_wrapper.so
 vendor/lib64/libaualgo_arp_component.so
@@ -130,11 +130,11 @@ vendor/lib64/libaudio_log_utils.so
 vendor/lib64/libdapparamstorage.so
 vendor/lib64/libext_tflite_c.so
 vendor/lib64/liblx-ar_util.so
--vendor/lib64/liblx-osal.so
+vendor/lib64/liblx-osal.so
 vendor/lib64/libmcs.so
 vendor/lib64/libqtigefar.so
 vendor/lib64/libspatializerparamstorage.so
--vendor/lib64/vendor.qti.hardware.pal@1.0-impl.so
+vendor/lib64/vendor.qti.hardware.pal@1.0-impl.so
 
 # Audio misc
 vendor/etc/ap_gain.bin
@@ -144,7 +144,7 @@ vendor/etc/models/acd/music.eai
 vendor/etc/models/acd/speech.eai
 
 # Audio - radar
--vendor/etc/vintf/manifest/manifest.xml
+vendor/etc/vintf/manifest/manifest.xml
 vendor/lib64/hw/audio_radar.primary.default.so
 vendor/lib64/hw/motorola.hardware.audio.radar@1.0-impl.so
 vendor/lib64/motorola.hardware.audio.radar@1.0.so
@@ -494,7 +494,7 @@ vendor/lib64/libeva_util.so
 
 # FASTCV
 vendor/lib64/libfastcvdsp_stub.so
--vendor/lib64/libfastcvopt.so
+vendor/lib64/libfastcvopt.so
 
 # Gatekeeper
 vendor/bin/hw/android.hardware.gatekeeper@1.0-service-qti
@@ -788,7 +788,7 @@ vendor/lib64/qti.video.utils.videobufferlayout.so
 vendor/lib64/vendor.qti.hardware.qconfig@1.0.so
 
 # Memory
--vendor/lib64/libvmmem.so
+vendor/lib64/libvmmem.so
 
 # ModemManager
 vendor/bin/modemManager
@@ -1377,8 +1377,8 @@ vendor/etc/init/vendor.qti.tftp.rc
 # Thermal engine
 vendor/bin/thermal-engine-v2
 vendor/etc/init/init_thermal-engine-v2.rc
--vendor/lib64/liblmthermallistner.so
--vendor/lib64/libthermalclient.so
+vendor/lib64/liblmthermallistner.so
+vendor/lib64/libthermalclient.so
 
 # Time services
 vendor/app/TimeService/TimeService.apk
