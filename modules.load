@@ -217,12 +217,10 @@ qce50_dlkm.ko
 hdcp_qseecom_dlkm.ko
 qrng_dlkm.ko
 smcinvoke_dlkm.ko
-qca_cld3_qca6750.ko
 wlan_firmware_service.ko
 cnss_nl.ko
 cnss_prealloc.ko
 cnss_utils.ko
-icnss2.ko
 btpower.ko
 bt_fm_slim.ko
 camera.ko
@@ -245,7 +243,6 @@ msm_ext_display.ko
 sync_fence.ko
 msm_hw_fence.ko
 msm-mmrm.ko
-nxp-nci.ko
 msm_video.ko
 utags.ko
 mmi_annotate.ko
@@ -266,7 +263,6 @@ wl2868c.ko
 wl2864c.ko
 sx937x_sar.ko
 awinic_sar.ko
-st54spi_gpio.ko
 aw862x_haptic_nv_v1.ko
 stmvl53l3.ko
 st21nfc.ko
@@ -276,6 +272,5 @@ con_dfpar.ko
 moto_mmap_fault.ko
 moto_mm.ko
 moto_swap.ko
-moto_sched.ko
 suspend_marker.ko
 msm_kgsl.ko
