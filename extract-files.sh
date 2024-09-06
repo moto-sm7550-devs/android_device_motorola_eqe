@@ -102,6 +102,10 @@ function blob_fixup() {
             [ "$2" = "" ] && return 0
             echo "pipe2: 1" >> "${2}"
             ;;
+        vendor/lib64/vendor.libdpmframework.so)
+            [ "$2" = "" ] && return 0
+            grep -q "libhidlbase_shim.so" "${2}" || ${PATCHELF} --add-needed "libhidlbase_shim.so" "${2}"
+            ;;
         *)
             return 1
             ;;
