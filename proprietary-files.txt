@@ -128,8 +128,6 @@ vendor/lib64/libaualgo_sst_component.so
 vendor/lib64/libaudio_log_utils.so
 vendor/lib64/libdapparamstorage.so
 vendor/lib64/libext_tflite_c.so
-vendor/lib64/libfmpal.so
-vendor/lib64/libhfp_pal.so
 vendor/lib64/liblx-ar_util.so
 -vendor/lib64/liblx-osal.so
 vendor/lib64/libmcs.so
