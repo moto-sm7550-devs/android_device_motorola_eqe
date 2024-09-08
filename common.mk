@@ -75,7 +75,6 @@ PRODUCT_PACKAGES += \
     android.hardware.soundtrigger@2.3-impl \
     audioadsprpcd \
     audio.bluetooth.default \
-    audio.primary.kalama \
     audio.r_submix.default \
     audio.usb.default \
     libagm_compress_plugin \
