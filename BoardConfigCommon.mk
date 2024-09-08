@@ -94,6 +94,7 @@ AUDIO_FEATURE_ENABLED_PAL_HIDL := true
 AUDIO_FEATURE_ENABLED_PROXY_DEVICE := true
 BOARD_SUPPORTS_SOUND_TRIGGER := true
 BOARD_USES_ALSA_AUDIO := true
+TARGET_PROVIDES_AUDIO_HAL := true
 TARGET_USES_QCOM_MM_AUDIO := true
 USE_CUSTOM_AUDIO_POLICY := 1
 
@@ -118,7 +119,10 @@ DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := \
     vendor/lineage/config/device_framework_matrix.xml
 DEVICE_MATRIX_FILE := hardware/qcom-caf/common/compatibility_matrix.xml
 DEVICE_MANIFEST_SKUS := kalama
-DEVICE_MANIFEST_KALAMA_FILES += $(COMMON_PATH)/manifest_kalama.xml
+DEVICE_MANIFEST_KALAMA_FILES += \
+    $(COMMON_PATH)/manifest_kalama.xml \
+    hardware/qcom-caf/sm8550/audio/primary-hal/configs/common/manifest_non_qmaa.xml \
+    hardware/qcom-caf/sm8550/audio/primary-hal/configs/common/manifest_non_qmaa_extn.xml
 
 # Metadata
 BOARD_USES_METADATA_PARTITION := true
