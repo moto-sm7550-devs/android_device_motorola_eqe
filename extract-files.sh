@@ -76,9 +76,9 @@ function blob_fixup() {
             [ "$2" = "" ] && return 0
             sed -i "s#/system/#/system_ext/#" "${2}"
             ;;
-        vendor/etc/vintf/manifest/vendor.dolby.vision.media.c2@1.0-service.xml)
+        vendor/etc/vintf/manifest/vendor.dolby.media.c2.v1.0@1.0-service.xml)
             [ "$2" = "" ] && return 0
-            sed -ni '/default1/!p' "${2}"
+            sed -ni '/default.*fqname/!p' "${2}"
             ;;
         vendor/bin/hw/android.hardware.security.keymint-service-qti)
             [ "$2" = "" ] && return 0
