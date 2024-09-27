@@ -23,87 +23,81 @@ ODM_MANIFEST_DN_FILES := $(DEVICE_PATH)/manifest_eqe_dn.xml
 ODM_MANIFEST_DNE_FILES := $(DEVICE_PATH)/manifest_eqe_dne.xml
 
 # Kernel
-TARGET_KERNEL_CONFIG += \
-	vendor/ext_config/moto-kalama-eqe.config
+#TARGET_KERNEL_CONFIG += \
+#	vendor/ext_config/moto-kalama-eqe.config
 
 
-#BOARD_KERNEL_BINARIES := kernel
-#BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)-kernel/dtbo.img
-#TARGET_FORCE_PREBUILT_KERNEL := true
-#TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)-kernel/kernel
-#TARGET_PREBUILT_DTB := $(DEVICE_PATH)-kernel/dtb.img
+BOARD_KERNEL_BINARIES := kernel
+BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)-kernel/dtbo.img
+TARGET_FORCE_PREBUILT_KERNEL := true
+TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)-kernel/kernel
+TARGET_PREBUILT_DTB := $(DEVICE_PATH)-kernel/dtb.img
 
-#INLINE_KERNEL_BUILDING := true
-#PRODUCT_COPY_FILES += \
-#    $(DEVICE_PATH)-kernel/dtb.img:$(TARGET_COPY_OUT)/dtb.img \
-#    $(DEVICE_PATH)-kernel/kernel:kernel \
-#    $(call find-copy-subdir-files,*,$(DEVICE_PATH)-kernel/system_dlkm/,$(TARGET_COPY_OUT_SYSTEM_DLKM)/lib/modules/5.15.123-android13-8-o-01093-gfc66aa2c3eb3) \
-#    $(call find-copy-subdir-files,*,$(DEVICE_PATH)-kernel/vendor_dlkm/,$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules) \
-#    $(call find-copy-subdir-files,*,$(DEVICE_PATH)-kernel/vendor_ramdisk/,$(TARGET_COPY_OUT_VENDOR_RAMDISK)/lib/modules)
+INLINE_KERNEL_BUILDING := true
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)-kernel/dtb.img:$(TARGET_COPY_OUT)/dtb.img \
+    $(DEVICE_PATH)-kernel/kernel:kernel \
+    $(call find-copy-subdir-files,*,$(DEVICE_PATH)-kernel/system_dlkm/,$(TARGET_COPY_OUT_SYSTEM_DLKM)/lib/modules/5.15.123-android13-8-o-01093-gfc66aa2c3eb3) \
+    $(call find-copy-subdir-files,*,$(DEVICE_PATH)-kernel/vendor_dlkm/,$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules) \
+    $(call find-copy-subdir-files,*,$(DEVICE_PATH)-kernel/vendor_ramdisk/,$(TARGET_COPY_OUT_VENDOR_RAMDISK)/lib/modules)
 
 # Kernel Modules
-BOARD_SYSTEM_KERNEL_MODULES_LOAD := $(strip $(shell cat $(DEVICE_PATH)/modules.load.system_dlkm))
-BOARD_VENDOR_KERNEL_MODULES_LOAD := $(strip $(shell cat $(DEVICE_PATH)/modules.load))
-BOARD_VENDOR_KERNEL_MODULES_BLOCKLIST_FILE := $(DEVICE_PATH)/modules.blocklist
-BOARD_VENDOR_RAMDISK_KERNEL_MODULES_LOAD := $(strip $(shell cat $(DEVICE_PATH)/modules.load.vendor_boot))
-BOARD_VENDOR_RAMDISK_KERNEL_MODULES_BLOCKLIST_FILE := $(DEVICE_PATH)/modules.blocklist.vendor_boot
-BOARD_VENDOR_RAMDISK_RECOVERY_KERNEL_MODULES_LOAD := $(strip $(shell cat $(DEVICE_PATH)/modules.load.recovery))
-BOOT_KERNEL_MODULES := $(strip $(shell cat $(DEVICE_PATH)/modules.load.recovery $(DEVICE_PATH)/modules.load.vendor_ramdisk))
-SYSTEM_KERNEL_MODULES := $(strip $(shell cat $(DEVICE_PATH)/modules.load.system_dlkm))
+#BOARD_SYSTEM_KERNEL_MODULES_LOAD := $(strip $(shell cat $(DEVICE_PATH)/modules.load.system_dlkm))
+#BOARD_VENDOR_KERNEL_MODULES_LOAD := $(strip $(shell cat $(DEVICE_PATH)/modules.load))
+#BOARD_VENDOR_KERNEL_MODULES_BLOCKLIST_FILE := $(DEVICE_PATH)/modules.blocklist
+#BOARD_VENDOR_RAMDISK_KERNEL_MODULES_LOAD := $(strip $(shell cat $(DEVICE_PATH)/modules.load.vendor_boot))
+#BOARD_VENDOR_RAMDISK_KERNEL_MODULES_BLOCKLIST_FILE := $(DEVICE_PATH)/modules.blocklist.vendor_boot
+#BOARD_VENDOR_RAMDISK_RECOVERY_KERNEL_MODULES_LOAD := $(strip $(shell cat $(DEVICE_PATH)/modules.load.recovery))
+#BOOT_KERNEL_MODULES := $(strip $(shell cat $(DEVICE_PATH)/modules.load.recovery $(DEVICE_PATH)/modules.load.vendor_ramdisk))
+#SYSTEM_KERNEL_MODULES := $(strip $(shell cat $(DEVICE_PATH)/modules.load.system_dlkm))
 
-TARGET_KERNEL_EXT_MODULES := \
-  qcom/opensource/mmrm-driver \
-  qcom/opensource/mm-drivers/hw_fence \
-  qcom/opensource/mm-drivers/msm_ext_display \
-  qcom/opensource/mm-drivers/sync_fence \
-  qcom/opensource/audio-kernel \
-  qcom/opensource/camera-kernel \
-  qcom/opensource/dataipa/drivers/platform/msm \
-  qcom/opensource/datarmnet/core \
-  qcom/opensource/datarmnet-ext/aps \
-  qcom/opensource/datarmnet-ext/offload \
-  qcom/opensource/datarmnet-ext/shs \
-  qcom/opensource/datarmnet-ext/perf \
-  qcom/opensource/datarmnet-ext/perf_tether \
-  qcom/opensource/datarmnet-ext/sch \
-  qcom/opensource/datarmnet-ext/wlan \
-  qcom/opensource/securemsm-kernel \
-  qcom/opensource/display-drivers/msm \
-  qcom/opensource/eva-kernel \
-  qcom/opensource/video-driver \
-  qcom/opensource/graphics-kernel \
-  qcom/opensource/wlan/platform \
-  qcom/opensource/bt-kernel \
-  motorola/drivers/mmi_annotate \
-  motorola/drivers/mmi_info \
-  motorola/drivers/power/bm_adsp_ulog \
-  motorola/drivers/power/mmi_charger \
-  motorola/drivers/power/qti_glink_charger \
-  motorola/drivers/power/qpnp_adaptive_charge \
-  motorola/drivers/misc/utag \
-  motorola/drivers/mmi_relay \
-  motorola/drivers/power/mmi_lpd_mitigate \
-  motorola/drivers/moto_f_usbnet \
-  motorola/drivers/misc/mmi_sys_temp \
-  motorola/drivers/power/wakeup_sources \
-  motorola/drivers/watchdogtest \
-  motorola/drivers/regulator/wl2868c \
-  motorola/drivers/regulator/wl2864c \
-  motorola/drivers/sensors \
-  motorola/drivers/misc/sx937x \
-  motorola/drivers/misc/awinic/sarsensor \
-  motorola/drivers/misc/awinic/aw862x_haptic_nv_v1 \
-  motorola/drivers/misc/suspend_marker \
-  motorola/drivers/input/touchscreen/touchscreen_mmi \
-  motorola/drivers/input/touchscreen/goodix_berlin_mmi \
-  motorola/drivers/input/misc/goodix_fod_mmi \
-  motorola/drivers/input/misc/vl53L1_14_1_2 \
-  motorola/drivers/moto_mm \
-  motorola/drivers/moto_mmap_fault \
-  motorola/drivers/moto_swap \
-  motorola/drivers/moto_con_dfpar \
-  motorola/drivers/nfc/st21nfc
-#  qcom/opensource/wlan/qcacld-3.0/.qca6750 \
+#TARGET_KERNEL_EXT_MODULES := \
+#  qcom/opensource/mmrm-driver \
+#  qcom/opensource/mm-drivers/hw_fence \
+#  qcom/opensource/mm-drivers/msm_ext_display \
+#  qcom/opensource/mm-drivers/sync_fence \
+#  qcom/opensource/audio-kernel \
+#  qcom/opensource/camera-kernel \
+#  qcom/opensource/dataipa/drivers/platform/msm \
+#  qcom/opensource/datarmnet/core \
+#  qcom/opensource/datarmnet-ext/aps \
+#  qcom/opensource/datarmnet-ext/offload \
+#  qcom/opensource/datarmnet-ext/shs \
+#  qcom/opensource/datarmnet-ext/perf \
+#  qcom/opensource/datarmnet-ext/perf_tether \
+#  qcom/opensource/datarmnet-ext/sch \
+#  qcom/opensource/datarmnet-ext/wlan \
+#  qcom/opensource/securemsm-kernel \
+#  qcom/opensource/display-drivers/msm \
+#  qcom/opensource/eva-kernel \
+#  qcom/opensource/video-driver \
+#  qcom/opensource/graphics-kernel \
+#  qcom/opensource/wlan/platform \
+#  qcom/opensource/wlan/qcacld-3.0/.kiwi_v2 \
+#  qcom/opensource/bt-kernel \
+#  nxp/opensource/driver \
+#  motorola/drivers/mmi_annotate \
+#  motorola/drivers/mmi_info \
+#  motorola/drivers/power/bm_adsp_ulog \
+#  motorola/drivers/power/mmi_charger \
+#  motorola/drivers/power/qti_glink_charger \
+#  motorola/drivers/power/qpnp_adaptive_charge \
+#  motorola/drivers/misc/utag \
+#  motorola/drivers/mmi_relay \
+#  motorola/drivers/power/mmi_lpd_mitigate \
+#  motorola/drivers/moto_f_usbnet \
+#  motorola/drivers/misc/mmi_sys_temp \
+#  motorola/drivers/power/wakeup_sources \
+#  motorola/drivers/watchdogtest \
+#  motorola/drivers/regulator/wl2868c \
+#  motorola/drivers/sensors \
+#  motorola/drivers/misc/sx937x_multi \
+#  motorola/drivers/input/touchscreen/touchscreen_mmi \
+#  motorola/drivers/input/touchscreen/goodix_berlin_mmi \
+#  motorola/drivers/input/misc/goodix_fod_mmi \
+#  motorola/drivers/moto_mm \
+#  motorola/drivers/moto_mmap_fault \
+#  motorola/drivers/moto_swap
 
 # Partitions
 ifneq ($(WITH_GMS),true)
