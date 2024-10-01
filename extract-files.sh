@@ -101,10 +101,19 @@ function blob_fixup() {
         vendor/etc/seccomp_policy/qwesd@2.0.policy)
             [ "$2" = "" ] && return 0
             echo "pipe2: 1" >> "${2}"
+            echo "gettid: 1" >> "${2}"
             ;;
         vendor/lib64/vendor.libdpmframework.so)
             [ "$2" = "" ] && return 0
             grep -q "libhidlbase_shim.so" "${2}" || ${PATCHELF} --add-needed "libhidlbase_shim.so" "${2}"
+            ;;
+        vendor/lib64/libqcodec2_core.so)
+            [ "$2" = "" ] && return 0
+            grep -q "libcodec2_shim.so" "${2}" || ${PATCHELF} --add-needed "libcodec2_shim.so" "${2}"
+            ;;
+        vendor/etc/seccomp_policy/atfwd@2.0.policy | vendor/etc/seccomp_policy/wfdhdcphalservice.policy)
+            [ "$2" = "" ] && return 0
+            echo "gettid: 1" >> "${2}"
             ;;
         *)
             return 1
