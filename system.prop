@@ -26,9 +26,9 @@ persist.data.df.ul_mode=5
 persist.data.wda.enable=true
 
 # IMS
-#persist.dbg.volte_avail_ovr=1
-#persist.dbg.vt_avail_ovr=1
-#persist.dbg.wfc_avail_ovr=1
+persist.dbg.volte_avail_ovr=1
+persist.dbg.vt_avail_ovr=1
+persist.dbg.wfc_avail_ovr=1
 net.lte.ims.data.enabled=true,true
 ro.qcom.ims.use_moto_vt_ext=true
 
