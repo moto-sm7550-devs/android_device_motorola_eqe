@@ -84,6 +84,7 @@ PRODUCT_PACKAGES += \
     libaudiochargerlistener \
     libaudioroute.vendor \
     libbatterylistener \
+    libhapticgenerator \
     libqcompostprocbundle \
     libqcomvisualizer \
     libqcomvoiceprocessing \
