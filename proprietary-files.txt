@@ -106,6 +106,7 @@ vendor/lib64/hw/audio.primary.kalama.so
 vendor/lib64/libPeripheralStateUtils.so
 vendor/lib64/libadm.so
 vendor/lib64/libadsprpc.so
+vendor/lib64/libar-acdb.so
 vendor/lib64/libar-gpr.so
 -vendor/lib64/libar-gsl.so
 -vendor/lib64/libar-pal.so
