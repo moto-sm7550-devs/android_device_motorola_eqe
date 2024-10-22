@@ -54,7 +54,9 @@ function lib_to_package_fixup_vendor_variants() {
             vendor.qti.qspmhal@1.0)
             echo "$1-vendor"
             ;;
-        libqsap_sdk | \
+        libagmclient | \
+            libpalclient | \
+            libqsap_sdk | \
             libril | \
             libwpa_client) ;;
         *)
