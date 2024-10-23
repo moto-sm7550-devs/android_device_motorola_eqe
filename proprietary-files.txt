@@ -1021,7 +1021,6 @@ vendor/lib64/libDcfHalLogger.so
 vendor/lib64/libDcfHalQtiMutex.so
 vendor/lib64/libSensorsInterface.so
 vendor/lib64/libqape_oem_ext.so
-vendor/lib64/libqsap_sdk.so
 vendor/lib64/libqsh_ble_pb.so
 vendor/lib64/libvui_dmgr.so
 vendor/lib64/libvui_dmgr_client.so
