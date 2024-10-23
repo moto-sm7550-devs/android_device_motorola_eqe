@@ -971,7 +971,6 @@ vendor/lib64/vendor.qti.qesdsys-V3-ndk.so
 
 # QMI
 system/etc/sysconfig/qti_whitelist.xml
-vendor/bin/init.qti.write.sh
 vendor/bin/irsc_util
 vendor/bin/qmi_motext_hook
 vendor/bin/qmipriod
@@ -1306,7 +1305,6 @@ vendor/lib64/se_nq_extn_client.so
 
 # Sensors
 vendor/bin/hw/vendor.qti.hardware.sensorscalibrate@1.0-service
-vendor/bin/init.qcom.sensors.sh
 vendor/bin/sensors.qti
 vendor/bin/sscrpcd
 vendor/etc/init/init.vendor.sensors.rc
