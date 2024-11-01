@@ -957,10 +957,8 @@ vendor/lib64/vendor.qti.hardware.qccvndhal@1.0.so
 vendor/bin/qesdk-manager
 vendor/etc/init/qesdk-manager.rc
 vendor/etc/seccomp_policy/qesdk.policy
-vendor/lib64/liblocation_qesdk.so
 vendor/lib64/libqesdk2_0.so
 vendor/lib64/libqesdk_manager.so
-vendor/lib64/libqti-qesdk-secure.so
 vendor/lib64/vendor.qti.qesdhal@1.0.so
 vendor/lib64/vendor.qti.qesdhal@1.1.so
 vendor/lib64/vendor.qti.qesdhal@1.2.so
@@ -1313,7 +1311,6 @@ vendor/etc/init/vendor.sensors.sscrpcd.rc
 vendor/etc/permissions/vendor-qti-hardware-sensorscalibrate.xml
 vendor/lib64/hw/vendor.qti.hardware.sensorscalibrate@1.0-impl.so
 vendor/lib64/libnanopb.so
-vendor/lib64/libsdsprpc.so
 vendor/lib64/libsensorcal.so
 vendor/lib64/libsensorslog.so
 vendor/lib64/libsns_api.so
@@ -1327,7 +1324,6 @@ vendor/lib64/libsnsdiaglog.so
 vendor/lib64/libsnsutils.so
 vendor/lib64/libssc.so
 vendor/lib64/libssc_default_listener.so
-vendor/lib64/motorola.hardware.sensors-V1-ndk_platform.so
 vendor/lib64/vendor.qti.hardware.sensorscalibrate@1.0.so
 
 # Sensors - Moto
