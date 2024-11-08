@@ -23,7 +23,7 @@ PRODUCT_MODEL := motorola edge 50 pro
 PRODUCT_GMS_CLIENTID_BASE := android-motorola
 
 PRODUCT_BUILD_PROP_OVERRIDES += \
-    TARGET_PRODUCT=eqe_g \
-    PRIVATE_BUILD_DESC="eqe_g-user 14 U2UMS34.27-38-1-2-3-1 76e47-863bd0 release-keys"
+    DeviceProduct=eqe_g \
+    BuildDesc=$(call normalize-path-list, "eqe_g-user 14 U2UMS34.27-38-1-2-3-1 76e47-863bd0 release-keys")
 
 BUILD_FINGERPRINT := motorola/eqe_g/eqe:14/U2UMS34.27-38-1-2-3-1/76e47-863bd0:user/release-keys
