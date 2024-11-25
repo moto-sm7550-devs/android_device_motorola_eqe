@@ -795,11 +795,6 @@ vendor/lib64/vendor.qti.hardware.qconfig@1.0.so
 # Memory
 vendor/lib64/libvmmem.so
 
-# ModemManager
-vendor/bin/modemManager
-vendor/etc/init/modemManager.rc
-vendor/etc/seccomp_policy/modemManager.policy
-
 # Neural networks
 vendor/lib64/libCOSNet_spatial_qnn_quantized.so
 vendor/lib64/libQnnChrometraceProfilingReader.so
