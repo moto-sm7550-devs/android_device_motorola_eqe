@@ -45,7 +45,8 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/audio/audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio/audio_policy_configuration.xml \
     $(LOCAL_PATH)/audio/audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_crow_qssi/audio_policy_configuration.xml \
-    $(LOCAL_PATH)/audio/sku_crow/mixer_paths_crow_idp.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_crow/mixer_paths_crow_idp.xml
+    $(LOCAL_PATH)/audio/sku_crow/mixer_paths_crow_idp.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_crow/mixer_paths_crow_idp.xml \
+    $(LOCAL_PATH)/audio/sku_crow/resourcemanager_crow_idp.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_crow/resourcemanager_crow_idp.xml
 
 # Dex-pre-opt exclusions
 $(call add-product-dex-preopt-module-config,MotoSignatureApp,disable)
