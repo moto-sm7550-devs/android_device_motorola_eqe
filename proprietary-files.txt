@@ -376,6 +376,11 @@ product/app/EuiccPartnerApp/EuiccPartnerApp.apk;PRESIGNED
 product/etc/permissions/privapp-permissions-com.google.android.euicc.xml
 product/priv-app/EuiccGoogle/EuiccGoogle.apk;PRESIGNED
 
+# Felica
+product/etc/felica/common.cfg
+product/etc/felica/mfm.cfg
+product/etc/felica/mfs.cfg
+
 # Fingerprint
 vendor/bin/hw/android.hardware.biometrics.fingerprint@2.1-goodixservice
 vendor/etc/init/android.hardware.biometrics.fingerprint@2.1-goodix.rc
