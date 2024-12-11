@@ -49,6 +49,9 @@ vendor/etc/default_volume_tables.xml
 vendor/etc/microphone_characteristics.xml
 vendor/etc/usecaseKvManager.xml
 
+# Audio firmware
+vendor/firmware/aw882xx_acf.bin
+
 # Camera
 vendor/lib64/camera/arcsoft_dc_calibration_u.bin
 vendor/lib64/camera/com.qti.ois.mot_dw9784_main.so
