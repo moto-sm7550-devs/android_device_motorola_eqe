@@ -25,6 +25,10 @@ persist.data.df.mux_count=8
 persist.data.df.ul_mode=5
 persist.data.wda.enable=true
 
+# Google
+ro.opa.device_model_id=motorola-rtwo
+ro.opa.eligible_device=true
+
 # IMS
 persist.dbg.volte_avail_ovr=1
 persist.dbg.vt_avail_ovr=1

@@ -39,6 +39,10 @@ vendor.audio.hal.boot.timeout.ms=20000
 vendor.audio.hal.output.suspend.supported=true
 vendor.audio.hdr.spf.record.enable=true
 vendor.audio.hw.aac.encoder=false
+vendor.audio.max.dr=7.2,7.0
+vendor.audio.max.temp=60.0
+vendor.audio.min.dr=5.8,5.6
+vendor.audio.min.temp=20.0
 vendor.audio.offload.buffer.size.kb=32
 vendor.audio.offload.gapless.enabled=true
 vendor.audio.offload.multiaac.enable=true
@@ -151,7 +155,9 @@ vendor.qcom.bluetooth.soc=hamilton
 
 # Camera
 camera.disable_zsl_mode=1
+persist.vendor.camera.physical.num=4
 persist.vendor.camera.privapp.list=com.motorola.camera3
+ro.camera.enableCamera1MaxZsl=1
 
 # Dalvik
 dalvik.vm.dex2oat64.enabled=true
@@ -203,6 +209,7 @@ drm.service.enabled=true
 
 # Fingerprint
 persist.vendor.qfp=true
+ro.hardware.fingerprint=goodix
 
 # FRP
 ro.frp.pst=/dev/block/bootdevice/by-name/frp
@@ -256,6 +263,9 @@ ro.hardware.keystore_desede=true
 debug.c2.use_dmabufheaps=1
 debug.stagefright.c2inputsurface=-1
 vendor.media.omx=0
+
+# Motorola
+ro.mot.build.customerid=global
 
 # Perf
 ro.vendor.extension_library=libqti-perfd-client.so

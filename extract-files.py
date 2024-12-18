@@ -19,7 +19,7 @@ from extract_utils.main import (
 )
 
 namespace_imports = [
-    'device/motorola/sm8550-common',
+    'device/motorola/rtwo',
     'hardware/qcom-caf/sm8550',
     'hardware/qcom-caf/wlan',
     'hardware/motorola',
@@ -59,6 +59,8 @@ lib_fixups: lib_fixups_user_type = {
 }
 
 blob_fixups: blob_fixups_user_type = {
+    'product/priv-app/MotCamera4/MotCamera4.apk': blob_fixup()
+        .apktool_patch('MotCamera4-patches'),
     'system_ext/etc/permissions/moto-telephony.xml': blob_fixup()
         .regex_replace('/system/', '/system_ext/'),
     'system_ext/priv-app/ims/ims.apk': blob_fixup()
@@ -90,7 +92,7 @@ blob_fixups: blob_fixups_user_type = {
 }  # fmt: skip
 
 module = ExtractUtilsModule(
-    'sm8550-common',
+    'rtwo',
     'motorola',
     blob_fixups=blob_fixups,
     lib_fixups=lib_fixups,

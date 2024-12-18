@@ -1,0 +1,4 @@
+runtime_resource_overlay {
+    name: "ApertureResRtwo",
+    product_specific: true
+}
