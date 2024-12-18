@@ -1,0 +1,184 @@
+
+# This is for Moto rtwo device init rc file
+on fs
+    #zram wb
+    mount_all /vendor/etc/fstab.qcom.zram --early
+
+on post-fs
+    start vendor.copy_qc_cert
+
+    # Sensors
+    chown system system /sys/devices/platform/soc/ac0000.qcom,qupv3_1_geni_se/a90000.spi/spi_master/spi0/spi0.0/touchscreen/primary/double_tap_enabled
+    chown system system /sys/devices/platform/soc/ac0000.qcom,qupv3_1_geni_se/a90000.spi/spi_master/spi0/spi0.0/touchscreen/primary/double_tap_pressed
+    chown system system /sys/devices/platform/soc/ac0000.qcom,qupv3_1_geni_se/a90000.spi/spi_master/spi0/spi0.0/touchscreen/primary/udfps_enabled
+    chown system system /sys/devices/platform/soc/ac0000.qcom,qupv3_1_geni_se/a90000.spi/spi_master/spi0/spi0.0/touchscreen/primary/udfps_pressed
+
+on early-boot
+    chown system system /dev/goodix_fp
+    chmod 0664 /dev/goodix_fp
+    mkdir /data/vendor/gf_data 0770 system system
+    mkdir /mnt/vendor/persist/goodix 0770 system system
+# Add for after-sales ois gyro cal
+    mkdir /mnt/vendor/persist/camera/gyro_compat 0770 vendor_tcmd camera
+# Create directory for wireless charge test in factory
+    mkdir /data/vendor/wlc 0775 vendor_tcmd system
+    chown system system /mnt/vendor/persist/sensors/als_comp_multi_cal_raw
+    chmod 0664 /mnt/vendor/persist/sensors/als_comp_multi_cal_raw
+
+on boot
+    # allow TCMD to access cci
+    chmod 0660 /dev/cci_intf
+    chown system camera /dev/cci_intf
+
+    # Touch game mode control
+    chown system system /sys/class/touchscreen/primary/rotate
+    chmod 0660 /sys/class/touchscreen/primary/rotate
+    chown system system /sys/class/touchscreen/primary/interpolation
+    chmod 0660 /sys/class/touchscreen/primary/interpolation
+    chown system system /sys/class/touchscreen/primary/edge
+    chmod 0660 /sys/class/touchscreen/primary/edge
+    chown system system /sys/class/touchscreen/primary/sensitivity
+    chmod 0660 /sys/class/touchscreen/primary/sensitivity
+    chown system system /sys/class/touchscreen/primary/gesture
+    chmod 0660 /sys/class/touchscreen/primary/gesture
+    chown system system /sys/class/touchscreen/primary/sample
+    chmod 0660 /sys/class/touchscreen/primary/sample
+
+    #change vibrator test node file access permission
+    chmod 0660 /sys/class/qcom-haptics/enable_play
+    chown vendor_tcmd system /sys/class/qcom-haptics/enable_play
+
+    #bluetooth sar
+    write /data/vendor/radio/bluetooth_sar disable
+    chmod 0644 /data/vendor/radio/bluetooth_sar
+    chown radio /data/vendor/radio/bluetooth_sar
+
+    # max readyfor apps
+    setprop ro.vendor.config.max_readyfor_apps 4
+
+service vendor.mot_vsync_psd /vendor/bin/mot_vsync_psd
+    class late_start
+    user root
+
+service vendor.capsense_reset /vendor/bin/capsense_reset
+   class core
+   user system
+   group system input
+   disabled
+
+service vendor.copy_qc_cert /vendor/bin/copy_qc_cert.sh
+    class main
+    user system
+    group root system
+    oneshot
+    disabled
+
+service vendor.mmi-cap-sh /vendor/bin/init.mmi.cap.sh
+    class core
+    user root
+    oneshot
+
+on property:sys.boot_completed=1
+    start vendor.capsense_reset
+    #change adsp pmic test command file access permission
+    chown vendor_tcmd system /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/tcmd
+    chown vendor_tcmd system /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_pmic_icl
+    chown vendor_tcmd system /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_usb_suspend
+    chown vendor_tcmd system /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_wls_en
+    chown vendor_tcmd system /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_wls_curr_max
+    chown vendor_tcmd system /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_wls_volt_max
+    chmod 0660 /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/tcmd
+    chmod 0660 /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_pmic_icl
+    chmod 0660 /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_usb_suspend
+    chmod 0660 /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_wls_en
+    chmod 0660 /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_wls_curr_max
+    chmod 0660 /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_wls_volt_max
+
+    chown system system /sys/class/power_supply/wireless/device/tx_mode
+    chown system system /sys/class/power_supply/wireless/device/wls_input_current_limit
+    chown vendor_tcmd system /sys/class/power_supply/wireless/device/tx_mode_vout
+    chmod 0660 /sys/class/power_supply/wireless/device/tx_mode
+    chmod 0660 /sys/class/power_supply/wireless/device/wls_input_current_limit
+
+    # Set wlc perms for HAL
+    chown system system /sys/class/power_supply/wireless/device/wlc_light_ctl
+    chown system system /sys/class/power_supply/wireless/device/wlc_fan_speed
+    chown system system /sys/class/power_supply/wireless/device/wlc_st_changed
+    chown system system /sys/class/power_supply/wireless/device/wlc_tx_power
+    chown system system /sys/class/power_supply/wireless/device/wlc_tx_type
+    chmod 0660 /sys/class/power_supply/wireless/device/wlc_light_ctl
+    chmod 0660 /sys/class/power_supply/wireless/device/wlc_fan_speed
+
+    # Change force_charging_enable access mode and permission for tcmd
+    chmod 0664 /sys/class/power_supply/battery/device/force_charging_enable
+    chown vendor_tcmd system /sys/class/power_supply/battery/device/force_charging_enable
+
+    # Set adaptive charging perms for HAL
+    chown system system /sys/module/qpnp_adaptive_charge/parameters/upper_limit
+    chown system system /sys/module/qpnp_adaptive_charge/parameters/lower_limit
+    #Try to update wireless firmware
+    write /sys/class/qcom-battery/wireless_fw_update_time_ms 10000
+    write /sys/class/qcom-battery/wireless_fw_update 1
+
+#Override fwpath string when wpa_supplicant server was killed
+on property:vendor.wifi.station=true
+    write /sys/module/kiwi_v2/parameters/sar_sta enabled
+
+on property:vendor.wifi.station=false
+    write /sys/module/kiwi_v2/parameters/sar_sta disabled
+
+on property:vendor.wifi.tethering=false
+    write /sys/module/kiwi_v2/parameters/sar_mhs disabled
+
+on property:vendor.wifi.tethering=true
+    write /sys/module/kiwi_v2/parameters/sar_mhs enabled
+
+on property:ro.product.is_prc=true
+    setprop persist.vendor.audio.use_case.extend prc
+
+on property:ro.carrier=tmo
+    setprop persist.vendor.audio.use_case.extend tmo
+
+#enable ftrace when boot complete
+# MMI_STOPSHIP <debug abnormal QC sensor>: capture sensor ftrace
+on property:dev.bootcomplete=1 && property:ro.vendor.build.type=userdebug
+    write /sys/kernel/tracing/tracing_on 0
+    write /sys/kernel/tracing/buffer_size_kb 65534
+    write /sys/kernel/tracing/set_event ""
+    write /sys/kernel/tracing/trace   ""
+    write /sys/kernel/tracing/events/irq/enable 1
+    write /sys/kernel/tracing/events/sched/sched_switch/enable 1
+    write /sys/kernel/tracing/events/sched/sched_enq_deq_task/enable 1
+    write /sys/kernel/tracing/events/sched/sched_migrate_task/enable 1
+    write /sys/kernel/tracing/events/sched/sched_wakeup/enable 1
+    write /sys/kernel/tracing/events/sched/sched_wakeup_new/enable 1
+    write /sys/kernel/tracing/events/power/cpu_idle/enable 1
+    write /sys/kernel/tracing/events/power/suspend_resume/enable 1
+    write /sys/kernel/tracing/events/iommu/map/enable 1
+    write /sys/kernel/tracing/events/iommu/unmap/enable 1
+    write /sys/kernel/tracing/events/arm_smmu/map_pages/enable 1
+    write /sys/kernel/tracing/events/arm_smmu/map_sg/enable 1
+    write /sys/kernel/tracing/events/arm_smmu/unmap_pages/enable 1
+    write /sys/kernel/tracing/set_event "workqueue:workqueue_execute_end workqueue:workqueue_execute_start"
+    write /sys/kernel/tracing/set_event "workqueue:workqueue_activate_work workqueue:workqueue_queue_work"
+    write /sys/kernel/tracing/set_event "sched:sched_switch sched:sched_wakeup sched:sched_stat_blocked"
+    write /sys/kernel/tracing/set_event "sched:sched_process_wait sched:sched_load_balance"
+    write /sys/kernel/tracing/set_event "sched:* irq:*"
+    write /sys/kernel/tracing/tracing_on 1
+
+on property:vendor.bluetooth.sar_state=connect
+    write /data/vendor/radio/bluetooth_sar connect
+
+on property:vendor.bluetooth.sar_state=disconnect
+    write /data/vendor/radio/bluetooth_sar disconnect
+
+#update the high watermark by set efk value
+on property:vendor.post_boot.parsed=1
+    setprop sys.sysctl.extra_free_kbytes ${sys.sysctl.extra_free_kbytes}
+
+on property:vendor.usb.headset_reset=2
+    write /sys/bus/platform/devices/${ro.boot.usb.dwc3_msm:-a600000.ssusb}/mode none
+
+on property:vendor.usb.headset_reset=0
+    wait /sys/bus/platform/devices/${ro.boot.usb.dwc3_msm:-a600000.ssusb}/headset_reset_delay 2
+    write /sys/bus/platform/devices/${ro.boot.usb.dwc3_msm:-a600000.ssusb}/mode host
