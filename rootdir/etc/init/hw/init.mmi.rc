@@ -364,8 +364,12 @@ on charger
     trigger late-fs-charger
     trigger post-fs-data
     trigger moto-charger
+    trigger tks-charger
     class_stop main
     class_stop late_start
+
+on tks-charger && property:persist.sys.tksautoboot=1
+    setprop sys.powerctl "reboot,tks-charger"
 
 service vendor.apanic_annotate /vendor/bin/apanic_save.sh build
     class late_start
@@ -450,6 +454,11 @@ on property:persist.vendor.qc.sub.rdump.on=*
 
 on property:ro.vendor.hw.dualsim=false
    setprop persist.radio.multisim.config ""
+
+on property:ro.vendor.hw.felica=true && property:ro.vendor.hw.nfc=ese_st
+   setprop persist.vendor.nfc.st_nfc_felica_ese 1
+   setprop persist.vendor.nfc.config_file_name "libnfc-nci-st-felica.conf"
+   copy /vendor/etc/sttesttool.json /data/nfc/sttesttool.json
 
 on property:sys.sysctl.swappiness=*
     write /proc/sys/vm/swappiness ${sys.sysctl.swappiness}
@@ -561,4 +570,12 @@ on property:ro.carrier=softbank
 
 # IKSWT-90913: Force shutter tone on Japan ymobile carrier
 on property:ro.carrier=ymobile
+    setprop audio.camerasound.force true
+
+# IKSWU-148561: Force shutter tone on Japan Docomo carrier
+on property:ro.carrier=docomo
+    setprop audio.camerasound.force true
+
+# IKSWU-165346: Force shutter tone on Korea carriers
+on property:ro.carrier=retkr
     setprop audio.camerasound.force true
