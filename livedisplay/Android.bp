@@ -13,7 +13,7 @@
 // limitations under the License.
 
 cc_defaults {
-    name: "livedisplay_motorola_kalama",
+    name: "livedisplay_eqe",
     defaults: ["hidl_defaults"],
     relative_install_path: "hw",
     srcs: [
@@ -39,9 +39,9 @@ cc_defaults {
 }
 
 cc_binary {
-    name: "vendor.lineage.livedisplay@2.1-service.motorola_kalama",
-    init_rc: ["vendor.lineage.livedisplay@2.1-service.motorola_kalama.rc"],
-    vintf_fragments: ["vendor.lineage.livedisplay@2.1-service.motorola_kalama.xml"],
-    defaults: ["livedisplay_motorola_kalama"],
+    name: "vendor.lineage.livedisplay@2.1-service.eqe",
+    init_rc: ["vendor.lineage.livedisplay@2.1-service.eqe.rc"],
+    vintf_fragments: ["vendor.lineage.livedisplay@2.1-service.eqe.xml"],
+    defaults: ["livedisplay_eqe"],
     vendor: true,
 }

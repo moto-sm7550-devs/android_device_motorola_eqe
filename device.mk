@@ -23,12 +23,12 @@ DEVICE_PACKAGE_OVERLAYS += \
 PRODUCT_ENFORCE_RRO_TARGETS := *
 
 PRODUCT_PACKAGES += \
-    ApertureResRtwo \
-    FrameworksResRtwo \
-    LineageSystemUIRtwo \
-    ProductFrameworksResRtwo \
-    SettingsResRtwo \
-    SystemUIResRtwo
+    ApertureResEqe \
+    FrameworksResEqe \
+    LineageSystemUIEqe \
+    ProductFrameworksResEqe \
+    SettingsResEqe \
+    SystemUIResEqe
 
 PRODUCT_PACKAGES += \
     FrameworksResCommon_Sys \
@@ -43,8 +43,7 @@ $(call inherit-product, hardware/qcom-caf/common/common.mk)
 
 # AAPT
 PRODUCT_AAPT_CONFIG := normal
-PRODUCT_AAPT_PREF_CONFIG := 400dpi
-PRODUCT_AAPT_PREBUILT_DPI := xxxhdpi xxhdpi xhdpi hdpi
+PRODUCT_AAPT_PREF_CONFIG := xxhdpi
 
 # A/B
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
@@ -99,7 +98,7 @@ PRODUCT_PACKAGES += \
     libsndcardparser \
     libtinycompress \
     libvolumelistener \
-    sound_trigger.primary.kalama
+    sound_trigger.primary.crow
 
 AUDIO_HAL_DIR := hardware/qcom-caf/sm8550/audio/primary-hal
 
@@ -167,7 +166,7 @@ PRODUCT_PACKAGES += \
 
 # Fingerprint
 PRODUCT_PACKAGES += \
-    android.hardware.biometrics.fingerprint@2.3-service.rtwo
+    android.hardware.biometrics.fingerprint@2.3-service.eqe
 
 # GPS
 PRODUCT_PACKAGES += \
@@ -237,7 +236,7 @@ PRODUCT_COPY_FILES += \
 
 # LiveDisplay
 PRODUCT_PACKAGES += \
-    vendor.lineage.livedisplay@2.1-service.motorola_kalama
+    vendor.lineage.livedisplay@2.1-service.eqe
 
 # Media
 PRODUCT_COPY_FILES += \
@@ -336,7 +335,7 @@ PRODUCT_PACKAGES += \
 
 # PowerShare
 PRODUCT_PACKAGES += \
-    vendor.lineage.powershare@1.0-service.rtwo
+    vendor.lineage.powershare@1.0-service.eqe
 
 # Protobuf
 PRODUCT_PACKAGES += \
@@ -355,7 +354,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     android.hardware.sensors-service.multihal \
     sensors.dynamic_sensor_hal \
-    sensors.rtwo
+    sensors.eqe
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/sensors/hals.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/hals.conf
@@ -400,7 +399,7 @@ PRODUCT_COPY_FILES += \
 
 # Touch
 PRODUCT_PACKAGES += \
-    vendor.lineage.touch@1.0-service.rtwo
+    vendor.lineage.touch@1.0-service.eqe
 
 # Update engine
 PRODUCT_PACKAGES += \
@@ -463,4 +462,4 @@ PRODUCT_BOOT_JARS += \
     WfdCommon
 
 # Inherit from vendor blobs
-$(call inherit-product, vendor/motorola/rtwo/rtwo-vendor.mk)
+$(call inherit-product, vendor/motorola/eqe/eqe-vendor.mk)

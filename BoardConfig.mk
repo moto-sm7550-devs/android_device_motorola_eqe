@@ -5,7 +5,7 @@
 
 BOARD_VENDOR := motorola
 
-DEVICE_PATH := device/motorola/rtwo
+DEVICE_PATH := device/motorola/eqe
 
 # Architecture
 TARGET_ARCH := arm64
@@ -15,7 +15,7 @@ TARGET_CPU_VARIANT := generic
 TARGET_CPU_VARIANT_RUNTIME := kryo300
 
 # Bootloader
-TARGET_BOOTLOADER_BOARD_NAME := rtwo
+TARGET_BOOTLOADER_BOARD_NAME := eqe
 TARGET_NO_BOOTLOADER := true
 
 # Init boot
@@ -43,7 +43,7 @@ BOARD_KERNEL_CMDLINE += mem.enable_mglru=1
 BOARD_BOOTCONFIG += androidboot.hardware=qcom
 BOARD_BOOTCONFIG += androidboot.memcg=1
 BOARD_BOOTCONFIG += androidboot.usbcontroller=a600000.dwc3
-# BOARD_BOOTCONFIG += androidboot.selinux=permissive
+BOARD_BOOTCONFIG += androidboot.selinux=permissive
 BOARD_KERNEL_IMAGE_NAME := Image
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
@@ -55,7 +55,7 @@ TARGET_KERNEL_CONFIG := \
     vendor/kalama_GKI.config \
     vendor/ext_config/moto-kalama.config \
     vendor/ext_config/moto-kalama-gki.config \
-    vendor/ext_config/moto-kalama-rtwo.config
+    vendor/ext_config/moto-kalama-eqe.config
 
 # Kernel modules
 TARGET_KERNEL_EXT_MODULE_ROOT := kernel/motorola/sm8550-modules
@@ -119,7 +119,7 @@ TARGET_KERNEL_EXT_MODULES := \
 
 # Platform
 BOARD_USES_QCOM_HARDWARE := true
-TARGET_BOARD_PLATFORM := kalama
+TARGET_BOARD_PLATFORM := crow
 
 BOARD_ROOT_EXTRA_SYMLINKS := \
     /vendor/fsg:/fsg
@@ -173,14 +173,14 @@ DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := \
     hardware/qcom-caf/common/vendor_framework_compatibility_matrix.xml \
     vendor/lineage/config/device_framework_matrix.xml
 DEVICE_MATRIX_FILE := hardware/qcom-caf/common/compatibility_matrix.xml
-DEVICE_MANIFEST_SKUS := kalama
-DEVICE_MANIFEST_KALAMA_FILES += \
-    $(DEVICE_PATH)/manifest_kalama.xml \
+DEVICE_MANIFEST_SKUS := crow
+DEVICE_MANIFEST_CROW_FILES += \
+    $(DEVICE_PATH)/manifest_crow.xml \
     hardware/qcom-caf/sm8550/audio/primary-hal/configs/common/manifest_non_qmaa.xml \
     hardware/qcom-caf/sm8550/audio/primary-hal/configs/common/manifest_non_qmaa_extn.xml
 ODM_MANIFEST_SKUS += dn dne
-ODM_MANIFEST_DN_FILES := $(DEVICE_PATH)/manifest_rtwo_dn.xml
-ODM_MANIFEST_DNE_FILES := $(DEVICE_PATH)/manifest_rtwo_dne.xml
+ODM_MANIFEST_DN_FILES := $(DEVICE_PATH)/manifest_eqe_dn.xml
+ODM_MANIFEST_DNE_FILES := $(DEVICE_PATH)/manifest_eqe_dne.xml
 
 # Metadata
 BOARD_USES_METADATA_PARTITION := true
@@ -276,4 +276,4 @@ WIFI_HIDL_UNIFIED_SUPPLICANT_SERVICE_RC_ENTRY := true
 WPA_SUPPLICANT_VERSION := VER_0_8_X
 
 # inherit from the proprietary version
-include vendor/motorola/rtwo/BoardConfigVendor.mk
+include vendor/motorola/eqe/BoardConfigVendor.mk

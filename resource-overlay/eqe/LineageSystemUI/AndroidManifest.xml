@@ -4,6 +4,10 @@
      SPDX-License-Identifier: Apache-2.0
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="android.overlay.product.rtwo">
-    <overlay android:targetPackage="android" android:isStatic="true" android:priority="600"/>
+    package="com.android.systemui.eqe.lineage">
+
+    <overlay
+        android:isStatic="true"
+        android:priority="800"
+        android:targetPackage="com.android.systemui" />
 </manifest>

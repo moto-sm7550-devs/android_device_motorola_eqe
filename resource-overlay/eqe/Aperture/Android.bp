@@ -1,4 +1,4 @@
 runtime_resource_overlay {
-    name: "ProductFrameworksResRtwo",
+    name: "ApertureResEqe",
     product_specific: true
 }

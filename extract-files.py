@@ -19,7 +19,7 @@ from extract_utils.main import (
 )
 
 namespace_imports = [
-    'device/motorola/rtwo',
+    'device/motorola/eqe',
     'hardware/qcom-caf/sm8550',
     'hardware/qcom-caf/wlan',
     'hardware/motorola',
@@ -92,7 +92,7 @@ blob_fixups: blob_fixups_user_type = {
 }  # fmt: skip
 
 module = ExtractUtilsModule(
-    'rtwo',
+    'eqe',
     'motorola',
     blob_fixups=blob_fixups,
     lib_fixups=lib_fixups,
