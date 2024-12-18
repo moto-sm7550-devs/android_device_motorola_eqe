@@ -1,11 +1,25 @@
+# This is for Moto eqe device init rc file
 
-# This is for Moto rtwo device init rc file
+import /vendor/etc/init/hw/init.vendor.st21nfc.rc
+
 on fs
     #zram wb
     mount_all /vendor/etc/fstab.qcom.zram --early
 
 on post-fs
     start vendor.copy_qc_cert
+
+on post-fs && property:ro.bootmode=mot-factory
+    start vendor.set_st_ese_version
+
+on post-fs-data
+    chmod 0773 /data/vendor/touchrec
+    chmod 0664 /data/vendor/touchrec/raw_data.bin
+
+    # Add for modem rfs logs
+    rm /data/vendor/radio/read_modem_efs
+    write /data/vendor/radio/read_modem_efs 0
+    chmod 0666 /data/vendor/radio/read_modem_efs
 
     # Sensors
     chown system system /sys/devices/platform/soc/ac0000.qcom,qupv3_1_geni_se/a90000.spi/spi_master/spi0/spi0.0/touchscreen/primary/double_tap_enabled
@@ -24,6 +38,14 @@ on early-boot
     mkdir /data/vendor/wlc 0775 vendor_tcmd system
     chown system system /mnt/vendor/persist/sensors/als_comp_multi_cal_raw
     chmod 0664 /mnt/vendor/persist/sensors/als_comp_multi_cal_raw
+# for ufs HID
+    chown system system /sys/devices/platform/soc/1d84000.ufshc/ufshid/trigger
+    chown system system /sys/devices/platform/soc/1d84000.ufshc/manual_gc
+# for ghost log capture
+    chmod 0444 /dev/tp_tools
+# for eSE strongbox
+    mkdir /mnt/vendor/persist/ese 0775 system system
+
 
 on boot
     # allow TCMD to access cci
@@ -43,10 +65,20 @@ on boot
     chmod 0660 /sys/class/touchscreen/primary/gesture
     chown system system /sys/class/touchscreen/primary/sample
     chmod 0660 /sys/class/touchscreen/primary/sample
+    chown system system /sys/class/touchscreen/primary/stowed
+    chmod 0660 /sys/class/touchscreen/primary/stowed
+    chown system system /sys/class/touchscreen/primary/log_trigger
+    chmod 0660 /sys/class/touchscreen/primary/log_trigger
 
-    #change vibrator test node file access permission
-    chmod 0660 /sys/class/qcom-haptics/enable_play
-    chown vendor_tcmd system /sys/class/qcom-haptics/enable_play
+    #change vibrator gain node file access permission
+    chown system system /sys/class/leds/vibrator/gain
+    chmod 0660 /sys/class/leds/vibrator/gain
+    chown system system /sys/class/leds/vibrator/strength
+    chmod 0660 /sys/class/leds/vibrator/strength
+    chown system system /sys/class/leds/vibrator/rtp
+    chmod 0660 /sys/class/leds/vibrator/rtp
+    chown system system /sys/class/leds/vibrator/rtp_interface
+    chmod 0660 /sys/class/leds/vibrator/rtp_interface
 
     #bluetooth sar
     write /data/vendor/radio/bluetooth_sar disable
@@ -56,15 +88,57 @@ on boot
     # max readyfor apps
     setprop ro.vendor.config.max_readyfor_apps 4
 
-service vendor.mot_vsync_psd /vendor/bin/mot_vsync_psd
-    class late_start
-    user root
+    #Add for laser
+    chown system /sys/devices/virtual/laser/stmvl53l1/do_flush
+    chmod 0660 /sys/devices/virtual/laser/stmvl53l1/do_flush
+    chmod 0660 /sys/devices/virtual/laser/stmvl53l1/enable_ps_sensor
+    chown system /sys/devices/virtual/laser/stmvl53l1/enable_ps_sensor
+    chmod 0664 /mnt/vendor/persist/camera/focus/offset_cal
+    chmod 0664 /mnt/vendor/persist/camera/focus/cal_data
+
+    # Change ownership for capsensor
+    chown root input /sys/class/sensors/Moto\ CapSense\ Ch0/enable
+    chown root input /sys/class/sensors/Moto\ CapSense\ Ch0/poll_delay
+    chown root input /sys/class/sensors/Moto\ CapSense\ Ch1/enable
+    chown root input /sys/class/sensors/Moto\ CapSense\ Ch1/poll_delay
+    chown root input /sys/class/sensors/Moto\ CapSense\ Ch2/enable
+    chown root input /sys/class/sensors/Moto\ CapSense\ Ch2/poll_delay
+    chown root input /sys/class/sensors/Moto\ CapSense\ Ch3/enable
+    chown root input /sys/class/sensors/Moto\ CapSense\ Ch3/poll_delay
+    chown root input /sys/class/sensors/Moto\ CapSense\ Ch4/enable
+    chown root input /sys/class/sensors/Moto\ CapSense\ Ch4/poll_delay
+
+    # change permission for capsensor
+    chown system system /sys/class/capsense/reset
+    chown system system /sys/class/capsense/int_state
+    chown radio system /sys/class/capsense/reg
+    chown radio system /sys/class/capsense/fw_download_status
+    chown system system /sys/class/capsense/mode
+    chmod 0660 /sys/class/capsense/reset
+    chmod 0660 /sys/class/capsense/int_state
+    chmod 0660 /sys/class/capsense/reg
+    chmod 0660 /sys/class/capsense/fw_download_status
+    chmod 0660 /sys/class/capsense/mode
+
+    # eSE
+    setprop ro.vendor.oem.device ${ro.product.vendor.device}
+    setprop ro.vendor.oem.name ${ro.product.vendor.name}
+    setprop ro.vendor.oem.model ${ro.product.vendor.model}
+    setprop ro.vendor.oem.brand ${ro.product.vendor.brand}
+    setprop ro.vendor.oem.manufacturer ${ro.product.vendor.manufacturer}
+    setprop ro.vendor.oem.serialno ${ro.serialno}
+
+    write /proc/sys/vm/dirty_background_bytes 26214400
+    write /proc/sys/vm/dirty_bytes 104857600
 
 service vendor.capsense_reset /vendor/bin/capsense_reset
    class core
    user system
    group system input
    disabled
+
+on property:ro.carrier="oraeu"
+    setprop persist.vendor.audio.cal_path.extend oraeu
 
 service vendor.copy_qc_cert /vendor/bin/copy_qc_cert.sh
     class main
@@ -73,10 +147,31 @@ service vendor.copy_qc_cert /vendor/bin/copy_qc_cert.sh
     oneshot
     disabled
 
-service vendor.mmi-cap-sh /vendor/bin/init.mmi.cap.sh
+service vendor.set_st_ese_version /vendor/bin/set_st_ese_version.sh
+    class main
+    user vendor_tcmd
+    group root system
+    oneshot
+    disabled
+
+service vendor.mmi-laser-sh /vendor/bin/init.mmi.laser.sh
     class core
     user root
     oneshot
+
+service vendor.modem-rfs-sh /vendor/bin/init.mmi.modem-rfs.sh loop_forever
+    class late_start
+    user root
+    group log system radio
+    oneshot
+
+# enable perf checkin
+
+on  post-fs && property:ro.product.is_production=false
+    setprop debug.sf.track_jank_threshold 5
+    setprop persist.sys.moto_perf_monitor true
+on  post-fs && property:ro.product.is_production=true
+    setprop persist.sys.moto_perf_monitor false
 
 on property:sys.boot_completed=1
     start vendor.capsense_reset
@@ -87,12 +182,18 @@ on property:sys.boot_completed=1
     chown vendor_tcmd system /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_wls_en
     chown vendor_tcmd system /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_wls_curr_max
     chown vendor_tcmd system /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_wls_volt_max
+    chown vendor_tcmd system /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/addr
+    chown vendor_tcmd system /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/data
+    chown vendor_tcmd system /sys/module/bm_adsp_ulog/parameters/debug_enabled
     chmod 0660 /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/tcmd
     chmod 0660 /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_pmic_icl
     chmod 0660 /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_usb_suspend
     chmod 0660 /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_wls_en
     chmod 0660 /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_wls_curr_max
     chmod 0660 /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/force_wls_volt_max
+    chmod 0660 /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/addr
+    chmod 0660 /sys/devices/platform/soc/soc:qcom,pmic_glink/soc:qcom,pmic_glink:mmi,qti-glink-charger/data
+    chmod 0660 /sys/module/bm_adsp_ulog/parameters/debug_enabled
 
     chown system system /sys/class/power_supply/wireless/device/tx_mode
     chown system system /sys/class/power_supply/wireless/device/wls_input_current_limit
@@ -122,49 +223,16 @@ on property:sys.boot_completed=1
 
 #Override fwpath string when wpa_supplicant server was killed
 on property:vendor.wifi.station=true
-    write /sys/module/kiwi_v2/parameters/sar_sta enabled
+    write /sys/module/qca6750/parameters/sar_sta enabled
 
 on property:vendor.wifi.station=false
-    write /sys/module/kiwi_v2/parameters/sar_sta disabled
+    write /sys/module/qca6750/parameters/sar_sta disabled
 
 on property:vendor.wifi.tethering=false
-    write /sys/module/kiwi_v2/parameters/sar_mhs disabled
+    write /sys/module/qca6750/parameters/sar_mhs disabled
 
 on property:vendor.wifi.tethering=true
-    write /sys/module/kiwi_v2/parameters/sar_mhs enabled
-
-on property:ro.product.is_prc=true
-    setprop persist.vendor.audio.use_case.extend prc
-
-on property:ro.carrier=tmo
-    setprop persist.vendor.audio.use_case.extend tmo
-
-#enable ftrace when boot complete
-# MMI_STOPSHIP <debug abnormal QC sensor>: capture sensor ftrace
-on property:dev.bootcomplete=1 && property:ro.vendor.build.type=userdebug
-    write /sys/kernel/tracing/tracing_on 0
-    write /sys/kernel/tracing/buffer_size_kb 65534
-    write /sys/kernel/tracing/set_event ""
-    write /sys/kernel/tracing/trace   ""
-    write /sys/kernel/tracing/events/irq/enable 1
-    write /sys/kernel/tracing/events/sched/sched_switch/enable 1
-    write /sys/kernel/tracing/events/sched/sched_enq_deq_task/enable 1
-    write /sys/kernel/tracing/events/sched/sched_migrate_task/enable 1
-    write /sys/kernel/tracing/events/sched/sched_wakeup/enable 1
-    write /sys/kernel/tracing/events/sched/sched_wakeup_new/enable 1
-    write /sys/kernel/tracing/events/power/cpu_idle/enable 1
-    write /sys/kernel/tracing/events/power/suspend_resume/enable 1
-    write /sys/kernel/tracing/events/iommu/map/enable 1
-    write /sys/kernel/tracing/events/iommu/unmap/enable 1
-    write /sys/kernel/tracing/events/arm_smmu/map_pages/enable 1
-    write /sys/kernel/tracing/events/arm_smmu/map_sg/enable 1
-    write /sys/kernel/tracing/events/arm_smmu/unmap_pages/enable 1
-    write /sys/kernel/tracing/set_event "workqueue:workqueue_execute_end workqueue:workqueue_execute_start"
-    write /sys/kernel/tracing/set_event "workqueue:workqueue_activate_work workqueue:workqueue_queue_work"
-    write /sys/kernel/tracing/set_event "sched:sched_switch sched:sched_wakeup sched:sched_stat_blocked"
-    write /sys/kernel/tracing/set_event "sched:sched_process_wait sched:sched_load_balance"
-    write /sys/kernel/tracing/set_event "sched:* irq:*"
-    write /sys/kernel/tracing/tracing_on 1
+    write /sys/module/qca6750/parameters/sar_mhs enabled
 
 on property:vendor.bluetooth.sar_state=connect
     write /data/vendor/radio/bluetooth_sar connect

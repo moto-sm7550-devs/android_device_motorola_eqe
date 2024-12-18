@@ -45,6 +45,6 @@ service vendor.qrtr-lookup-sh /vendor/bin/init.mmi.qrtr-lookup.sh
 on property:sys.boot_completed=1 && property:ro.product.is_production=false
     start vendor.qrtr-lookup-sh
 
-on init
+on init && property:ro.product.is_production=true
     write /sys/kernel/cnss/recovery 1
 
