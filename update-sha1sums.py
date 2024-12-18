@@ -20,7 +20,7 @@ import os
 import sys
 from hashlib import sha1
 
-device='rtwo'
+device='eqe'
 vendor='motorola'
 
 with open('proprietary-files.txt', 'r') as f:

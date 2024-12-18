@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define LOG_TAG "fingerprint@2.3-service.rtwo"
+#define LOG_TAG "fingerprint@2.3-service.eqe"
 
 #include "BiometricsFingerprint.h"
 
