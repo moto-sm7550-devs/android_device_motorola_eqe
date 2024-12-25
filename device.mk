@@ -48,7 +48,8 @@ PRODUCT_PACKAGES += \
     TelephonyResCommon_Sys \
     WifiResCommon_Sys \
     FrameworksResTarget \
-    WifiResTarget
+    WifiResTarget \
+    NcmTetheringOverlayCommon
 
 # Add common definitions for Qualcomm
 $(call inherit-product, hardware/qcom-caf/common/common.mk)
