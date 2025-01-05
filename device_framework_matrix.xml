@@ -70,6 +70,14 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <hal format="aidl" optional="true">
+        <name>vendor.arcsoft.hardware.camera.postproc</name>
+        <version>1</version>
+        <interface>
+            <name>IPostProcService</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
     <hal format="hidl" optional="true">
         <name>vendor.egistec.hardware.fingerprint</name>
         <transport>hwbinder</transport>
