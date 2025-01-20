@@ -1035,6 +1035,26 @@ vendor/lib64/vendor.qti.imsrtpservice@3.1.so;MODULE_SUFFIX=_vendor
 vendor/bin/msm_irqbalance
 vendor/etc/msm_irqbalance.conf
 
+# Kernel
+vendor/bin/init.class_main.sh
+vendor/bin/init.kernel.post_boot-crow.sh
+vendor/bin/init.kernel.post_boot-crow_4_2_1.sh
+vendor/bin/init.kernel.post_boot-crow_4_3_0.sh
+vendor/bin/init.kernel.post_boot-crow_default_4_3_1.sh
+vendor/bin/init.kernel.post_boot.sh
+vendor/bin/init.mmi.boot.sh
+vendor/bin/init.mmi.touch.sh
+vendor/bin/init.oem.hw.sh
+vendor/bin/init.qcom.class_core.sh
+vendor/bin/init.qcom.early_boot.sh
+vendor/bin/init.qcom.post_boot.sh
+vendor/bin/init.qcom.sh
+vendor/bin/init.qti.kernel.sh
+vendor/bin/init.qti.qcv.sh
+vendor/bin/init.qti.write.sh
+vendor/bin/system_dlkm_modprobe.sh
+vendor/bin/vendor_modprobe.sh
+
 # Keymaster
 vendor/bin/hw/android.hardware.keymaster@4.0-service-qti
 vendor/lib64/libkeymasterdeviceutils.so
@@ -1569,6 +1589,7 @@ vendor/lib64/libextra-thales.so
 
 # Sensors
 vendor/bin/hw/vendor.qti.hardware.sensorscalibrate@1.0-service
+vendor/bin/init.qcom.sensors.sh
 vendor/bin/sensors.qti
 vendor/bin/sscrpcd
 vendor/etc/init/init.vendor.sensors.rc
@@ -1745,6 +1766,9 @@ vendor/lib64/libwvaidl.so
 # WiFi
 vendor/bin/cnss-daemon
 vendor/etc/init/init.vendor.wlan.rc
+vendor/etc/wifi/p2p_supplicant_overlay.conf
+vendor/etc/wifi/qca6750/WCNSS_qcom_cfg.ini
+vendor/etc/wifi/wpa_supplicant_overlay.conf
 
 # WiFi Display
 system/framework/WfdCommon.jar
