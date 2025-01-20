@@ -321,7 +321,6 @@ ro.soc.model=SM8550
 
 # Surfaceflinger
 ro.sf.lcd_density=400
-ro.surface_flinger.enable_frame_rate_override=true
 ro.surface_flinger.force_hwc_copy_for_virtual_displays=true
 ro.surface_flinger.has_HDR_display=true
 ro.surface_flinger.has_wide_color_display=true
