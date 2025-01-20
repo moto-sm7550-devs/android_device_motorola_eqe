@@ -1040,7 +1040,6 @@ vendor/lib64/libqtikeymint.so
 vendor/lib64/libspcom.so
 
 # Listen
-vendor/lib64/hw/sound_trigger.primary.crow.so
 vendor/lib64/libcapiv2svacnnvendor.so
 vendor/lib64/libcapiv2svarnnvendor.so
 vendor/lib64/libcapiv2udk7vendor.so
