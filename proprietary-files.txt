@@ -111,6 +111,9 @@ vendor/etc/card-defs.xml
 vendor/etc/default_volume_tables.xml
 vendor/etc/usecaseKvManager.xml
 
+# Audio firmware
+vendor/firmware/aw882xx_acf.bin
+
 # Audio libraries
 vendor/lib64/hw/audio.primary.crow.so
 vendor/lib64/libadm.so
@@ -921,6 +924,9 @@ vendor/gpu/kbc/unified_ksqs.bin
 
 # Graphics - Vulkan
 vendor/lib64/hw/vulkan.adreno.so
+
+# Haptics (firmware)
+vendor/firmware/aw862xx_haptic.bin
 
 # HotwordEnrollment
 product/priv-app/HotwordEnrollmentOKGoogleHEXAGON_WIDEBAND/HotwordEnrollmentOKGoogleHEXAGON_WIDEBAND.apk
