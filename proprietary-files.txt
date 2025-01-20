@@ -101,6 +101,16 @@ vendor/lib64/libaualgo_azp_component.so
 vendor/lib64/libaualgo_azp_wrapper.so
 vendor/lib64/libaualgo_foundation.so
 
+# Audio configs
+vendor/etc/audio/sku_crow/audio_effects.conf
+vendor/etc/audio/sku_crow/mixer_paths_crow_idp.xml
+vendor/etc/audio/sku_crow/resourcemanager_crow_idp.xml
+vendor/etc/audio_ext_spkr.conf
+vendor/etc/audio_policy_volumes.xml
+vendor/etc/card-defs.xml
+vendor/etc/default_volume_tables.xml
+vendor/etc/usecaseKvManager.xml
+
 # Audio libraries
 vendor/lib64/hw/audio.primary.crow.so
 vendor/lib64/libadm.so
