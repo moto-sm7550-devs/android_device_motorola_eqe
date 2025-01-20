@@ -305,7 +305,6 @@ ro.vendor.use_data_netmgrd=true
 persist.vendor.sensors.enable.mag_filter=true
 persist.vendor.sensors.mot_tap=true
 ro.vendor.sensors.enlarge_tries_count=true
-ro.vendor.sensors.front_light_compensate=true
 ro.vendor.sensors.glance_approach=false
 ro.vendor.sensors.led_interfere_rear_light=true
 ro.vendor.sensors.sns_offbody=false
