@@ -189,7 +189,6 @@ PRODUCT_PACKAGES += \
     gnss@2.0-xtra-daemon.policy
 
 PRODUCT_PACKAGES += \
-    apdr.conf \
     batching.conf \
     gnss_antenna_info.conf \
     gps.conf \
