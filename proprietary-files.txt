@@ -1159,7 +1159,9 @@ vendor/lib64/libQnnSystem.so
 # NFC
 vendor/bin/hw/vendor.nxp.hardware.nfc@2.0-service
 vendor/etc/init/vendor.nxp.hardware.nfc@2.0-service.rc
+vendor/lib64/libstnfc-auth.so
 vendor/lib64/nfc_nci.nqx.default.hw.so
+vendor/lib64/nfc_nci.st21nfc.st.so
 vendor/lib64/vendor.nxp.hardware.nfc@2.0.so
 
 # NFC - configs
@@ -1182,6 +1184,8 @@ vendor/etc/libnfc-qrd-SN100_38_4MHZ.conf
 vendor/lib64/libpn560_fw.so
 vendor/lib64/libsn100u_fw.so
 vendor/lib64/libsn220u_fw.so
+vendor/firmware/st54l_fw.bin
+vendor/firmware/st54l_fw_felica.bin
 
 # OEM
 vendor/bin/motobox;SYMLINK=vendor/bin/expat
