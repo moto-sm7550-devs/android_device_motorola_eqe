@@ -47,6 +47,7 @@ vendor/bin/adsprpcd
 vendor/bin/audioadsprpcd
 vendor/bin/loadalgo
 vendor/etc/init/vendor.qti.adsprpc-guestos-service.rc
+vendor/etc/init/vendor.qti.audio-adsprpc-service.rc
 vendor/lib64/libadsp_default_listener.so
 vendor/lib64/libadspd.so
 vendor/lib64/libloadalgo_stub.so
