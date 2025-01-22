@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024 The LineageOS Project
+# Copyright (C) 2025 The LineageOS Project
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -23,6 +23,6 @@ PRODUCT_MODEL := motorola edge 50 pro
 PRODUCT_GMS_CLIENTID_BASE := android-motorola
 
 PRODUCT_BUILD_PROP_OVERRIDES += \
-    BuildDesc="eqe_g-user 14 U3UMS34.69-8-3-2 73a20-132b3f release-keys" \
-    BuildFingerprint=motorola/eqe_g/eqe:14/U3UMS34.69-8-3-2/73a20-132b3f:user/release-keys \
+    BuildDesc="eqe_g-user 15 V1UM35M.10-38-1 faca5 release-keys" \
+    BuildFingerprint=motorola/eqe_g/msi:15/V1UM35M.10-38-1/faca5:user/release-keys \
     DeviceProduct=eqe_g
