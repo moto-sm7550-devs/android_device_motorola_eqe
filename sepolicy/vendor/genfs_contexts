@@ -39,15 +39,18 @@ genfscon sysfs /devices/platform/soc/c440000.qcom,spmi/spmi-0/spmi0-00/c440000.q
 # Sensors
 genfscon sysfs /devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0/card0-DSI-1/panelName              u:object_r:vendor_sysfs_data:s0
 genfscon sysfs /devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0/card0-DSI-1/panelRegDA             u:object_r:vendor_sysfs_data:s0
+genfscon sysfs /devices/virtual/laser/stmvl53l1                                                         u:object_r:vendor_sysfs_laser:s0
 
 # Touchscreen
 genfscon sysfs /class/touchscreen                                               u:object_r:vendor_sysfs_touchpanel:s0
 genfscon sysfs /devices/virtual/touchscreen                                     u:object_r:vendor_sysfs_touchpanel:s0
 genfscon sysfs /devices/platform/soc/a94000.i2c/i2c-2/2-0049/touchscreen        u:object_r:vendor_sysfs_touchpanel:s0
 genfscon sysfs /devices/platform/soc/ac0000.qcom,qupv3_1_geni_se/a90000.spi/spi_master/spi0/spi0.0/touchscreen  u:object_r:vendor_sysfs_touchpanel:s0
+genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_0_geni_se/880000.spi/spi_master/spi0/spi0.0/touchscreen u:object_r:vendor_sysfs_touchpanel:s0
 
 # Vibrator
 genfscon sysfs /devices/platform/soc/984000.i2c/i2c-0/0-005a/leds/vibrator      u:object_r:sysfs_vibrator:s0
+genfscon sysfs /devices/platform/soc/ac0000.qcom,qupv3_1_geni_se/a94000.i2c/i2c-2/2-005a/leds/vibrator u:object_r:sysfs_vibrator:s0
 
 # Wakeup
 genfscon sysfs /devices/platform/soc/1e00000.qcom,ipa/wakeup/wakeup             u:object_r:sysfs_wakeup:s0
