@@ -130,6 +130,7 @@ vendor/lib64/liblx-osal.so
 vendor/lib64/libmcs.so
 vendor/lib64/libqtigefar.so
 vendor/lib64/libspatializerparamstorage.so
+vendor/lib64/libvui_dmgr_client.so
 vendor/lib64/vendor.qti.hardware.pal@1.0-impl.so
 
 # Audio misc
@@ -288,6 +289,7 @@ vendor/lib64/libtriplecam_video_optical_zoom.so
 vendor/lib64/libubifocus.so
 vendor/lib64/libvideoml.so
 vendor/lib64/libvidhance.so
+vendor/lib64/sensors.tof.vl53l1.so
 vendor/lib64/vendor.qti.hardware.camera.aon-service-impl.so
 vendor/lib64/vendor.arcsoft.hardware.camera.postproc-V1-ndk.so
 vendor/lib64/vendor.qti.hardware.camera.postproc@1.0-service-impl.so
