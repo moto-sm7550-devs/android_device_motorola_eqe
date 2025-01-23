@@ -1,2 +1,5 @@
+# Camera
+vendor.arcsoft.hardware.camera.postproc.IPostProcService/default          u:object_r:vendor_hal_arcsoftpp_service:s0
+
 # Sensors
 motorola.hardware.sensors.ISensorExt/default                        u:object_r:hal_sensorext_service:s0
