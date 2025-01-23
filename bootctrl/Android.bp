@@ -31,7 +31,7 @@ cc_defaults {
 }
 
 cc_library {
-    name: "bootctrl.kalama",
+    name: "bootctrl.eqe",
     defaults: ["bootctrl_hal_defaults"],
     static_libs: ["libgptutils.eqe"],
 }
