@@ -167,15 +167,17 @@ vendor/lib64/libbtnv.so
 vendor/lib64/libsoc_helper.so
 vendor/lib64/vendor.qti.hardware.bttpi-V2-ndk.so
 
+# Bluetooth (A2DP) - from rtwo_g-user 14 U1TRS34.8-30-13-2-2-4 68e97-f9a887 release-keys
+vendor/lib64/btaudio_offload_if.so|950aa586550620a1e78ec65338fbfcbc41f7156b
+vendor/lib64/libbluetooth_audio_session_aidl_qti.so|96b417c278159ad4657e0760698b0e77f29357c7
+
 # Bluetooth (A2DP)
-vendor/lib64/btaudio_offload_if.so;DISABLE_CHECKELF
 vendor/lib64/hw/android.hardware.bluetooth.audio-impl-qti.so
 vendor/lib64/hw/vendor.qti.hardware.bluetooth_audio@2.0-impl.so
 vendor/lib64/hw/vendor.qti.hardware.bluetooth_audio@2.1-impl.so
 vendor/lib64/hw/vendor.qti.hardware.bluetooth_sar@1.1-impl.so
 vendor/lib64/hw/vendor.qti.hardware.btconfigstore@1.0-impl.so
 vendor/lib64/hw/vendor.qti.hardware.btconfigstore@2.0-impl.so
-vendor/lib64/libbluetooth_audio_session_aidl_qti.so;DISABLE_CHECKELF
 vendor/lib64/libbluetooth_audio_session_qti.so
 vendor/lib64/libbluetooth_audio_session_qti_2_1.so
 vendor/lib64/libbt-hidlclient.so
