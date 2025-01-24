@@ -250,3 +250,7 @@ on property:vendor.usb.headset_reset=2
 on property:vendor.usb.headset_reset=0
     wait /sys/bus/platform/devices/${ro.boot.usb.dwc3_msm:-a600000.ssusb}/headset_reset_delay 2
     write /sys/bus/platform/devices/${ro.boot.usb.dwc3_msm:-a600000.ssusb}/mode host
+
+# Bind SB felica configs if SB SKU
+on property:sys.boot_completed=1 && property:ro.boot.hardware.sku=XT2403-5
+    mount none /product/etc/felica_sb /product/etc/felica bind
