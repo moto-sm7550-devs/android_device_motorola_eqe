@@ -19,3 +19,5 @@ ro.mot.build.customerid=global
 
 # Radio
 ro.vendor.radio.imei.sv=4
+
+import /product/product.${ro.boot.hardware.sku}.prop
