@@ -1,0 +1,12 @@
+#
+# XT2403-5 variant specific props
+#
+
+ro.product.bootimage.model=motorola edge 50s pro
+ro.product.model=motorola edge 50s pro
+ro.product.odm.model=motorola edge 50s pro
+ro.product.product.model=motorola edge 50s pro
+ro.product.system.model=motorola edge 50s pro
+ro.product.system_ext.model=motorola edge 50s pro
+ro.product.vendor.model=motorola edge 50s pro
+ro.product.vendor_dlkm.model=motorola edge 50s pro
