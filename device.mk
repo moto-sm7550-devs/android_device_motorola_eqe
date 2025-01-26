@@ -99,6 +99,7 @@ PRODUCT_PACKAGES += \
     libagm_compress_plugin \
     libagm_mixer_plugin \
     libagm_pcm_plugin \
+    libats \
     libaudiochargerlistener \
     libbatterylistener \
     libfmpal \
@@ -107,10 +108,10 @@ PRODUCT_PACKAGES += \
     libqcompostprocbundle \
     libqcomvisualizer \
     libqcomvoiceprocessing \
-    libsndcardparser \
     libtinycompress \
     libvolumelistener \
-    sound_trigger.primary.crow
+    sound_trigger.primary.crow \
+    vendor.qti.hardware.AGMIPC@1.0-impl
 
 AUDIO_HAL_DIR := hardware/qcom-caf/sm8550/audio/primary-hal
 
@@ -128,6 +129,12 @@ PRODUCT_COPY_FILES += \
 # Boot animation
 TARGET_SCREEN_HEIGHT := 2712
 TARGET_SCREEN_WIDTH := 1220
+
+# Bluetooth
+PRODUCT_PACKAGES += \
+    lib_bt_aptx \
+    lib_bt_ble \
+    lib_bt_bundle
 
 # Boot control
 PRODUCT_PACKAGES += \

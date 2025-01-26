@@ -2,7 +2,10 @@
 ## are from EQE_RETAIL_15_V1UMS35H.10-67-3-1.
 
 # Current blobs with ELF checks disabled:
+# audio.primary.crow.so depends on liblx-osal and vendor.qti.hardware.AGMIPC@1.0-impl, which are gnu makefile targets
+# libagm depends on libar-gsl, libats and liblx-osal, which are gnu makefile targets
 # libar-pal depends on libagmclient, which is a gnu makefile target
+# libmcs depends on libar-acdb, libats and liblx-osal, which are gnu makefile targets
 # libqc2audio_hwaudiocodec depends on libpalclient, which is a gnu makefile target
 
 # ACDB Data
@@ -44,6 +47,7 @@ vendor/bin/adsprpcd
 vendor/bin/loadalgo
 vendor/etc/init/vendor.qti.adsprpc-guestos-service.rc
 vendor/lib64/libadsp_default_listener.so
+vendor/lib64/libadsprpc.so
 vendor/lib64/libadspd.so
 vendor/lib64/libloadalgo_stub.so
 
@@ -85,10 +89,6 @@ vendor/lib/rfsa/adsp/libmctfengine_skel.so
 vendor/lib/rfsa/adsp/libworker_pool.so
 vendor/lib/rfsa/adsp/nlc.so
 
-# Audio AGM
-vendor/lib64/libagm.so
-vendor/lib64/vendor.qti.hardware.AGMIPC@1.0-impl.so
-
 # Audio - aualgo config
 vendor/etc/aualgo/ainr_tfv2.dat
 vendor/etc/aualgo/aualgo_comp_azs.conf
@@ -111,20 +111,14 @@ vendor/etc/usecaseKvManager.xml
 vendor/firmware/aw882xx_acf.bin
 
 # Audio libraries
-vendor/lib64/hw/audio.primary.crow.so
+vendor/lib64/hw/audio.primary.crow.so;DISABLE_CHECKELF
 vendor/lib64/libadm.so
-vendor/lib64/libadsprpc.so
-vendor/lib64/libar-acdb.so
-vendor/lib64/libar-gpr.so
-vendor/lib64/libar-gsl.so
+vendor/lib64/libagm.so;DISABLE_CHECKELF
 vendor/lib64/libar-pal.so;DISABLE_CHECKELF
-vendor/lib64/libats.so
 vendor/lib64/libaudio_log_utils.so
 vendor/lib64/libdapparamstorage.so
 vendor/lib64/libext_tflite_c.so
-vendor/lib64/liblx-ar_util.so
-vendor/lib64/liblx-osal.so
-vendor/lib64/libmcs.so
+vendor/lib64/libmcs.so;DISABLE_CHECKELF
 vendor/lib64/libqtigefar.so
 vendor/lib64/libspatializerparamstorage.so
 vendor/lib64/libvui_dmgr_client.so
@@ -149,9 +143,6 @@ vendor/etc/vintf/manifest/bttpi-saidl.xml
 vendor/lib64/hw/android.hardware.bluetooth@1.0-impl-qti.so
 vendor/lib64/hw/android.hardware.bluetooth@1.1-impl-qti.so
 vendor/lib64/hw/vendor.qti.hardware.bttpi-impl.so
-vendor/lib64/lib_bt_aptx.so
-vendor/lib64/lib_bt_ble.so
-vendor/lib64/lib_bt_bundle.so
 vendor/lib64/libbtnv.so
 vendor/lib64/libsoc_helper.so
 vendor/lib64/vendor.qti.hardware.bttpi-V2-ndk.so
@@ -1061,8 +1052,6 @@ vendor/lib64/libcapiv2uvvendor.so
 vendor/lib64/libeai_fixed.so
 vendor/lib64/libeai_float.so
 vendor/lib64/liblistensoundmodel2vendor.so
-vendor/lib64/vendor.qti.hardware.ListenSoundModel@1.0-impl.so
-vendor/lib64/vendor.qti.hardware.ListenSoundModel@1.0.so
 
 # Media
 system_ext/lib64/libmmosal.so
