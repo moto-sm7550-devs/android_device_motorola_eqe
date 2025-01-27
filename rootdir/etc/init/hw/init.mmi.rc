@@ -457,7 +457,7 @@ on property:ro.vendor.hw.dualsim=false
 
 on property:ro.vendor.hw.felica=true && property:ro.vendor.hw.nfc=ese_st
    setprop persist.vendor.nfc.st_nfc_felica_ese 1
-   setprop persist.vendor.nfc.config_file_name "libnfc-nci-st-felica.conf"
+   setprop persist.vendor.nfc.config_file_name "libnfc-hal-st-felica.conf"
    copy /vendor/etc/sttesttool.json /data/nfc/sttesttool.json
 
 on property:sys.sysctl.swappiness=*
