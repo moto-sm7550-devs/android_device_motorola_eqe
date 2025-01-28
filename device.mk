@@ -48,9 +48,6 @@ PRODUCT_PACKAGES += \
     FrameworksResTarget \
     WifiResTarget
 
-# Add common definitions for Qualcomm
-$(call inherit-product, hardware/qcom-caf/common/common.mk)
-
 # AAPT
 PRODUCT_AAPT_CONFIG := normal
 PRODUCT_AAPT_PREF_CONFIG := xxhdpi
@@ -222,6 +219,9 @@ $(foreach f,$(wildcard $(LOCAL_PATH)/rootdir/*.rc),\
 $(foreach f,$(wildcard $(LOCAL_PATH)/rootdir/system/bin/*.sh),\
         $(eval PRODUCT_COPY_FILES += $(f):$(TARGET_COPY_OUT_SYSTEM)/bin/$(notdir $f)))
 
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/rootdir/etc/init.recovery.qcom.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.qcom.rc
+
 # IPACM
 PRODUCT_PACKAGES += \
     ipacm \
@@ -344,10 +344,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     android.hardware.power-service-qti
 
-# PowerShare
-PRODUCT_PACKAGES += \
-    vendor.lineage.powershare@1.0-service.eqe
-
 # Protobuf
 PRODUCT_PACKAGES += \
     libprotobuf-cpp-full-3.9.1-vendorcompat \
@@ -357,9 +353,117 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libvndfwk_detect_jni.qti_vendor # Needed by CNE app
 
+# RFS APQ GNSS symlinks
+PRODUCT_PACKAGES += \
+    rfs_apq_gnss_hlos_symlink \
+    rfs_apq_gnss_ramdumps_symlink \
+    rfs_apq_gnss_readonly_firmware_symlink \
+    rfs_apq_gnss_readonly_vendor_firmware_symlink \
+    rfs_apq_gnss_readwrite_symlink \
+    rfs_apq_gnss_shared_symlink
+
+# RFS MDM ADSP symlinks
+PRODUCT_PACKAGES += \
+    rfs_mdm_adsp_hlos_symlink \
+    rfs_mdm_adsp_ramdumps_symlink \
+    rfs_mdm_adsp_readonly_firmware_symlink \
+    rfs_mdm_adsp_readonly_vendor_firmware_symlink \
+    rfs_mdm_adsp_readwrite_symlink \
+    rfs_mdm_adsp_shared_symlink
+
+# RFS MDM CDSP symlinks
+PRODUCT_PACKAGES += \
+    rfs_mdm_cdsp_hlos_symlink \
+    rfs_mdm_cdsp_ramdumps_symlink \
+    rfs_mdm_cdsp_readonly_firmware_symlink \
+    rfs_mdm_cdsp_readonly_vendor_firmware_symlink \
+    rfs_mdm_cdsp_readwrite_symlink \
+    rfs_mdm_cdsp_shared_symlink
+
+# RFS MDM MPSS symlinks
+PRODUCT_PACKAGES += \
+    rfs_mdm_mpss_hlos_symlink \
+    rfs_mdm_mpss_ramdumps_symlink \
+    rfs_mdm_mpss_readonly_firmware_symlink \
+    rfs_mdm_mpss_readonly_vendor_firmware_symlink \
+    rfs_mdm_mpss_readwrite_symlink \
+    rfs_mdm_mpss_shared_symlink
+
+# RFS MDM SLPI symlinks
+PRODUCT_PACKAGES += \
+    rfs_mdm_slpi_hlos_symlink \
+    rfs_mdm_slpi_ramdumps_symlink \
+    rfs_mdm_slpi_readonly_firmware_symlink \
+    rfs_mdm_slpi_readonly_vendor_firmware_symlink \
+    rfs_mdm_slpi_readwrite_symlink \
+    rfs_mdm_slpi_shared_symlink
+
+# RFS MDM TN symlinks
+PRODUCT_PACKAGES += \
+    rfs_mdm_tn_hlos_symlink \
+    rfs_mdm_tn_ramdumps_symlink \
+    rfs_mdm_tn_readonly_firmware_symlink \
+    rfs_mdm_tn_readonly_vendor_firmware_symlink \
+    rfs_mdm_tn_readwrite_symlink \
+    rfs_mdm_tn_shared_symlink
+
+# RFS MDM WPSS symlinks
+PRODUCT_PACKAGES += \
+    rfs_mdm_wpss_hlos_symlink \
+    rfs_mdm_wpss_ramdumps_symlink \
+    rfs_mdm_wpss_readonly_firmware_symlink \
+    rfs_mdm_wpss_readonly_vendor_firmware_symlink \
+    rfs_mdm_wpss_readwrite_symlink \
+    rfs_mdm_wpss_shared_symlink
+
+# RFS MSM ADSP symlinks
+PRODUCT_PACKAGES += \
+    rfs_msm_adsp_hlos_symlink \
+    rfs_msm_adsp_ramdumps_symlink \
+    rfs_msm_adsp_readonly_firmware_symlink \
+    rfs_msm_adsp_readonly_vendor_firmware_symlink \
+    rfs_msm_adsp_readwrite_symlink \
+    rfs_msm_adsp_shared_symlink
+
+# RFS MSM CDSP symlinks
+PRODUCT_PACKAGES += \
+    rfs_msm_cdsp_hlos_symlink \
+    rfs_msm_cdsp_ramdumps_symlink \
+    rfs_msm_cdsp_readonly_firmware_symlink \
+    rfs_msm_cdsp_readonly_vendor_firmware_symlink \
+    rfs_msm_cdsp_readwrite_symlink \
+    rfs_msm_cdsp_shared_symlink
+
+# RFS MSM MPSS symlinks
+PRODUCT_PACKAGES += \
+    rfs_msm_mpss_hlos_symlink \
+    rfs_msm_mpss_ramdumps_symlink \
+    rfs_msm_mpss_readonly_firmware_symlink \
+    rfs_msm_mpss_readonly_vendor_firmware_symlink \
+    rfs_msm_mpss_readwrite_symlink \
+    rfs_msm_mpss_shared_symlink
+
 # RFS MSM MPSS symlinks
 PRODUCT_PACKAGES += \
     rfs_msm_mpss_readonly_vendor_fsg_symlink
+
+# RFS MSM SLPI symlinks
+PRODUCT_PACKAGES += \
+    rfs_msm_slpi_hlos_symlink \
+    rfs_msm_slpi_ramdumps_symlink \
+    rfs_msm_slpi_readonly_firmware_symlink \
+    rfs_msm_slpi_readonly_vendor_firmware_symlink \
+    rfs_msm_slpi_readwrite_symlink \
+    rfs_msm_slpi_shared_symlink
+
+# RFS MSM WPSS symlinks
+PRODUCT_PACKAGES += \
+    rfs_msm_wpss_hlos_symlink \
+    rfs_msm_wpss_ramdumps_symlink \
+    rfs_msm_wpss_readonly_firmware_symlink \
+    rfs_msm_wpss_readonly_vendor_firmware_symlink \
+    rfs_msm_wpss_readwrite_symlink \
+    rfs_msm_wpss_shared_symlink
 
 # Sensors
 PRODUCT_PACKAGES += \
@@ -382,37 +486,12 @@ PRODUCT_SOONG_NAMESPACES += \
     kernel/motorola/sm7550-modules
 
 # Telephony
-PRODUCT_PACKAGES += \
-    extphonelib \
-    extphonelib-product \
-    extphonelib.xml \
-    extphonelib_product.xml \
-    MotoNrEnabler \
-    ims-ext-common \
-    ims_ext_common.xml \
-    qti-telephony-hidl-wrapper \
-    qti-telephony-hidl-wrapper-prd \
-    qti_telephony_hidl_wrapper.xml \
-    qti_telephony_hidl_wrapper_prd.xml \
-    qti-telephony-utils \
-    qti-telephony-utils-prd \
-    qti_telephony_utils.xml \
-    qti_telephony_utils_prd.xml \
-    telephony-ext
-
-PRODUCT_BOOT_JARS += \
-    telephony-ext
-
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/telephony_system-ext_privapp-permissions-qti.xml:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/permissions/telephony_system-ext_privapp-permissions-qti.xml
 
 # Thermal
 PRODUCT_PACKAGES += \
     android.hardware.thermal-service.qti
-
-# Touch
-PRODUCT_PACKAGES += \
-    vendor.lineage.touch@1.0-service.eqe
 
 # Update engine
 PRODUCT_PACKAGES += \

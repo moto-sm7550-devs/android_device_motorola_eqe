@@ -1199,8 +1199,8 @@ vendor/bin/motobox;SYMLINK=vendor/bin/expat
 vendor/etc/vhw.xml
 
 # PD
-vendor/bin/pd-mapper
-vendor/lib64/libpdmapper.so
+vendor/bin/pd-mapper;DISABLE_DEPS
+vendor/lib64/libpdmapper.so;DISABLE_DEPS
 vendor/lib64/libpdnotifier.so
 
 # Peripheral manager
@@ -1793,7 +1793,7 @@ vendor/etc/vintf/manifest/manifest_android.hardware.drm-service.widevine.xml
 vendor/lib64/libwvaidl.so
 
 # WiFi
-vendor/bin/cnss-daemon
+vendor/bin/cnss-daemon;DISABLE_DEPS
 vendor/etc/init/init.vendor.wlan.rc
 vendor/etc/wifi/p2p_supplicant_overlay.conf
 vendor/etc/wifi/qca6750/WCNSS_qcom_cfg.ini
@@ -1854,7 +1854,7 @@ vendor/lib64/libwfdhdcpcp.so
 vendor/lib64/libwfdhdcpservice_proprietary.so
 vendor/lib64/libwfdmminterface_proprietary.so
 vendor/lib64/libwfdmmservice_proprietary.so
-vendor/lib64/libwfdmmsrc_proprietary.so
+vendor/lib64/libwfdmmsrc_proprietary.so;DISABLE_DEPS
 vendor/lib64/libwfdmodulehdcpsession.so
 vendor/lib64/libwfdrtsp_vendor.so
 vendor/lib64/libwfdsessionmodule.so

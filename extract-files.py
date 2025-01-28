@@ -20,13 +20,12 @@ from extract_utils.main import (
 
 namespace_imports = [
     'device/motorola/eqe',
+    'hardware/qcom-caf/sm8550/display',
     'hardware/qcom-caf/sm8550',
-    'hardware/qcom-caf/wlan',
     'hardware/motorola',
     'vendor/qcom/opensource/commonsys-intf/display',
     'vendor/qcom/opensource/commonsys/display',
     'vendor/qcom/opensource/dataservices',
-    'vendor/qcom/opensource/display',
 ]
 
 def lib_fixup_vendor_suffix(lib: str, partition: str, *args, **kwargs):

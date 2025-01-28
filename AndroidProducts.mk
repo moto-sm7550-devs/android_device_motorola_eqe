@@ -5,4 +5,4 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/aosp_eqe.mk
+    $(LOCAL_DIR)/eqe.mk
