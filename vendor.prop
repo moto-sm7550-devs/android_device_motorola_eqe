@@ -292,6 +292,7 @@ persist.vendor.radio.force_gba_over_isim_app=1
 persist.vendor.radio.mcfg_ver_num=0,0
 persist.vendor.radio.mcfg_version=null,null
 persist.vendor.radio.multisim.config=dsds
+persist.vendor.radio.poweron_opt=0
 persist.vendor.radio.procedure_bytes=SKIP
 persist.vendor.radio.ril_payload_on=0
 persist.vendor.radio.sar_sensor=1
