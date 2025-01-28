@@ -37,7 +37,8 @@ PRODUCT_PACKAGES += \
     ProductFrameworksResEqe \
     RegulatoryInfoOverlayEqe \
     SettingsResEqe \
-    SystemUIResEqe
+    SystemUIResEqe \
+    SecureElementOverlayEqe
 
 PRODUCT_PACKAGES += \
     FrameworksResCommon_Sys \

@@ -1,1 +1,3 @@
 set_prop(hal_secure_element_default, vendor_secure_element_prop)
+
+allow hal_secure_element_default secure_element_service:service_manager find;
