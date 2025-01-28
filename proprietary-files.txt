@@ -1584,6 +1584,15 @@ vendor/lib64/libnativecospatchkernel-thales.so
 vendor/lib64/libnativecosupdateapi-thales.so
 vendor/lib64/libextra-thales.so
 
+# Secure Element - configs
+vendor/etc/hal_uuid_map_ds.xml
+vendor/etc/hal_uuid_map_bs.xml
+vendor/etc/hal_uuid_map_bf.xml
+vendor/etc/hal_uuid_map_df.xml
+vendor/etc/hal_uuid_map_d.xml
+vendor/etc/hal_uuid_map_b.xml
+vendor/etc/hal_uuid_map_config.xml
+
 # Sensors
 vendor/bin/hw/vendor.qti.hardware.sensorscalibrate@1.0-service
 vendor/bin/init.qcom.sensors.sh
