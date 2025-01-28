@@ -4,6 +4,7 @@
 #
 
 BUILD_BROKEN_DUP_RULES := true
+DISABLE_ARTIFACT_PATH_REQUIREMENTS := true
 
 BOARD_VENDOR := motorola
 
@@ -125,10 +126,6 @@ TARGET_KERNEL_EXT_MODULES := \
     motorola/drivers/nfc/st21nfc \
     motorola/drivers/ese/st54spi_gpio
 
-# Platform
-BOARD_USES_QCOM_HARDWARE := true
-TARGET_BOARD_PLATFORM := crow
-
 BOARD_ROOT_EXTRA_SYMLINKS := \
     /vendor/fsg:/fsg
 
@@ -179,7 +176,7 @@ DEVICE_FRAMEWORK_MANIFEST_FILE += $(DEVICE_PATH)/framework_manifest.xml
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := \
     $(DEVICE_PATH)/device_framework_matrix.xml \
     hardware/qcom-caf/common/vendor_framework_compatibility_matrix.xml \
-    vendor/aosp/config/device_framework_matrix.xml
+    vendor/yaap/config/device_framework_matrix.xml
 DEVICE_MATRIX_FILE := hardware/qcom-caf/common/compatibility_matrix.xml
 DEVICE_MANIFEST_SKUS := crow
 DEVICE_MANIFEST_CROW_FILES += \
@@ -197,7 +194,7 @@ BOARD_USES_METADATA_PARTITION := true
 # Partitions
 TARGET_RO_FILE_SYSTEM_TYPE ?= ext4
 ifneq ($(TARGET_RO_FILE_SYSTEM_TYPE),erofs)
--include vendor/aosp/config/BoardConfigReservedSize.mk
+-include vendor/yaap/config/BoardConfigReservedSize.mk
 else
 BOARD_EROFS_COMPRESSOR := lz4
 BOARD_EROFS_PCLUSTER_SIZE := 262144
@@ -237,7 +234,7 @@ BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := true
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
-TARGET_RECOVERY_DEVICE_DIRS += $(DEVICE_PATH)
+TARGET_RECOVERY_DEVICE_DIRS += $(DEVICE_PATH)/recovery
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/rootdir/etc/fstab.qcom
 TARGET_RECOVERY_WIPE := $(DEVICE_PATH)/recovery/recovery.wipe
 

@@ -340,6 +340,10 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/hotword-hiddenapi-package-whitelist.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/sysconfig/hotword-hiddenapi-package-whitelist.xml
 
+# Platform
+BOARD_USES_QCOM_HARDWARE := true
+TARGET_BOARD_PLATFORM := crow
+
 # Power
 PRODUCT_PACKAGES += \
     android.hardware.power-service-qti
@@ -382,27 +386,6 @@ PRODUCT_SOONG_NAMESPACES += \
     kernel/motorola/sm7550-modules
 
 # Telephony
-PRODUCT_PACKAGES += \
-    extphonelib \
-    extphonelib-product \
-    extphonelib.xml \
-    extphonelib_product.xml \
-    MotoNrEnabler \
-    ims-ext-common \
-    ims_ext_common.xml \
-    qti-telephony-hidl-wrapper \
-    qti-telephony-hidl-wrapper-prd \
-    qti_telephony_hidl_wrapper.xml \
-    qti_telephony_hidl_wrapper_prd.xml \
-    qti-telephony-utils \
-    qti-telephony-utils-prd \
-    qti_telephony_utils.xml \
-    qti_telephony_utils_prd.xml \
-    telephony-ext
-
-PRODUCT_BOOT_JARS += \
-    telephony-ext
-
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/telephony_system-ext_privapp-permissions-qti.xml:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/permissions/telephony_system-ext_privapp-permissions-qti.xml
 
