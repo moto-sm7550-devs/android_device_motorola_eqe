@@ -150,13 +150,7 @@
 
          @see https://www.w3.org/TR/SVG/paths.html#PathData
          -->
-    <string translatable="false" name="config_mainBuiltInDisplayCutout">
-        M -35,0
-        L 35,0
-        L 35,112
-        L -35,112
-        Z
-    </string>
+    <string name="config_mainBuiltInDisplayCutout">M -56,0 L 56,0 L 56,106 L -56,106 Z</string>
 
     <!-- Indicate whether to allow the device to suspend when the screen is off
          due to the proximity sensor.  This resource should only be set to true
@@ -279,7 +273,7 @@
     </array>
 
     <!-- MMS user agent string -->
-    <string name="config_mms_user_agent" translatable="false">motorolaedge40pro</string>
+    <string name="config_mms_user_agent" translatable="false">motorolaedge50pro</string>
     <!-- MMS user agent profile url -->
     <string name="config_mms_user_agent_profile_url" translatable="false">http://uaprof.motorola.com/phoneconfig/motov1/Profile/motov1.rdf</string>
 
