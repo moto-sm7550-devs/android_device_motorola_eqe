@@ -143,6 +143,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES_DEBUG += \
     bootctl
 
+# Camera
+PRODUCT_PACKAGES += \
+    libgui_shim_vendor
+
 # Charger
 WITH_LINEAGE_CHARGER := false
 
