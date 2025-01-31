@@ -36,6 +36,7 @@ PRODUCT_PACKAGES += \
     LineageSystemUIEqe \
     ProductFrameworksResEqe \
     RegulatoryInfoOverlayEqe \
+    RegulatoryInfoOverlayEqeSB \
     SettingsResEqe \
     SystemUIResEqe \
     SecureElementOverlayEqe
