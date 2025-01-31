@@ -80,11 +80,6 @@
          non-zero. -->
     <integer name="config_defaultPeakRefreshRate">120</integer>
 
-    <!-- MMS user agent string -->
-    <string name="config_mms_user_agent" translatable="false">motorolaedge40pro</string>
-    <!-- MMS user agent profile url -->
-    <string name="config_mms_user_agent_profile_url" translatable="false">http://uaprof.motorola.com/phoneconfig/motov1/Profile/motov1.rdf</string>
-
     <!-- List supported color modes. -->
     <array name="config_availableColorModes">
         <item>0</item> <!-- COLOR_MODE_NATURAL -->     <!-- This uses colorimetric render intents-->
