@@ -51,6 +51,7 @@ ro.media.recorder-max-base-layer-fps=60
 persist.vendor.data.mode=concurrent
 
 # NFC
+init.svc.vendor.stflashtool=stopped
 ro.nfc.port=I2C
 
 # Perf
