@@ -1164,7 +1164,9 @@ vendor/lib64/libQnnHtpV75Stub.so
 vendor/lib64/libQnnSystem.so
 
 # NFC
+vendor/bin/hw/android.hardware.nfc@1.2-service.st
 vendor/bin/hw/vendor.nxp.hardware.nfc@2.0-service
+vendor/etc/init/android.hardware.nfc@1.2-service.st.rc
 vendor/etc/init/vendor.nxp.hardware.nfc@2.0-service.rc
 vendor/lib64/libstnfc-auth.so
 vendor/lib64/nfc_nci.nqx.default.hw.so
