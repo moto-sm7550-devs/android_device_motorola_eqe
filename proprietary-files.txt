@@ -800,6 +800,9 @@ product/etc/felica/common.cfg
 product/etc/felica/mfm.cfg
 product/etc/felica/mfs.cfg
 
+# Felica - APK
+product/priv-app/MobileFeliCaClient/MobileFeliCaClient.apk;PRESIGNED
+
 # Fingerprint
 vendor/bin/hw/android.hardware.biometrics.fingerprint@2.1-goodixservice
 vendor/etc/init/android.hardware.biometrics.fingerprint@2.1-goodix.rc
