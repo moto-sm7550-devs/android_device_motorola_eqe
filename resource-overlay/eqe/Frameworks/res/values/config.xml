@@ -299,4 +299,13 @@
     <!-- The sensor id of an "any motion" sensor used in auto-power save modes.
          0 indicates this sensor is not available. -->
     <integer name="config_autoPowerModeAnyMotionSensor">30</integer>
+
+    <!-- Applications which are disabled unless matching a particular sku -->
+    <string-array name="config_disableApksUnlessMatchedSku_apk_list" translatable="false">
+        <item>com.felicanetworks.mfc</item>
+    </string-array>
+    <string-array name="config_disableApkUnlessMatchedSku_skus_list" translatable="false">
+        <item>XT2403-4</item>
+        <item>XT2403-5</item>
+    </string-array>
 </resources>
