@@ -20,12 +20,7 @@
 #include <android-base/file.h>
 #include <android-base/logging.h>
 #include <fcntl.h>
-#include <poll.h>
-#include <sys/stat.h>
 
-#include <chrono>
-#include <cmath>
-#include <fstream>
 #include <thread>
 
 #define NOTIFY_FINGER_UP IMotFodEventType::FINGER_UP
