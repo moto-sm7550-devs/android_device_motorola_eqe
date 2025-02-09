@@ -4,6 +4,9 @@
 //
 
 soong_namespace {
+    imports: [
+        "hardware/motorola",
+    ],
 }
 
 install_symlink {
