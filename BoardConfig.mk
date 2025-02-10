@@ -119,7 +119,6 @@ TARGET_KERNEL_EXT_MODULES := \
     motorola/drivers/moto_mm \
     motorola/drivers/moto_mmap_fault \
     motorola/drivers/moto_swap \
-    motorola/drivers/moto_con_dfpar \
     motorola/drivers/nfc/st21nfc \
     motorola/drivers/ese/st54spi_gpio
 
