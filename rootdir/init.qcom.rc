@@ -65,14 +65,5 @@ service mmi-bootanim /system/bin/init.mmi.bootanim.sh
     oneshot
     disabled
 
-service sim-restart /system/bin/init.sim.restart.sh
-    class main
-    user root
-    oneshot
-    disabled
-
 on property:init.svc.bootanim=running
     start mmi-bootanim
-
-on property:sys.boot_completed=1
-    start sim-restart
