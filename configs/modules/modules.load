@@ -271,7 +271,6 @@ stmvl53l3.ko
 st21nfc.ko
 qpnp_adaptive_charge.ko
 mmi_sys_temp.ko
-con_dfpar.ko
 moto_mmap_fault.ko
 moto_mm.ko
 moto_swap.ko
