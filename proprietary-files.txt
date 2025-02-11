@@ -265,7 +265,7 @@ vendor/lib64/libmmcamera_mfnr.so
 vendor/lib64/libmmcamera_mfnr_t4.so
 vendor/lib64/libmmcamera_pdpc.so
 vendor/lib64/libmot_afd.so
-vendor/lib64/libmot_chi_desktop_helper.so
+vendor/lib64/libmot_chi_desktop_helper.so;DISABLE_DEPS
 vendor/lib64/libmot_engine_settings.so
 vendor/lib64/libmotcameramodulemonitor.so
 vendor/lib64/libmotoisdataqueue.so
@@ -469,12 +469,6 @@ vendor/firmware/CAMERA_ICP.elf
 vendor/firmware/CAMERA_ICP.mbn
 vendor/firmware/CAMERA_ICP.mdt
 vendor/firmware/CAMERA_ICP_170.elf
-
-# Camera - Motorola
-vendor/bin/hw/motorola.hardware.camera.desktop@2.0-service
-vendor/etc/init/motorola.hardware.camera.desktop@2.0-service.rc
-vendor/lib64/motorola.hardware.camera.desktop@1.0.so
-vendor/lib64/motorola.hardware.camera.desktop@2.0.so
 
 # Camera - OIS
 vendor/firmware/mot_dw9784_main.prog

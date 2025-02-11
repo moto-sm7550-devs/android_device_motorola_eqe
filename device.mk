@@ -144,6 +144,8 @@ PRODUCT_PACKAGES_DEBUG += \
 PRODUCT_PACKAGES += \
     libgui_shim_vendor
 
+$(call inherit-product-if-exists, vendor/motorola/eqe-motcamera/eqe-motcamera-vendor.mk)
+
 # Charger
 WITH_LINEAGE_CHARGER := false
 
