@@ -1,6 +1,5 @@
 ## All proprietary files from this list, unless pinned and noted otherwise,
-## RETAIL variant
-## are from edge 50 pro (V1UM35H.10-38-1 f42a9-faca5).
+## are from EQE_RETAIL_15_V1UMS35H.10-38-1-1.
 
 # Current blobs with ELF checks disabled:
 # libar-pal depends on libagmclient, which is a gnu makefile target
