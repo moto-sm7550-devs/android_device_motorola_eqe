@@ -227,6 +227,7 @@ vendor/lib64/libarcsoft_hp_detection.so
 vendor/lib64/libarcsoft_mcxmflpolicy.so
 vendor/lib64/libarcsoft_pic_trace.so
 vendor/lib64/libarcsoftpostprocservice.so
+vendor/lib64/libBSTDSLR.so
 vendor/lib64/libBSTHDRDETECT.so
 vendor/lib64/libBSTMultiExpoGainHDR.so
 vendor/lib64/libBSTNodeUtils.so
@@ -247,8 +248,10 @@ vendor/lib64/libchifeature2.so
 vendor/lib64/libchilog.so
 vendor/lib64/libcom.qti.chinodeutils.so
 vendor/lib64/libcommonchiutils.so
+vendor/lib64/libenginepostproc.moto.so
 vendor/lib64/libhdr10plus.so
 vendor/lib64/libhme.so
+vendor/lib64/libiqi_bridge.so
 vendor/lib64/libipebpsstriping.so
 vendor/lib64/libipebpsstriping170.so
 vendor/lib64/libipebpsstriping480.so
@@ -273,6 +276,7 @@ vendor/lib64/libopencv.so
 vendor/lib64/libopencv3a.so
 vendor/lib64/libopestriping.so
 vendor/lib64/libos.so
+vendor/lib64/libpostprocclient.moto.so
 vendor/lib64/libqll.so
 vendor/lib64/libqll10.so
 vendor/lib64/libqllengine.so
