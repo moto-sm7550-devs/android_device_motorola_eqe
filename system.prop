@@ -12,6 +12,9 @@ persist.vendor.service.bt.adv_audio_mask=1
 persist.vendor.btstack.aac_frm_ctl.enabled=true
 persist.vendor.btstack.qhs_enable=true
 
+# Display
+sys.brightness.disable_gamma_conversion=true
+
 # CNE
 persist.vendor.cne.feature=1
 
