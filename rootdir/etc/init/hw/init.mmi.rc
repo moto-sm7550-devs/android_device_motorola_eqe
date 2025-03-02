@@ -546,16 +546,6 @@ on property:vendor.wifi.tethering=false
 on property:vendor.wifi.tethering=true
     write /sys/module/wlan/parameters/sar_mhs enabled
 
-# from hardware/interfaces/sensors/aidl/multihal
-# to add input and uhid group access
-service vendor.sensors-hal-multihal /vendor/bin/hw/android.hardware.sensors-service.multihal
-    class hal
-    user system
-    group system wakelock context_hub input uhid
-    task_profiles ServiceCapacityLow
-    capabilities BLOCK_SUSPEND
-    rlimit rtprio 10 10
-
 # Override fwpath string when wpa_supplicant server state is changed
 # The fwpath changes on different products, remember to overlay it in product overlay file
 on property:vendor.wifi.station=true
