@@ -449,7 +449,6 @@ PRODUCT_ENFORCE_ARTIFACT_PATH_REQUIREMENTS := strict
 PRODUCT_PACKAGES += \
     android.hardware.wifi-service \
     hostapd \
-    libqsap_sdk \
     libwifi-hal-ctrl \
     libwifi-hal-qcom \
     wpa_supplicant \

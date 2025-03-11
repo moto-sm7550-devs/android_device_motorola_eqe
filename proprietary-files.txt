@@ -3,7 +3,6 @@
 
 # Current blobs with ELF checks disabled:
 # libar-pal depends on libagmclient, which is a gnu makefile target
-# libmdmcutback depends on libqsap_sdk, which is a gnu makefile target
 # libqc2audio_hwaudiocodec depends on libpalclient, which is a gnu makefile target
 
 # ACDB Data
@@ -1322,7 +1321,7 @@ vendor/etc/init/qmipriod.debug.rc
 vendor/etc/init/qmipriod.rc
 vendor/etc/seccomp_policy/qti-systemd.policy
 vendor/lib64/libidl.so
-vendor/lib64/libmdmcutback.so;DISABLE_CHECKELF
+vendor/lib64/libmdmcutback.so
 vendor/lib64/libmdmdetect.so
 vendor/lib64/libqcci_legacy.so
 vendor/lib64/libqmi.so

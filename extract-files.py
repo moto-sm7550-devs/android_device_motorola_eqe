@@ -53,7 +53,6 @@ lib_fixups: lib_fixups_user_type = {
     (
         'libagmclient',
         'libpalclient',
-        'libqsap_sdk',
     ): lib_fixup_remove,
 }
 
