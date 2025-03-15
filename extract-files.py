@@ -84,7 +84,7 @@ blob_fixups: blob_fixups_user_type = {
         .add_needed('libhidlbase_shim.so'),
     ('vendor/lib/libmot_chi_desktop_helper.so', 'vendor/lib64/libmot_chi_desktop_helper.so'): blob_fixup()
         .add_needed('libgui_shim_vendor.so'),
-    'vendor/lib64/sensors.moto.so': blob_fixup()
+    ('vendor/lib64/sensors.moto.so', 'vendor/lib64/nfc_nci.nqx.default.hw.so'): blob_fixup()
         .add_needed('libbase_shim.so'),
     (
         'vendor/lib64/libqcrilNr.so',
