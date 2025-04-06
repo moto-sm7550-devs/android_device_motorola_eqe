@@ -266,8 +266,7 @@ PRODUCT_PACKAGES += \
 
 # MotoActions
 PRODUCT_PACKAGES += \
-    MotoActions \
-    MotoCommonOverlay
+    MotoActions
 
 # NFC
 PRODUCT_PACKAGES += \
@@ -473,3 +472,4 @@ PRODUCT_BOOT_JARS += \
 
 # Inherit from vendor blobs
 $(call inherit-product, vendor/motorola/eqe/eqe-vendor.mk)
+$(call inherit-product, vendor/motorola/eqe-motcamera/eqe-motcamera-vendor.mk )
