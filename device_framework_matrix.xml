@@ -38,6 +38,13 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <hal format="aidl" optional="true">
+        <name>motorola.hardware.camera.imgtuner.aidl</name>
+        <interface>
+            <name>IImageTuning</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
     <hal format="hidl" optional="true">
         <name>motorola.hardware.camera.imgtuner</name>
         <version>1.0</version>
