@@ -1,3 +1,7 @@
+attribute hal_imagetuner;
+attribute hal_imagetuner_client;
+attribute hal_imagetuner_server;
+
 attribute hal_panel;
 attribute hal_panel_client;
 attribute hal_panel_server;

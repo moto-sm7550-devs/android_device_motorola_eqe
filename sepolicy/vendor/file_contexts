@@ -44,6 +44,7 @@
 /(vendor|system/vendor)/lib64/libqmiservices\.so                                         u:object_r:same_process_hal_file:s0
 /(vendor|system/vendor)/lib64/libqmimotext\.so                                           u:object_r:same_process_hal_file:s0
 /(vendor|system/vendor)/lib64/libiqi_bridge\.so                                          u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/bin/hw/motorola\.hardware\.camera\.imgtuner\.aidl-service        u:object_r:hal_imagetuner_default_exec:s0
 /data/vendor/misc/imager                                u:object_r:vendor_camera_data_file:s0
 /sys/devices/platform/soc/soc:qcom,cam-req-mgr/video4linux/video[0-33]/name(/.*)?       u:object_r:vendor_sysfs_jpeg:s0
 /sys/devices/virtual/input/input[0-9]+/calibration_data u:object_r:vendor_sysfs_laser:s0
