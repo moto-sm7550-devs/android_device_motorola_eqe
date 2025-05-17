@@ -1,4 +1,5 @@
 # Camera
+ro.vendor.camera.res.fmq.size   u:object_r:vendor_camera_prop:s0
 vendor.camera.led.torchmode     u:object_r:vendor_camera_prop:s0
 
 # Radio
