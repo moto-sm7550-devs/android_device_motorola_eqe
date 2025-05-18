@@ -1294,7 +1294,7 @@ vendor/etc/init/qmipriod.debug.rc
 vendor/etc/init/qmipriod.rc
 vendor/etc/seccomp_policy/qti-systemd.policy
 vendor/lib64/libidl.so
-vendor/lib64/libmdmcutback.so
+vendor/lib64/libmdmcutback.so;DISABLE_DEPS
 vendor/lib64/libmdmdetect.so
 vendor/lib64/libqcci_legacy.so
 vendor/lib64/libqmi.so
