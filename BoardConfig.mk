@@ -121,10 +121,6 @@ TARGET_KERNEL_EXT_MODULES := \
     motorola/drivers/nfc/st21nfc \
     motorola/drivers/ese/st54spi_gpio
 
-# Platform
-BOARD_USES_QCOM_HARDWARE := true
-TARGET_BOARD_PLATFORM := crow
-
 BOARD_ROOT_EXTRA_SYMLINKS := \
     /vendor/fsg:/fsg
 
