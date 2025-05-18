@@ -177,7 +177,7 @@ BOARD_USES_METADATA_PARTITION := true
 # Partitions
 TARGET_RO_FILE_SYSTEM_TYPE ?= ext4
 ifneq ($(TARGET_RO_FILE_SYSTEM_TYPE),erofs)
--include vendor/lineage/config/BoardConfigReservedSize.mk
+-include vendor/2by2/config/BoardConfigReservedSize.mk
 else
 BOARD_EROFS_COMPRESSOR := lz4
 BOARD_EROFS_PCLUSTER_SIZE := 262144
