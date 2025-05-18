@@ -12,10 +12,10 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 # Inherit from eqe device
 $(call inherit-product, device/motorola/eqe/device.mk)
 
-# Inherit some common Lineage stuff.
-$(call inherit-product, vendor/lineage/config/common_full_phone.mk)
+# Inherit some common 2by2 stuff.
+$(call inherit-product, vendor/2by2/config/common_full_phone.mk)
 
-PRODUCT_NAME := lineage_eqe
+PRODUCT_NAME := eqe
 PRODUCT_DEVICE := eqe
 PRODUCT_MANUFACTURER := motorola
 PRODUCT_BRAND := motorola
