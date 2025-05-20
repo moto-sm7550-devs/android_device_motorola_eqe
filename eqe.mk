@@ -21,6 +21,8 @@ PRODUCT_MANUFACTURER := motorola
 PRODUCT_BRAND := motorola
 PRODUCT_MODEL := motorola edge 50 pro
 
+CUSTOM_PROCESSOR_INFO := Qualcomm Snapdragon 7 Gen 3
+
 PRODUCT_GMS_CLIENTID_BASE := android-motorola
 
 PRODUCT_BUILD_PROP_OVERRIDES += \
