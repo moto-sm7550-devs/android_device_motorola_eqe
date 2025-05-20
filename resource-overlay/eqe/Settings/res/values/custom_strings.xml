@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2025 The 2by2 Project
+    SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <string name="maintainer_name" translatable="false">kailua</string>
+    <string name="maintainer_telegram" translatable="false">https://t.me/kailua26_dev</string>
+</resources>
