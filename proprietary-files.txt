@@ -791,7 +791,9 @@ vendor/lib64/vendor.goodix.hardware.biometrics.fingerprint@2.1.so
 
 # Gatekeeper
 vendor/bin/hw/android.hardware.gatekeeper@1.0-service-qti
+vendor/bin/hw/android.hardware.gatekeeper@1.0-service-spu-qti
 vendor/etc/init/android.hardware.gatekeeper@1.0-service-qti.rc
+vendor/etc/init/android.hardware.gatekeeper@1.0-service-spu-qti.rc
 vendor/lib64/hw/android.hardware.gatekeeper@1.0-impl-qti.so
 
 # GNSS
@@ -1032,17 +1034,32 @@ vendor/bin/vendor_modprobe.sh
 
 # Keymaster
 vendor/bin/hw/android.hardware.keymaster@4.0-service-qti
+vendor/bin/KmInstallKeybox
+vendor/bin/KmValidateKeybox
+vendor/bin/StoreKeybox
 vendor/lib64/libkeymasterdeviceutils.so
 vendor/lib64/libkeymasterprovision.so
 vendor/lib64/libkeymasterutils.so
+vendor/lib64/liboemcrypto.so
 vendor/lib64/libqtikeymaster4.so
+vendor/lib64/libtpa.so
 
 # Keymint
 vendor/bin/hw/android.hardware.security.keymint-service-qti
+vendor/bin/hw/android.hardware.security.keymint-service-spu-qti
+vendor/bin/hw/android.hardware.security.keymint-service.strongbox-thales
 vendor/etc/init/android.hardware.security.keymint-service-qti.rc
+vendor/etc/init/android.hardware.security.keymint-service.strongbox-thales.rc
 vendor/etc/vintf/manifest/android.hardware.security.keymint-service-qti.xml
+vendor/lib64/libjc_keymint-thales.so
+vendor/lib64/libjc_keymint_transport-thales.so
+vendor/lib64/libjc_keymint_transport_thales.so
 vendor/lib64/libqtikeymint.so
 vendor/lib64/libspcom.so
+vendor/lib64/libspukeymint.so
+vendor/lib64/libspukeymintdeviceutils.so
+vendor/lib64/libspukeymintprovision.so
+vendor/lib64/libspukeymintutils.so
 
 # Listen
 vendor/lib64/libcapiv2svacnnvendor.so
@@ -1744,6 +1761,12 @@ vendor/firmware/vpu30_4v_16mb_unsigned.mbn
 vendor/firmware/vpu30_4v_unsigned.mbn
 vendor/firmware/vpu33_4v.mbn
 vendor/firmware/vpu33_4v_unsigned.mbn
+
+# Weaver
+vendor/bin/hw/android.hardware.weaver-service-spu-qti
+vendor/bin/hw/android.hardware.weaver@1.0-service-thales
+vendor/etc/init/android.hardware.weaver@1.0-service-thales.rc
+vendor/lib64/ese_weaver_thales.so
 
 # Widevine DRM
 vendor/bin/hw/android.hardware.drm-service.widevine

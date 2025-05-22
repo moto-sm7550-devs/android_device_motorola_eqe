@@ -191,6 +191,10 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     android.hardware.biometrics.fingerprint@2.3-service.eqe
 
+# Gatekeeper
+PRODUCT_PACKAGES += \
+    android.hardware.gatekeeper@1.0.vendor
+
 # GPS
 PRODUCT_PACKAGES += \
     gnss@2.0-base.policy \
@@ -247,9 +251,23 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayout/goodix_ts.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/goodix_ts.kl
 
+# Keymaster
+PRODUCT_PACKAGES += \
+    android.hardware.keymaster@3.0.vendor \
+    android.hardware.keymaster@4.0.vendor \
+    android.hardware.keymaster@4.1.vendor \
+    lib_android_keymaster_keymint_utils.vendor \
+    libcppbor_external.vendor \
+    libkeymaster_messages.vendor \
+    libkeymaster_portable.vendor \
+    libpuresoftkeymasterdevice.vendor \
+    libsoft_attestation_cert.vendor
+
 # Keymint
 PRODUCT_PACKAGES += \
-    android.hardware.hardware_keystore.xml
+    android.hardware.hardware_keystore.xml \
+    android.hardware.security.keymint-V4-ndk.vendor \
+    libkeymint.vendor
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.keystore.app_attest_key.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.keystore.app_attest_key.xml \
@@ -339,7 +357,7 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/nfcee_access.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/nfcee_access.xml
 
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/android.hardware.strongbox_keystore_v4.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.strongbox_keystore.xml
+    $(LOCAL_PATH)/configs/android.hardware.strongbox_keystore.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.strongbox_keystore.xml
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/product_privapp-permissions-hotword.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/privapp-permissions-hotword.xml
@@ -441,6 +459,10 @@ PRODUCT_COPY_FILES += \
 
 # VNDK
 PRODUCT_ENFORCE_ARTIFACT_PATH_REQUIREMENTS := strict
+
+# Weaver
+PRODUCT_PACKAGES += \
+    android.hardware.weaver@1.0.vendor
 
 # WiFi
 PRODUCT_PACKAGES += \
