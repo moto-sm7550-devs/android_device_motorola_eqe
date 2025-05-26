@@ -1293,6 +1293,7 @@ vendor/bin/qrtr-ns
 vendor/etc/init/qmipriod.debug.rc
 vendor/etc/init/qmipriod.rc
 vendor/etc/seccomp_policy/qti-systemd.policy
+vendor/etc/sec_config
 vendor/lib64/libidl.so
 vendor/lib64/libmdmcutback.so
 vendor/lib64/libmdmdetect.so
