@@ -446,6 +446,23 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     vendor/qcom/opensource/vibrator/excluded-input-devices.xml:$(TARGET_COPY_OUT_VENDOR)/etc/excluded-input-devices.xml
 
+# VINTF
+DEVICE_FRAMEWORK_MANIFEST_FILE += $(LOCAL_PATH)/framework_manifest.xml
+DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := \
+    $(LOCAL_PATH)/device_framework_matrix.xml \
+    hardware/qcom-caf/common/vendor_framework_compatibility_matrix.xml \
+    vendor/lineage/config/device_framework_matrix.xml
+DEVICE_MATRIX_FILE := hardware/qcom-caf/common/compatibility_matrix.xml
+DEVICE_MANIFEST_SKUS := crow
+DEVICE_MANIFEST_CROW_FILES += \
+    $(LOCAL_PATH)/manifest_crow.xml \
+    hardware/qcom-caf/sm8550/audio/primary-hal/configs/common/manifest_non_qmaa.xml \
+    hardware/qcom-caf/sm8550/audio/primary-hal/configs/common/manifest_non_qmaa_extn.xml \
+    $(LOCAL_PATH)/configs/secure_element-service.xml
+ODM_MANIFEST_SKUS += dn dne
+ODM_MANIFEST_DN_FILES := $(LOCAL_PATH)/manifest_eqe_dn.xml
+ODM_MANIFEST_DNE_FILES := $(LOCAL_PATH)/manifest_eqe_dne.xml
+
 # VNDK
 PRODUCT_ENFORCE_ARTIFACT_PATH_REQUIREMENTS := strict
 

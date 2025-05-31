@@ -172,23 +172,6 @@ TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/config.fs
 # GPS
 BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := default
 
-# HIDL
-DEVICE_FRAMEWORK_MANIFEST_FILE += $(DEVICE_PATH)/framework_manifest.xml
-DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := \
-    $(DEVICE_PATH)/device_framework_matrix.xml \
-    hardware/qcom-caf/common/vendor_framework_compatibility_matrix.xml \
-    vendor/lineage/config/device_framework_matrix.xml
-DEVICE_MATRIX_FILE := hardware/qcom-caf/common/compatibility_matrix.xml
-DEVICE_MANIFEST_SKUS := crow
-DEVICE_MANIFEST_CROW_FILES += \
-    $(DEVICE_PATH)/manifest_crow.xml \
-    hardware/qcom-caf/sm8550/audio/primary-hal/configs/common/manifest_non_qmaa.xml \
-    hardware/qcom-caf/sm8550/audio/primary-hal/configs/common/manifest_non_qmaa_extn.xml \
-    $(DEVICE_PATH)/configs/secure_element-service.xml
-ODM_MANIFEST_SKUS += dn dne
-ODM_MANIFEST_DN_FILES := $(DEVICE_PATH)/manifest_eqe_dn.xml
-ODM_MANIFEST_DNE_FILES := $(DEVICE_PATH)/manifest_eqe_dne.xml
-
 # Metadata
 BOARD_USES_METADATA_PARTITION := true
 
