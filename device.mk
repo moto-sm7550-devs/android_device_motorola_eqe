@@ -417,9 +417,6 @@ PRODUCT_SOONG_NAMESPACES += \
 PRODUCT_PACKAGES += \
     MotoNrEnabler
 
-PRODUCT_PACKAGES += \
-    qcrilNrDb_vendor
-
 # Thermal
 PRODUCT_PACKAGES += \
     android.hardware.thermal-service.qti
