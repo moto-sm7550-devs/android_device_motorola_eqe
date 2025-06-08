@@ -410,6 +410,9 @@ PRODUCT_PACKAGES += \
 PRODUCT_BOOT_JARS += \
     telephony-ext
 
+PRODUCT_PACKAGES += \
+    libqsap_sdk
+
 # Thermal
 PRODUCT_PACKAGES += \
     android.hardware.thermal-service.qti
