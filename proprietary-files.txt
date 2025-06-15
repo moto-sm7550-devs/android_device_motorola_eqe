@@ -103,7 +103,6 @@ vendor/etc/audio/sku_crow/mixer_paths_crow_idp.xml
 vendor/etc/audio/sku_crow/resourcemanager_crow_idp.xml
 vendor/etc/audio_ext_spkr.conf
 vendor/etc/audio_policy_volumes.xml
-vendor/etc/card-defs.xml
 vendor/etc/default_volume_tables.xml
 vendor/etc/usecaseKvManager.xml
 
