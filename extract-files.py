@@ -68,16 +68,6 @@ blob_fixups: blob_fixups_user_type = {
         .apktool_patch('ims-patches'),
     'vendor/lib64/libwvhidl.so': blob_fixup()
         .add_needed('libcrypto_shim.so'),
-    'system_ext/lib64/libwfdmmsrc_system.so': blob_fixup()
-        .add_needed('libgui_shim.so'),
-    'system_ext/lib64/libwfdnative.so': blob_fixup()
-        .add_needed('libbinder_shim.so')
-        .add_needed('libinput_shim.so')
-        .replace_needed('android.hidl.base@1.0.so', 'libhidlbase.so'),
-    'system_ext/lib64/libwfdservice.so': blob_fixup()
-        .add_needed('libaudioclient_shim.so')
-        .replace_needed('android.hardware.common-V2-ndk_platform.so', 'android.hardware.common-V2-ndk.so')
-        .replace_needed('android.media.audio.common.types-V2-cpp.so', 'android.media.audio.common.types-V4-cpp.so'),
     ('vendor/bin/hw/android.hardware.security.keymint-service-qti', 'vendor/lib64/libqtikeymint.so'): blob_fixup()
         .add_needed('android.hardware.security.rkp-V3-ndk.so'),
     ('vendor/etc/media_codecs_crow_v0.xml', 'vendor/etc/media_codecs_crow_v1.xml', 'vendor/etc/media_codecs_crow_v2.xml'): blob_fixup()
