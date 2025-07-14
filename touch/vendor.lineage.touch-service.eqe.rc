@@ -1,0 +1,7 @@
+on post-fs
+    chown system system /sys/class/touchscreen/primary/single_tap_enabled
+
+service vendor.touch-hal /vendor/bin/hw/vendor.lineage.touch-service.eqe
+    class hal
+    user system
+    group system

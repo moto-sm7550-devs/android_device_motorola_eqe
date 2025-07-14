@@ -425,7 +425,7 @@ PRODUCT_PACKAGES += \
 
 # Touch
 PRODUCT_PACKAGES += \
-    vendor.lineage.touch@1.0-service.eqe
+    vendor.lineage.touch-service.eqe
 
 # Update engine
 PRODUCT_PACKAGES += \

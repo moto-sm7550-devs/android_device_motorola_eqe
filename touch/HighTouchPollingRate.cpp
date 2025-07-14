@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The LineageOS Project
+ * Copyright (C) 2022-2025 The LineageOS Project
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -12,33 +12,33 @@
 #include <android-base/logging.h>
 #include <android-base/strings.h>
 
+namespace aidl {
 namespace vendor {
 namespace lineage {
 namespace touch {
-namespace V1_0 {
-namespace implementation {
 
 const std::string kInterpolationPath = "/sys/class/touchscreen/primary/interpolation";
 
-Return<bool> HighTouchPollingRate::isEnabled() {
+ndk::ScopedAStatus HighTouchPollingRate::getEnabled(bool* _aidl_return) {
     std::string buf;
     if (!android::base::ReadFileToString(kInterpolationPath, &buf)) {
         LOG(ERROR) << "Failed to read " << kInterpolationPath;
-        return false;
+        return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
     }
-    return std::stoi(android::base::Trim(buf)) == 1;
+
+    *_aidl_return = std::stoi(android::base::Trim(buf)) == 1;
+    return ndk::ScopedAStatus::ok();
 }
 
-Return<bool> HighTouchPollingRate::setEnabled(bool enabled) {
+ndk::ScopedAStatus HighTouchPollingRate::setEnabled(bool enabled) {
     if (!android::base::WriteStringToFile(std::to_string(enabled), kInterpolationPath)) {
         LOG(ERROR) << "Failed to write " << kInterpolationPath;
-        return false;
+        return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
     }
-    return true;
+    return ndk::ScopedAStatus::ok();
 }
 
-}  // namespace implementation
-}  // namespace V1_0
 }  // namespace touch
 }  // namespace lineage
 }  // namespace vendor
+}  // namespace aidl
