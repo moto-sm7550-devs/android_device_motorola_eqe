@@ -1,5 +1,5 @@
 ## All proprietary files from this list, unless pinned and noted otherwise,
-## are from EQE_RETAIL_15_V1UMS35H.10-67-3-1.
+## are from EQE_RETAIL_15_V1UM35M.10-67-9.
 
 # Current blobs with ELF checks disabled:
 # audio.primary.crow.so depends on liblx-osal and vendor.qti.hardware.AGMIPC@1.0-impl, which are gnu makefile targets
