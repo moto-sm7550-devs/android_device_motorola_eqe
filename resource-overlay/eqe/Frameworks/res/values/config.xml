@@ -27,17 +27,18 @@
     <integer-array name="config_autoBrightnessLevels">
         <item>2</item>
         <item>4</item>
-        <item>5</item>
         <item>10</item>
+        <item>20</item>
         <item>40</item>
         <item>100</item>
         <item>325</item>
         <item>1250</item>
         <item>3500</item>
-        <item>5500</item>
+        <item>5000</item>
         <item>10000</item>
-        <item>50000</item>
-        <item>100000</item>
+        <item>20000</item>
+        <item>30000</item>
+        <item>200000</item>
     </integer-array>
 
     <!-- Array of desired screen brightness in nits corresponding to the lux values
@@ -53,22 +54,23 @@
          This array should have size one greater than the size of the config_autoBrightnessLevels
          array. The brightness values must be non-negative and non-decreasing. This must be
          overridden in platform specific overlays -->
-    <array name="config_autoBrightnessDisplayValuesNits">
+    <integer-array name="config_autoBrightnessDisplayValuesNits">
         <item>3</item>
         <item>7</item>
         <item>10</item>
-        <item>12</item>
         <item>24</item>
+        <item>64</item>
         <item>82</item>
-        <item>96</item>
-        <item>130</item>
+        <item>90</item>
+        <item>105</item>
         <item>192</item>
-        <item>325</item>
+        <item>412</item>
         <item>500</item>
         <item>700</item>
-        <item>800</item>
         <item>1000</item>
-    </array>
+        <item>1200</item>
+        <item>1350</item>
+    </integer-array>
 
     <!-- An array describing the screen's backlight values corresponding to the brightness
          values in the config_screenBrightnessNits array.
@@ -77,17 +79,18 @@
     <integer-array name="config_screenBrightnessBacklight">
         <item>7</item>
         <item>27</item>
-        <item>33</item>
-        <item>37</item>
-        <item>52</item>
-        <item>95</item>
-        <item>103</item>
-        <item>118</item>
-        <item>141</item>
-        <item>182</item>
-        <item>219</item>
-        <item>233</item>
-        <item>241</item>
+        <item>34</item>
+        <item>53</item>
+        <item>86</item>
+        <item>96</item>
+        <item>101</item>
+        <item>108</item>
+        <item>143</item>
+        <item>200</item>
+        <item>222</item>
+        <item>231</item>
+        <item>244</item>
+        <item>253</item>
         <item>255</item>
     </integer-array>
 
@@ -102,17 +105,18 @@
         <item>3</item>
         <item>7</item>
         <item>10</item>
-        <item>12</item>
         <item>24</item>
+        <item>64</item>
         <item>82</item>
-        <item>96</item>
-        <item>130</item>
+        <item>90</item>
+        <item>105</item>
         <item>192</item>
-        <item>325</item>
+        <item>412</item>
         <item>500</item>
         <item>700</item>
-        <item>800</item>
         <item>1000</item>
+        <item>1200</item>
+        <item>1350</item>
     </integer-array>
 
     <!-- Stability requirements in milliseconds for accepting a new brightness level.  This is used
@@ -263,14 +267,20 @@
          non-zero. -->
     <integer name="config_defaultPeakRefreshRate">120</integer>
 
+    <!-- Default refresh rate in the zone defined by brightness and ambient thresholds.
+         If non-positive, then the refresh rate is unchanged even if thresholds are configured. -->
+    <integer name="config_defaultRefreshRateInZone">90</integer>
+
     <!-- Not allow to switch to higher refresh rate when (display, ambient) brightness falls into
          the region defined by the two arrays -->
-    <array name="config_brightnessThresholdsOfPeakRefreshRate">
-        <item>50</item>
-    </array>
-    <array name="config_ambientThresholdsOfPeakRefreshRate">
+    <integer-array name="config_brightnessThresholdsOfPeakRefreshRate">
+        <item>68</item>
+        <item>82</item>
+    </integer-array>
+    <integer-array name="config_ambientThresholdsOfPeakRefreshRate">
         <item>-1</item>
-    </array>
+        <item>70</item>
+    </integer-array>
 
     <!-- MMS user agent string -->
     <string name="config_mms_user_agent" translatable="false">motorolaedge50pro</string>
@@ -281,7 +291,7 @@
     <array name="config_availableColorModes">
         <item>0</item> <!-- COLOR_MODE_NATURAL -->     <!-- This uses colorimetric render intents-->
         <item>1</item> <!-- COLOR_MODE_BOOSTED -->     <!-- This applies a 10% boost using the PCC-->
-        <item>3</item> <!-- COLOR_MODE_AUTOMATIC -->   <!-- This uses enhanced render intents-->
+        <item>2</item> <!-- COLOR_MODE_SATURATED -->   <!-- Similar to vivid but over-saturated-->
     </array>
 
     <!-- How long it takes for the HW to start illuminating after the illumination is requested. -->
