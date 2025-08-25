@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The LineageOS Project
+ * Copyright (C) 2020 The LineageOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,37 +14,39 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "vendor.lineage.touch-service.eqe"
+#define LOG_TAG "lineage.touch@1.0-service.lge_msmnile"
 
 #include <android-base/logging.h>
-#include <android/binder_manager.h>
-#include <android/binder_process.h>
+#include <hidl/HidlTransportSupport.h>
 
 #include "HighTouchPollingRate.h"
 #include "TouchscreenGesture.h"
 
-using aidl::vendor::lineage::touch::HighTouchPollingRate;
-using aidl::vendor::lineage::touch::TouchscreenGesture;
+using ::vendor::lineage::touch::V1_0::IHighTouchPollingRate;
+using ::vendor::lineage::touch::V1_0::ITouchscreenGesture;
+using ::vendor::lineage::touch::V1_0::implementation::HighTouchPollingRate;
+using ::vendor::lineage::touch::V1_0::implementation::TouchscreenGesture;
 
 int main() {
-    binder_status_t status = STATUS_OK;
+    android::sp<IHighTouchPollingRate> highTouchPollingRate = new HighTouchPollingRate();
+    android::sp<ITouchscreenGesture> touchscreenGesture = new TouchscreenGesture();
 
-    ABinderProcess_setThreadPoolMaxThreadCount(0);
+    android::hardware::configureRpcThreadpool(1, true /*callerWillJoin*/);
 
-    std::shared_ptr<HighTouchPollingRate> htpr = ndk::SharedRefBase::make<HighTouchPollingRate>();
-    status = AServiceManager_addService(
-            htpr->asBinder().get(), HighTouchPollingRate::makeServiceName("default").c_str());
-    CHECK_EQ(status, STATUS_OK) << "Cannot register touchscreen glove HAL service.";
+    if (highTouchPollingRate->registerAsService() != android::OK) {
+        LOG(ERROR) << "Cannot register touchscreen glove HAL service.";
+        return 1;
+    }
 
-    std::shared_ptr<TouchscreenGesture> tg = ndk::SharedRefBase::make<TouchscreenGesture>();
-    status = AServiceManager_addService(
-            tg->asBinder().get(), TouchscreenGesture::makeServiceName("default").c_str());
-    CHECK_EQ(status, STATUS_OK) << "Cannot register touchscreen gesture HAL service.";
+    if (touchscreenGesture->registerAsService() != android::OK) {
+        LOG(ERROR) << "Cannot register touchscreen gesture HAL service.";
+        return 1;
+    }
 
     LOG(INFO) << "Touchscreen HAL service ready.";
 
-    ABinderProcess_joinThreadPool();
+    android::hardware::joinRpcThreadpool();
 
     LOG(ERROR) << "Touchscreen HAL service failed to join thread pool.";
-    return EXIT_FAILURE;  // should not reach
+    return 1;
 }

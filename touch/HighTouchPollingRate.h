@@ -1,25 +1,30 @@
 /*
- * Copyright (C) 2022-2025 The LineageOS Project
+ * Copyright (C) 2022 The LineageOS Project
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 
 #pragma once
 
-#include <aidl/vendor/lineage/touch/BnHighTouchPollingRate.h>
+#include <vendor/lineage/touch/1.0/IHighTouchPollingRate.h>
 
-namespace aidl {
 namespace vendor {
 namespace lineage {
 namespace touch {
+namespace V1_0 {
+namespace implementation {
 
-class HighTouchPollingRate : public BnHighTouchPollingRate {
+using ::android::hardware::Return;
+
+class HighTouchPollingRate : public IHighTouchPollingRate {
   public:
-    ndk::ScopedAStatus getEnabled(bool* _aidl_return) override;
-    ndk::ScopedAStatus setEnabled(bool enabled) override;
+    // Methods from ::vendor::lineage::touch::V1_0::IHighTouchPollingRate follow.
+    Return<bool> isEnabled() override;
+    Return<bool> setEnabled(bool enabled) override;
 };
 
+}  // namespace implementation
+}  // namespace V1_0
 }  // namespace touch
 }  // namespace lineage
 }  // namespace vendor
-}  // namespace aidl
