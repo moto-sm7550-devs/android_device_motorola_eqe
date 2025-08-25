@@ -83,6 +83,21 @@ blob_fixups: blob_fixups_user_type = {
         .add_needed('libgui_shim_vendor.so'),
     ('vendor/lib64/sensors.moto.so', 'vendor/lib64/nfc_nci.nqx.default.hw.so'): blob_fixup()
         .add_needed('libbase_shim.so'),
+    'system_ext/lib64/libwfdmmsrc_system.so': blob_fixup()
+        .add_needed('libgui_shim.so'),
+    'system_ext/lib64/libwfdnative.so': blob_fixup()
+        .add_needed('libbinder_shim.so')
+        .add_needed('libinput_shim.so'),
+    'system_ext/lib64/libwfdservice.so': blob_fixup()
+        .replace_needed(
+            'android.media.audio.common.types-V2-cpp.so',
+            'android.media.audio.common.types-V4-cpp.so',
+        )
+        .add_needed('libaudioclient_shim.so')
+        .replace_needed(
+            'android.hardware.common-V2-ndk_platform.so',
+            'android.hardware.common-V2-ndk.so',
+        ),
 }  # fmt: skip
 
 extract_fns: extract_fns_user_type = {
